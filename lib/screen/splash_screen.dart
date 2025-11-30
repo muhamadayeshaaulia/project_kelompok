@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
 class MySplashScreen extends StatefulWidget {
-  const MySplashScreen({super.key});
+  final String nextRoute;
+  const MySplashScreen({super.key, this.nextRoute = '/page1'});
 
   @override
   State<MySplashScreen> createState() => _MySplashScreenState();
@@ -18,7 +19,7 @@ class _MySplashScreenState extends State<MySplashScreen> {
   _navigateToHome() async {
     await Future.delayed(const Duration(seconds: 3));
     if (mounted) {
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, widget.nextRoute);
     }
   }
 
@@ -36,9 +37,9 @@ class _MySplashScreenState extends State<MySplashScreen> {
               height: 300,
               fit: BoxFit.contain,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 4),
             const Text(
-              'Welcome To My App',
+              'Sabar Boss..!',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
