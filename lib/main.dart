@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_kelompok/screen/home_screen.dart';
+import 'package:project_kelompok/screen/page1.dart';
 import 'package:project_kelompok/screen/splash_screen.dart';
 
 void main() {
@@ -18,6 +19,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const MySplashScreen(),
+        '/page1': (context) => const MyPage1(),
         '/home': (context) => const HomeScreen(),
       },
     );

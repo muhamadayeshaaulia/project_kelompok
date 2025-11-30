@@ -60,6 +60,7 @@ flutter:
 
   assets:
       - assets/annimations/Running_Cat.json
+      - assets/images/images1.webp
 
 
   # To add assets to your application, add an assets section, like this:
