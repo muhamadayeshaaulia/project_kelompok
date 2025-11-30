@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:project_kelompok/screen/splash_screen.dart';
 
-class MyPage1 extends StatelessWidget {
-  const MyPage1({super.key});
+class MyPage3 extends StatelessWidget {
+  const MyPage3({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class MyPage1 extends StatelessWidget {
               shape: BoxShape.circle,
               color: Colors.blue,
               image: DecorationImage(
-                image: AssetImage('assets/images/images1.webp'),
+                image: AssetImage('assets/images/images3.webp'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -39,7 +39,7 @@ class MyPage1 extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          const MySplashScreen(nextRoute: '/page2'),
+                          const MySplashScreen(nextRoute: '/home'),
                     ),
                     (Route<dynamic> route) => false,
                   );
