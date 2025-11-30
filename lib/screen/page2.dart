@@ -28,6 +28,45 @@ class MyPage2 extends StatelessWidget {
             style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
+           SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                child: Container(
+                  margin: EdgeInsets.all(10),
+                  height: 20,
+                  width: 20,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.blue[100],
+                  ),
+                ),
+              ),
+              SizedBox(
+                child: Container(
+                  margin: EdgeInsets.all(10),
+                  height: 20,
+                  width: 20,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.blue,
+                  ),
+                ),
+              ),
+              SizedBox(
+                child: Container(
+                  margin: EdgeInsets.all(10),
+                  height: 20,
+                  width: 20,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.blue[100],
+                  ),
+                ),
+              ),
+            ],
+          ),
           SizedBox(height: 20),
           Container(
             child: SizedBox(
