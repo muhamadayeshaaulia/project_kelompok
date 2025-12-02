@@ -78,7 +78,7 @@ class MyPage3 extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          const MySplashScreen(nextRoute: '/home'),
+                          const MySplashScreen(nextRoute: '/login'),
                     ),
                     (Route<dynamic> route) => false,
                   );
