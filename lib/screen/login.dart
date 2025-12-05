@@ -16,13 +16,14 @@ class MyLogin extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(10.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 'Login untuk melanjutkan perjalanan mu',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
               ),
               Lottie.asset(
                 'assets/annimations/Bus_Loader.json',
@@ -43,7 +44,7 @@ class MyLogin extends StatelessWidget {
                   hintText: 'Masukan Email Anda',
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 10),
               TextField(
                 keyboardType: TextInputType.visiblePassword,
                 obscureText: true,
@@ -61,6 +62,22 @@ class MyLogin extends StatelessWidget {
                     onPressed: () {},
                   ),
                 ),
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () {},
+                  child: Text(
+                    'Forget Password?',
+                    style: TextStyle(color: Colors.blue),
+                  ),
+                ),
+              ),
+              SizedBox(height: 5),
+              Container(
+                height: 50,
+                width: double.infinity,
+                child: ElevatedButton(onPressed: () {}, child: Text('Login')),
               ),
             ],
           ),
