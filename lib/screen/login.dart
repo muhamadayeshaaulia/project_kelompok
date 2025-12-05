@@ -13,7 +13,7 @@ class MyLogin extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Login untuk melanjukan perjalan an mu',
+              'Login untuk melanjutkan perjalanan mu',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             Lottie.asset(
