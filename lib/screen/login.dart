@@ -79,7 +79,6 @@ class MyLogin extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(onPressed: () {}, child: Text('Login')),
               ),
-              ),
               SizedBox(height: 20),
               TextField(
                 keyboardType: TextInputType.visiblePassword,
