@@ -79,25 +79,6 @@ class MyLogin extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(onPressed: () {}, child: Text('Login')),
               ),
-              SizedBox(height: 20),
-              TextField(
-                keyboardType: TextInputType.visiblePassword,
-                obscureText: true,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.blue),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  prefixIcon: Icon(Icons.lock),
-                  labelText: 'Password',
-                  hintText: 'Masukan password anda',
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.visibility),
-                    onPressed: () {},
-                  ),
-                ),
-              ),
             ],
           ),
         ),
