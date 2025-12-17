@@ -63,6 +63,7 @@ flutter:
   assets:
       - assets/annimations/Running_Cat.json
       - assets/annimations/Bus_Loader.json
+      - assets/annimations/Photography.json
       - assets/images/images1.jpg
       - assets/images/images2.jpg
       - assets/images/images3.jpg

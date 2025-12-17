@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
-class MyLogin extends StatelessWidget {
+class MyLogin extends StatefulWidget {
   const MyLogin({super.key});
 
+  @override
+  State<MyLogin> createState() => _MyLoginState();
+}
+
+class _MyLoginState extends State<MyLogin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +31,7 @@ class MyLogin extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               Lottie.asset(
-                'assets/annimations/Bus_Loader.json',
+                'assets/annimations/Photography.json',
                 height: 200,
                 width: 200,
                 fit: BoxFit.contain,
