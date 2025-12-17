@@ -25,21 +25,12 @@ class _MyLoginState extends State<MyLogin> {
         email: emailCtrl.text.trim(),
         password: passCtrl.text,
       );
-      final user = credential.user;
+
       if (!mounted) return;
 
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: const Text('Login Success'),
-          content: Text('UID: ${user?.uid}\nEmail: ${user?.email}'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MyHomePage()),
       );
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -68,10 +59,8 @@ class _MyLoginState extends State<MyLogin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Menggunakan resizeToAvoidBottomInset agar keyboard tidak menutupi TextField
       resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
-        // Agar halaman bisa di-scroll saat keyboard muncul
         child: Container(
           height: MediaQuery.of(context).size.height,
           decoration: const BoxDecoration(
@@ -99,7 +88,7 @@ class _MyLoginState extends State<MyLogin> {
                 ),
                 const SizedBox(height: 20),
                 TextField(
-                  controller: emailCtrl, // Menghubungkan controller email
+                  controller: emailCtrl,
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
@@ -109,13 +98,11 @@ class _MyLoginState extends State<MyLogin> {
                     ),
                     prefixIcon: const Icon(Icons.email),
                     labelText: 'Email',
-                    hintText: 'Masukan Email Anda',
                   ),
                 ),
                 const SizedBox(height: 15),
                 TextField(
-                  controller: passCtrl, // Menghubungkan controller password
-                  keyboardType: TextInputType.visiblePassword,
+                  controller: passCtrl,
                   obscureText: true,
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
@@ -125,39 +112,22 @@ class _MyLoginState extends State<MyLogin> {
                     ),
                     prefixIcon: const Icon(Icons.lock),
                     labelText: 'Password',
-                    hintText: 'Masukan password anda',
-                    suffixIcon: const Icon(Icons.visibility),
                   ),
                 ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      'Forget Password?',
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                  ),
-                ),
-
-                // Menampilkan pesan error jika ada
                 if (_error != null) ...[
+                  const SizedBox(height: 10),
                   Text(
                     _error!,
-                    style: const TextStyle(color: Colors.red, fontSize: 13),
+                    style: const TextStyle(color: Colors.red, fontSize: 12),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 10),
                 ],
-
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
                 SizedBox(
                   height: 50,
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _isLoading
-                        ? null
-                        : _login, // Matikan tombol saat loading
+                    onPressed: _isLoading ? null : _login,
                     child: _isLoading
                         ? const SizedBox(
                             height: 20,
