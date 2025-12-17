@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:project_kelompok/screen/page1.dart';
+import 'package:project_kelompok/screen/home_page.dart';
 
 class MyLogin extends StatefulWidget {
   const MyLogin({super.key});
@@ -31,7 +31,7 @@ class _MyLoginState extends State<MyLogin> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const MyPage1()),
+        MaterialPageRoute(builder: (context) => const MyHomePage()),
       );
     } on FirebaseAuthException catch (e) {
       setState(() {
