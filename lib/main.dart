@@ -5,8 +5,12 @@ import 'package:project_kelompok/screen/page1.dart';
 import 'package:project_kelompok/screen/page2.dart';
 import 'package:project_kelompok/screen/page3.dart';
 import 'package:project_kelompok/screen/splash_screen.dart';
+import 'firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(MyApp());
 }
 

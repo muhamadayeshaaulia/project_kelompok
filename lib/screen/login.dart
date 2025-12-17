@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
@@ -26,6 +27,7 @@ class _MyLoginState extends State<MyLogin> {
       );
       final user = credential.user;
       if (!mounted) return;
+
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
@@ -48,88 +50,125 @@ class _MyLoginState extends State<MyLogin> {
         _error = e.toString();
       });
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
+  }
+
+  @override
+  void dispose() {
+    emailCtrl.dispose();
+    passCtrl.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.white, Colors.yellow],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+      // Menggunakan resizeToAvoidBottomInset agar keyboard tidak menutupi TextField
+      resizeToAvoidBottomInset: true,
+      body: SingleChildScrollView(
+        // Agar halaman bisa di-scroll saat keyboard muncul
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.white, Colors.yellow],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
           ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Login untuk melanjutkan perjalanan mu',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-              Lottie.asset(
-                'assets/annimations/Photography.json',
-                height: 200,
-                width: 200,
-                fit: BoxFit.contain,
-              ),
-              TextField(
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.blue),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  prefixIcon: Icon(Icons.email),
-                  labelText: 'Email',
-                  hintText: 'Masukan Email Anda',
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Login untuk melanjutkan perjalanan mu',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
                 ),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                keyboardType: TextInputType.visiblePassword,
-                obscureText: true,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.blue),
-                    borderRadius: BorderRadius.circular(20),
+                Lottie.asset(
+                  'assets/annimations/Photography.json',
+                  height: 200,
+                  width: 200,
+                  fit: BoxFit.contain,
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: emailCtrl, // Menghubungkan controller email
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.blue),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    prefixIcon: const Icon(Icons.email),
+                    labelText: 'Email',
+                    hintText: 'Masukan Email Anda',
                   ),
-                  prefixIcon: Icon(Icons.lock),
-                  labelText: 'Password',
-                  hintText: 'Masukan password anda',
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.visibility),
+                ),
+                const SizedBox(height: 15),
+                TextField(
+                  controller: passCtrl, // Menghubungkan controller password
+                  keyboardType: TextInputType.visiblePassword,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.blue),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    prefixIcon: const Icon(Icons.lock),
+                    labelText: 'Password',
+                    hintText: 'Masukan password anda',
+                    suffixIcon: const Icon(Icons.visibility),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
                     onPressed: () {},
+                    child: const Text(
+                      'Forget Password?',
+                      style: TextStyle(color: Colors.blue),
+                    ),
                   ),
                 ),
-              ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {},
-                  child: Text(
-                    'Forget Password?',
-                    style: TextStyle(color: Colors.blue),
+
+                // Menampilkan pesan error jika ada
+                if (_error != null) ...[
+                  Text(
+                    _error!,
+                    style: const TextStyle(color: Colors.red, fontSize: 13),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 10),
+                ],
+
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 50,
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _isLoading
+                        ? null
+                        : _login, // Matikan tombol saat loading
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Login'),
                   ),
                 ),
-              ),
-              SizedBox(height: 5),
-              Container(
-                height: 50,
-                width: double.infinity,
-                child: ElevatedButton(onPressed: () {}, child: Text('Login')),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
