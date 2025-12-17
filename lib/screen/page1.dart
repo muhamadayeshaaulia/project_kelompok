@@ -17,14 +17,14 @@ class MyPage1 extends StatelessWidget {
               shape: BoxShape.circle,
               color: Colors.blue,
               image: DecorationImage(
-                image: AssetImage('assets/images/images1.webp'),
+                image: AssetImage('assets/images/images1.jpg'),
                 fit: BoxFit.cover,
               ),
             ),
           ),
           SizedBox(height: 20),
           Text(
-            'Perjalanan yg menyenangkan dengan keluarga dengan harga yg terjangkau \n Ayo pilih buss terbaik mu di aplikasi kami!',
+            'Pengalaman yg menyenangkan dengan keluarga, kerabat, ataupun teman dengan harga yg terjangkau \n Ayo pilih photobooth terbaik mu di aplikasi kami!',
             style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),

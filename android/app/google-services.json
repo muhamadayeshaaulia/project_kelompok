@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "542611358316",
+    "project_id": "project-rozak",
+    "storage_bucket": "project-rozak.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:542611358316:android:3bdf504386f699ca06ce49",
+        "android_client_info": {
+          "package_name": "com.example.project_kelompok"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVPX_VMw4skZ_8T57eaiul9kATdv47HS4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:542611358316:android:15dc5862cff2716906ce49",
+        "android_client_info": {
+          "package_name": "com.example.tugas_week_10_1123150006"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVPX_VMw4skZ_8T57eaiul9kATdv47HS4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:542611358316:android:6de96f673c7107ac06ce49",
+        "android_client_info": {
+          "package_name": "com.rozak.login"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVPX_VMw4skZ_8T57eaiul9kATdv47HS4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
