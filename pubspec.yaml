@@ -61,9 +61,9 @@ flutter:
   assets:
       - assets/annimations/Running_Cat.json
       - assets/annimations/Bus_Loader.json
-      - assets/images/images1.webp
-      - assets/images/images2.webp
-      - assets/images/images3.webp
+      - assets/images/images1.jpg
+      - assets/images/images2.jpg
+      - assets/images/images3.jpg
       - assets/images/images4.png
 
 
