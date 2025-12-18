@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:project_kelompok/screen/home_page.dart';
+import 'package:project_kelompok/screen/register.dart';
 
 class MyLogin extends StatefulWidget {
   const MyLogin({super.key});
@@ -149,7 +150,14 @@ class _MyLoginState extends State<MyLogin> {
                       style: TextStyle(color: Colors.black54),
                     ),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MyRegis(),
+                          ),
+                        );
+                      },
                       child: const Text(
                         "Daftar sekarang",
                         style: TextStyle(color: Colors.teal),
