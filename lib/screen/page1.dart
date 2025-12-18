@@ -8,35 +8,30 @@ class MyPage1 extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
-    children: [
-      Positioned.fill(
-        child: FittedBox(
-          fit: BoxFit.contain,
-          child: Image.asset('assets/images/home1.jpg'),
-        ),
-      ),
+        children: [
+          Positioned.fill(
+            child: Image.asset('assets/images/home1.jpg', fit: BoxFit.cover),
+          ),
 
-      Positioned.fill(
-        child: Container(
-          color: Colors.black.withOpacity(0.25),
-        ),
-      ),
+          Positioned.fill(
+            child: Container(color: Colors.black.withOpacity(0.25)),
+          ),
 
-      Positioned(
-        top: 80,
-        left: 0,
-        right: 0,
-        child: Center(
-          child: Text(
-            'GlobalPhotoBooth',
-            style: TextStyle(
-              fontSize: 48,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+          Positioned(
+            top: 80,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Text(
+                'GlobalPhotoBooth',
+                style: TextStyle(
+                  fontSize: 48,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
-        ),
-      ),
 
           Positioned(
             top: 40,
@@ -81,7 +76,7 @@ class MyPage1 extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              const MySplashScreen(nextRoute: '/login'),
+                              const MySplashScreen(nextRoute: '/regis'),
                         ),
                       );
                     },
@@ -99,16 +94,21 @@ class MyPage1 extends StatelessWidget {
 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Text(
+                    children: [
+                      const Text(
                         'Sudah punya akun? ',
                         style: TextStyle(color: Colors.white),
                       ),
-                      Text(
-                        'Masuk',
-                        style: TextStyle(
-                          color: Colors.lightBlueAccent,
-                          fontWeight: FontWeight.bold,
+                      InkWell(
+                        onTap: () {
+                          Navigator.pushReplacementNamed(context, '/login');
+                        },
+                        child: const Text(
+                          'Masuk',
+                          style: TextStyle(
+                            color: Colors.lightBlueAccent,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],
