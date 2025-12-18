@@ -7,91 +7,134 @@ class MyPage1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      body: Stack(
         children: [
-          Container(
-            height: 160,
-            width: 160,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.blue,
-              image: DecorationImage(
-                image: AssetImage('assets/images/images1.jpg'),
-                fit: BoxFit.cover,
+          Positioned.fill(
+            child: Image.asset('assets/images/home1.jpg', fit: BoxFit.cover),
+          ),
+
+          Positioned.fill(
+            child: Container(color: Colors.black.withOpacity(0.25)),
+          ),
+
+          Positioned(
+            top: 80,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Text(
+                'MyPhotoBooth',
+                style: TextStyle(
+                  fontSize: 48,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
-          SizedBox(height: 20),
-          Text(
-            'Pengalaman yg menyenangkan dengan keluarga, kerabat, ataupun teman dengan harga yg terjangkau \n Ayo pilih photobooth terbaik mu di aplikasi kami!',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                child: Container(
-                  margin: EdgeInsets.all(10),
-                  height: 20,
-                  width: 20,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.blue,
+
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _authButton(
+                    imagePath: 'assets/images/google1.jpg',
+                    text: 'Sambungkan dengan Google',
+                    onTap: () {},
                   ),
-                ),
-              ),
-              SizedBox(
-                child: Container(
-                  margin: EdgeInsets.all(10),
-                  height: 20,
-                  width: 20,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.blue[100],
+
+                  const SizedBox(height: 12),
+
+                  _authButton(
+                    imagePath: 'assets/images/email.jpg',
+                    text: 'Lanjut dengan Email',
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const MySplashScreen(nextRoute: '/register'),
+                        ),
+                      );
+                    },
                   ),
-                ),
-              ),
-              SizedBox(
-                child: Container(
-                  margin: EdgeInsets.all(10),
-                  height: 20,
-                  width: 20,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.blue[100],
+
+                  const SizedBox(height: 20),
+
+                  const Text(
+                    'Dengan mendaftar, kamu menyetujui\nKetentuan Penggunaan dan Kebijakan Privasi kami',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
                   ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 20),
-          Container(
-            child: SizedBox(
-              height: 40,
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          const MySplashScreen(nextRoute: '/page2'),
-                    ),
-                    (Route<dynamic> route) => false,
-                  );
-                },
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-                child: Text(
-                  "Next",
-                  style: TextStyle(fontSize: 16, color: Colors.black),
-                ),
+
+                  const SizedBox(height: 15),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Sudah punya akun? ',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          Navigator.pushReplacementNamed(context, '/login');
+                        },
+                        child: const Text(
+                          'Masuk',
+                          style: TextStyle(
+                            color: Colors.lightBlueAccent,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 20),
+                ],
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _authButton({
+    required String imagePath,
+    required String text,
+    required VoidCallback onTap,
+  }) {
+    return SizedBox(
+      height: 50,
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: onTap,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(imagePath, height: 24, width: 24),
+            const SizedBox(width: 12),
+            Text(
+              text,
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
