@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lottie/lottie.dart';
+import 'package:project_kelompok/screen/login.dart';
 
 class MyRegis extends StatefulWidget {
   const MyRegis({super.key});
@@ -58,6 +59,9 @@ class _MyRegisState extends State<MyRegis> {
       );
 
       await Future.delayed(const Duration(seconds: 2));
+
+      if (!mounted) return;
+
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -191,6 +195,12 @@ class _MyRegisState extends State<MyRegis> {
                     TextButton(
                       onPressed: () {
                         Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MyLogin(),
+                          ),
+                        );
                       },
                       child: const Text(
                         "Login",

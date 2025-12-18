@@ -33,26 +33,6 @@ class MyPage1 extends StatelessWidget {
             ),
           ),
 
-          Positioned(
-            top: 40,
-            right: 20,
-            child: TextButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        const MySplashScreen(nextRoute: '/page2'),
-                  ),
-                );
-              },
-              child: const Text(
-                'Lewati',
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
-            ),
-          ),
-
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
@@ -76,7 +56,7 @@ class MyPage1 extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              const MySplashScreen(nextRoute: '/regis'),
+                              const MySplashScreen(nextRoute: '/register'),
                         ),
                       );
                     },
