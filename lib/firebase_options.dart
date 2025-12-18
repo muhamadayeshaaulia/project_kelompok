@@ -50,20 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAet4E4BmeVFyV0gRV1J69LHXzH27NxnsQ',
-    appId: '1:542611358316:web:7b6a84058079b7cf06ce49',
-    messagingSenderId: '542611358316',
-    projectId: 'project-rozak',
-    authDomain: 'project-rozak.firebaseapp.com',
-    storageBucket: 'project-rozak.firebasestorage.app',
-    measurementId: 'G-B87QVRM9FW',
+    apiKey: "AIzaSyDMWUpytaEHpykTDDXsCNYTIjTD5-4h0AA",
+    authDomain: "myfristproject-dd7da.firebaseapp.com",
+    projectId: "myfristproject-dd7da",
+    storageBucket: "myfristproject-dd7da.firebasestorage.app",
+    messagingSenderId: "1043234910102",
+    appId: "1:1043234910102:web:8bce53cba2080fe048f7b7",
+    measurementId: "G-2Y1JNER5TK",
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDVPX_VMw4skZ_8T57eaiul9kATdv47HS4',
-    appId: '1:542611358316:android:3bdf504386f699ca06ce49',
-    messagingSenderId: '542611358316',
-    projectId: 'project-rozak',
-    storageBucket: 'project-rozak.firebasestorage.app',
+    apiKey: 'AIzaSyDMWUpytaEHpykTDDXsCNYTIjTD5-4h0AA',
+    appId: '1:1043234910102:web:8bce53cba2080fe048f7b7',
+    messagingSenderId: '1043234910102',
+    projectId: 'myfristproject-dd7da',
+    storageBucket: 'myfristproject-dd7da.firebasestorage.app',
   );
 }
