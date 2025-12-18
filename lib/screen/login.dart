@@ -138,6 +138,25 @@ class _MyLoginState extends State<MyLogin> {
                         : const Text('Login'),
                   ),
                 ),
+
+                const SizedBox(height: 30),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Belum punya akun?",
+                      style: TextStyle(color: Colors.black54),
+                    ),
+                    TextButton(
+                      onPressed: () {},
+                      child: const Text(
+                        "Daftar sekarang",
+                        style: TextStyle(color: Colors.teal),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
