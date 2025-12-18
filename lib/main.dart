@@ -4,6 +4,7 @@ import 'package:project_kelompok/screen/login.dart';
 import 'package:project_kelompok/screen/page1.dart';
 import 'package:project_kelompok/screen/page2.dart';
 import 'package:project_kelompok/screen/page3.dart';
+import 'package:project_kelompok/screen/register.dart';
 import 'package:project_kelompok/screen/splash_screen.dart';
 import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
         '/page3': (context) => const MyPage3(),
         '/login': (context) => const MyLogin(),
         '/home': (context) => const HomeScreen(),
+        '/register': (context) => const MyRegis(),
       },
     );
   }
