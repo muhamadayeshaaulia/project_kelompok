@@ -23,7 +23,7 @@ class MyPage1 extends StatelessWidget {
             right: 0,
             child: Center(
               child: Text(
-                'GlobalPhotoBooth',
+                'MyPhotoBooth',
                 style: TextStyle(
                   fontSize: 48,
                   color: Colors.white,
