@@ -8,47 +8,35 @@ class MyPage1 extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/House.jpg'),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
+    children: [
+      Positioned.fill(
+        child: FittedBox(
+          fit: BoxFit.contain,
+          child: Image.asset('assets/images/home1.jpg'),
+        ),
+      ),
 
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.black.withOpacity(0.4),
-                  Colors.black.withOpacity(0.2),
-                  Colors.transparent,
-                ],
-                begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
-              ),
-            ),
-          ),
+      Positioned.fill(
+        child: Container(
+          color: Colors.black.withOpacity(0.25),
+        ),
+      ),
 
-          // 🔥 JUDUL APP (PICSART)
-          Positioned(
-            top: 80,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Text(
-                'GlobalPhotoBooth',
-                style: TextStyle(
-                  fontSize: 48,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 1.5,
-                ),
-              ),
+      Positioned(
+        top: 80,
+        left: 0,
+        right: 0,
+        child: Center(
+          child: Text(
+            'GlobalPhotoBooth',
+            style: TextStyle(
+              fontSize: 48,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
             ),
           ),
+        ),
+      ),
 
           Positioned(
             top: 40,
@@ -78,7 +66,7 @@ class MyPage1 extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   _authButton(
-                    imagePath: 'assets/images/google.png',
+                    imagePath: 'assets/images/google1.jpg',
                     text: 'Sambungkan dengan Google',
                     onTap: () {},
                   ),
