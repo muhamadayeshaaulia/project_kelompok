@@ -15,7 +15,7 @@ class MyHomePage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              Navigator.of(context).pushReplacementNamed('/');
+              Navigator.of(context).pushReplacementNamed('/login');
             },
           ),
         ],

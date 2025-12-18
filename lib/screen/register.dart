@@ -1,46 +1,67 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lottie/lottie.dart';
-import 'package:project_kelompok/screen/home_page.dart';
-import 'package:project_kelompok/screen/register.dart';
 
-class MyLogin extends StatefulWidget {
-  const MyLogin({super.key});
+class MyRegis extends StatefulWidget {
+  const MyRegis({super.key});
 
   @override
-  State<MyLogin> createState() => _MyLoginState();
+  State<MyRegis> createState() => _MyRegisState();
 }
 
-class _MyLoginState extends State<MyLogin> {
+class _MyRegisState extends State<MyRegis> {
   final emailCtrl = TextEditingController();
   final passCtrl = TextEditingController();
+  final confirmCtrl = TextEditingController();
   bool _isLoading = false;
   String? _error;
 
-  Future<void> _login() async {
+  Future<void> _register() async {
+    if (emailCtrl.text.isEmpty || passCtrl.text.length < 6) {
+      setState(() {
+        _error = "Email kosong atau password kurang dari 6 karakter";
+      });
+      return;
+    }
+
+    if (passCtrl.text != confirmCtrl.text) {
+      setState(() {
+        _error = "Password dan konfirmasi tidak sama";
+      });
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _error = null;
     });
+
     try {
-      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailCtrl.text.trim(),
         password: passCtrl.text,
       );
 
       if (!mounted) return;
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const MyHomePage()),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: const [
+              Icon(Icons.check_circle, color: Colors.white),
+              SizedBox(width: 10),
+              Text('Registrasi berhasil'),
+            ],
+          ),
+          backgroundColor: Colors.green,
+        ),
       );
+
+      await Future.delayed(const Duration(seconds: 2));
+      Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       setState(() {
         _error = e.message;
-      });
-    } catch (e) {
-      setState(() {
-        _error = e.toString();
       });
     } finally {
       if (mounted) {
@@ -49,13 +70,6 @@ class _MyLoginState extends State<MyLogin> {
         });
       }
     }
-  }
-
-  @override
-  void dispose() {
-    emailCtrl.dispose();
-    passCtrl.dispose();
-    super.dispose();
   }
 
   @override
@@ -78,17 +92,21 @@ class _MyLoginState extends State<MyLogin> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
-                  'Login untuk melanjutkan perjalanan mu',
+                  'Buat akun baru',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
+
+                // 🔥 LOTTIE SAMA BIAR KONSISTEN
                 Lottie.asset(
-                  'assets/annimations/Photography.json',
+                  'assets/annimations/Camera_Click.json',
                   height: 200,
                   width: 200,
                   fit: BoxFit.contain,
                 ),
+
                 const SizedBox(height: 20),
+
                 TextField(
                   controller: emailCtrl,
                   keyboardType: TextInputType.emailAddress,
@@ -102,7 +120,9 @@ class _MyLoginState extends State<MyLogin> {
                     labelText: 'Email',
                   ),
                 ),
+
                 const SizedBox(height: 15),
+
                 TextField(
                   controller: passCtrl,
                   obscureText: true,
@@ -116,6 +136,23 @@ class _MyLoginState extends State<MyLogin> {
                     labelText: 'Password',
                   ),
                 ),
+
+                const SizedBox(height: 15),
+
+                TextField(
+                  controller: confirmCtrl,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.blue),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    prefixIcon: const Icon(Icons.lock_outline),
+                    labelText: 'Konfirmasi Password',
+                  ),
+                ),
+
                 if (_error != null) ...[
                   const SizedBox(height: 10),
                   Text(
@@ -124,19 +161,21 @@ class _MyLoginState extends State<MyLogin> {
                     textAlign: TextAlign.center,
                   ),
                 ],
+
                 const SizedBox(height: 20),
+
                 SizedBox(
                   height: 50,
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _isLoading ? null : _login,
+                    onPressed: _isLoading ? null : _register,
                     child: _isLoading
                         ? const SizedBox(
                             height: 20,
                             width: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : const Text('Login'),
+                        : const Text('Daftar'),
                   ),
                 ),
 
@@ -146,20 +185,15 @@ class _MyLoginState extends State<MyLogin> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      "Belum punya akun?",
+                      "Sudah punya akun?",
                       style: TextStyle(color: Colors.black54),
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MyRegis(),
-                          ),
-                        );
+                        Navigator.pop(context);
                       },
                       child: const Text(
-                        "Daftar sekarang",
+                        "Login",
                         style: TextStyle(color: Colors.teal),
                       ),
                     ),
