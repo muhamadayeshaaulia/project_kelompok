@@ -34,7 +34,18 @@ class _MyRegisState extends State<MyRegis> {
       );
 
       if (!mounted) return;
-      Navigator.pop(context); // balik ke login
+
+      ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Registrasi berhasil 🎉 Silakan login'),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 2),
+      ),
+    );
+
+
+    await Future.delayed(const Duration(seconds: 2));
+      Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       setState(() {
         _error = e.message;
