@@ -11,6 +11,7 @@ class ProfilePage extends StatelessWidget {
     final String displayName = user?.displayName ?? "Belum diatur";
     final String email = user?.email ?? "Email tidak ditemukan";
     final String photoUrl = user?.photoURL ?? "";
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -26,7 +27,7 @@ class ProfilePage extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              height: 220,
+              height: 200,
               width: double.infinity,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
@@ -39,66 +40,65 @@ class ProfilePage extends StatelessWidget {
                   end: Alignment.bottomRight,
                 ),
               ),
-              child: SafeArea(
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            SizedBox(
-                              width: 110,
-                              height: 110,
-                              child: CircularProgressIndicator(
-                                value: 0.5,
-                                strokeWidth: 6,
-                                backgroundColor: Colors.white30,
-                                valueColor: const AlwaysStoppedAnimation<Color>(
-                                  Colors.purple,
-                                ),
-                              ),
-                            ),
-                            CircleAvatar(
-                              radius: 45,
-                              backgroundColor: Colors.grey[300],
-                              child: const Icon(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SizedBox(
+                        width: 110,
+                        height: 110,
+                        child: CircularProgressIndicator(
+                          value: 0.8, 
+                          strokeWidth: 6,
+                          backgroundColor: Colors.white30,
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            Colors.purple,
+                          ),
+                        ),
+                      ),
+                      CircleAvatar(
+                        radius: 45,
+                        backgroundColor: Colors.grey[300],
+                        backgroundImage: photoUrl.isNotEmpty
+                            ? NetworkImage(photoUrl)
+                            : null,
+                        child: photoUrl.isEmpty
+                            ? const Icon(
                                 Icons.person,
                                 size: 50,
                                 color: Colors.white,
-                              ),
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: CircleAvatar(
-                                radius: 16,
-                                backgroundColor: Colors.white,
-                                child: Icon(
-                                  Icons.camera_alt,
-                                  size: 18,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                          ],
+                              )
+                            : null,
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: CircleAvatar(
+                          radius: 16,
+                          backgroundColor: Colors.white,
+                          child: Icon(
+                            Icons.camera_alt,
+                            size: 18,
+                            color: Colors.black,
+                          ),
                         ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          "50%\nSELESAI",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    displayName,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-
-            /// ===== FORM =====
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -110,11 +110,18 @@ class ProfilePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
 
-                  _buildField("Nama pengguna", "Nama pengguna"),
-                  _buildField("Nama", "Nama"),
-                  _buildEmailField("Email", "Email"),
-                  _buildField("Kata sandi", "Kata sandi", obscure: true),
-                  _buildField("Tentang saya", "Tentang saya", maxLines: 3),
+                  _buildField("Nama pengguna", displayName),
+                  _buildEmailField("Email", email),
+                  _buildField(
+                    "UID Firebase",
+                    user?.uid ?? "-",
+                    enabled: false,
+                  ),
+                  _buildField(
+                    "Tentang saya",
+                    "Fotografer Momen Berharga",
+                    maxLines: 3,
+                  ),
 
                   const SizedBox(height: 24),
                   const Text(
@@ -124,7 +131,9 @@ class ProfilePage extends StatelessWidget {
                   const SizedBox(height: 8),
 
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+
+                    },
                     child: const Text(
                       "Hapus Profil",
                       style: TextStyle(color: Colors.red),
@@ -139,25 +148,28 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  /// ===== TEXTFIELD NORMAL =====
   Widget _buildField(
     String label,
-    String hint, {
+    String value, {
     bool obscure = false,
     int maxLines = 1,
+    bool enabled = true,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label),
+          Text(label, style: const TextStyle(color: Colors.grey)),
           const SizedBox(height: 6),
           TextField(
+            controller: TextEditingController(text: value),
             obscureText: obscure,
             maxLines: maxLines,
+            enabled: enabled,
             decoration: InputDecoration(
-              hintText: hint,
+              filled: !enabled,
+              fillColor: Colors.grey[100],
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -168,21 +180,23 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  /// ===== EMAIL FIELD + CHECK =====
-  Widget _buildEmailField(String label, String hint) {
+  Widget _buildEmailField(String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label),
+          Text(label, style: const TextStyle(color: Colors.grey)),
           const SizedBox(height: 6),
           Row(
             children: [
               Expanded(
                 child: TextField(
+                  controller: TextEditingController(text: value),
+                  enabled: false, 
                   decoration: InputDecoration(
-                    hintText: hint,
+                    filled: true,
+                    fillColor: Colors.grey[100],
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -197,7 +211,7 @@ class ProfilePage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: Colors.teal),
                 ),
-                child: const Icon(Icons.check, color: Colors.teal),
+                child: const Icon(Icons.verified, color: Colors.teal),
               ),
             ],
           ),
