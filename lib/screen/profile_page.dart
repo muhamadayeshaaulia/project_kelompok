@@ -176,13 +176,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildField(
-    String label,
-    String value, {
-    bool obscure = false,
-    int maxLines = 1,
-    bool enabled = true,
-  }) {
+Widget _buildField(String label, TextEditingController controller, {int maxLines = 1, bool enabled = true}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: Column(
