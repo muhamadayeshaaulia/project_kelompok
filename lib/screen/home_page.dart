@@ -10,6 +10,7 @@ class MyHomePage extends StatelessWidget {
     final String userName =
         user?.displayName ?? user?.email?.split('@')[0] ?? 'Fotografer';
     return Scaffold(
+      extendBody: true,
       appBar: AppBar(
         title: const Text('Photo Booth App'),
         backgroundColor: Colors.yellow[700],
