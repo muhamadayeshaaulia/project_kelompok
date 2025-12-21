@@ -17,6 +17,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final socialMediaCtrl = TextEditingController();
 
   final user = FirebaseAuth.instance.currentUser;
+  bool isEditing = false;
   @override
   void initState() {
     super.initState();
@@ -56,6 +57,9 @@ class _ProfilePageState extends State<ProfilePage> {
         'email': user!.email,
         'updated_at': DateTime.now(),
       }, SetOptions(merge: true));
+      setState(() {
+        isEditing = false;
+      });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Profil berhasil diperbarui!')),
@@ -77,6 +81,20 @@ class _ProfilePageState extends State<ProfilePage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text("Profil", style: TextStyle(color: Colors.white)),
+        actions: [
+          TextButton(
+            onPressed: () {
+              setState(() {
+                isEditing = !isEditing;
+                if (!isEditing) _loadUserData();
+              });
+            },
+            child: Text(
+              isEditing ? "Batal" : "Edit",
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -134,12 +152,12 @@ class _ProfilePageState extends State<ProfilePage> {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
-                  _buildField("Nama Lengkap", nameCtrl),
-                  _buildField("Jenis Kelamin", genderCtrl),
+                  _buildField("Nama Lengkap", nameCtrl, enabled: isEditing),
+                  _buildField("Jenis Kelamin", genderCtrl, enabled: isEditing),
                   _buildEmailField("Email", user?.email ?? ""),
-                  _buildField("Alamat", addressCtrl),
-                  _buildField("Sosial Media (Link)", socialMediaCtrl),
-                  _buildField("Tentang saya", descCtrl, maxLines: 3),
+                  _buildField("Alamat", addressCtrl, enabled: isEditing),
+                  _buildField("Sosial Media (Link)", socialMediaCtrl, enabled: isEditing),
+                  _buildField("Tentang saya", descCtrl, maxLines: 3, enabled: isEditing),
 
                   const SizedBox(height: 24),
                   const Text(
