@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Pastikan ini sudah ada
 
 class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+    final String userName =
+        user?.displayName ?? user?.email?.split('@')[0] ?? 'Fotografer';
     return Scaffold(
       appBar: AppBar(
         title: const Text('Photo Booth App'),
@@ -14,7 +18,8 @@ class MyHomePage extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () {
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
               Navigator.of(context).pushReplacementNamed('/login');
             },
           ),
@@ -31,16 +36,19 @@ class MyHomePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.all(20.0),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Halo, Fotografer!',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    'Halo, $userName!',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  Text(
+                  const Text(
                     'Siap untuk mengabadikan momen hari ini?',
                     style: TextStyle(fontSize: 16, color: Colors.black54),
                   ),
@@ -87,11 +95,11 @@ class MyHomePage extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const Padding(
-                          padding: EdgeInsets.all(8.0),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
                           child: Text(
-                            'Momen #1',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            'Momen #${index + 1}',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
@@ -104,7 +112,8 @@ class MyHomePage extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
+        onPressed: () {
+        },
         label: const Text('Ambil Foto'),
         icon: const Icon(Icons.camera_alt),
         backgroundColor: Colors.yellow[800],
