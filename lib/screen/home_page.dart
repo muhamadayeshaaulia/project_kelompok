@@ -11,6 +11,40 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  String _displayName = "Fotografer";
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+  Future<void> _fetchUserData() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        final doc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+
+        if (doc.exists && doc.data() != null) {
+          setState(() {
+            _displayName = doc.data()!['nama'] ?? 
+                           user.displayName ?? 
+                           user.email?.split('@')[0] ?? 
+                           "Fotografer";
+          });
+        } else {
+          setState(() {
+            _displayName = user.displayName ?? user.email?.split('@')[0] ?? "Fotografer";
+          });
+        }
+      } catch (e) {
+        print("Error fetching user data: $e");
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
@@ -50,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Halo, $userName!',
+                    'Halo, $_displayName!',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
