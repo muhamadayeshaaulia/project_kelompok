@@ -66,6 +66,7 @@ flutter:
       - assets/animations/Bus_Loader.json
       - assets/animations/Photography.json
       - assets/animations/Camera_Click.json
+      - assets/images/
 
 
   # To add assets to your application, add an assets section, like this:
