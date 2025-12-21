@@ -7,6 +7,10 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+
+    final String displayName = user?.displayName ?? "Belum diatur";
+    final String email = user?.email ?? "Email tidak ditemukan";
+    final String photoUrl = user?.photoURL ?? "";
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -17,7 +21,11 @@ class ProfilePage extends StatelessWidget {
               width: double.infinity,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(0xFF7F7FD5), Color(0xFF86A8E7), Color(0xFF91EAE4)],
+                  colors: [
+                    Color(0xFF7F7FD5),
+                    Color(0xFF86A8E7),
+                    Color(0xFF91EAE4),
+                  ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
