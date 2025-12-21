@@ -64,13 +64,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-
-    final String name =
-        user?.displayName ?? user?.email?.split('@')[0] ?? 'Fotografer';
-    final String email = user?.email ?? "Email tidak ditemukan";
-    final String photoUrl = user?.photoURL ?? "";
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -102,58 +95,16 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      SizedBox(
-                        width: 110,
-                        height: 110,
-                        child: CircularProgressIndicator(
-                          value: 0.8,
-                          strokeWidth: 6,
-                          backgroundColor: Colors.white30,
-                          valueColor: const AlwaysStoppedAnimation<Color>(
-                            Colors.purple,
-                          ),
-                        ),
-                      ),
-                      CircleAvatar(
-                        radius: 45,
-                        backgroundColor: Colors.grey[300],
-                        backgroundImage: photoUrl.isNotEmpty
-                            ? NetworkImage(photoUrl)
-                            : null,
-                        child: photoUrl.isEmpty
-                            ? const Icon(
-                                Icons.person,
-                                size: 50,
-                                color: Colors.white,
-                              )
-                            : null,
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: CircleAvatar(
-                          radius: 16,
-                          backgroundColor: Colors.white,
-                          child: Icon(
-                            Icons.camera_alt,
-                            size: 18,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ],
+                  CircleAvatar(
+                    radius: 45,
+                    backgroundColor: Colors.grey[300],
+                    backgroundImage: user?.photoURL != null ? NetworkImage(user!.photoURL!) : null,
+                    child: user?.photoURL == null ? const Icon(Icons.person, size: 50, color: Colors.white) : null,
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    name,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    nameCtrl.text.isEmpty ? "Fotografer" : nameCtrl.text,
+                    style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
