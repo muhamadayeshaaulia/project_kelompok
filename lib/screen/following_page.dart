@@ -13,16 +13,19 @@ class _FollowingPageState extends State<FollowingPage> {
       "name": "name",
       "username": "@username",
       "isFollowing": false,
+      "isLiked": false,
     },
     {
       "name": "name",
       "username": "@username",
       "isFollowing": true,
+      "isLiked": true,
     },
     {
       "name": "name",
       "username": "@username",
       "isFollowing": false,
+      "isLiked": false,
     },
   ];
 
@@ -44,21 +47,46 @@ class _FollowingPageState extends State<FollowingPage> {
             ),
             title: Text(user["name"]),
             subtitle: Text(user["username"]),
-            trailing: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    user["isFollowing"] ? Colors.grey[300] : Colors.purple,
-                foregroundColor:
-                    user["isFollowing"] ? Colors.black : Colors.white,
-              ),
-              onPressed: () {
-                setState(() {
-                  user["isFollowing"] = !user["isFollowing"];
-                });
-              },
-              child: Text(
-                user["isFollowing"] ? "Following" : "Follow",
-              ),
+
+            /// 👉 LIKE + FOLLOW BUTTON
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                /// ❤️ Like Button
+                IconButton(
+                  icon: Icon(
+                    user["isLiked"]
+                        ? Icons.favorite
+                        : Icons.favorite_border,
+                    color: user["isLiked"] ? Colors.red : Colors.grey,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      user["isLiked"] = !user["isLiked"];
+                    });
+                  },
+                ),
+
+                /// ➕ Follow Button
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: user["isFollowing"]
+                        ? Colors.grey[300]
+                        : Colors.purple,
+                    foregroundColor: user["isFollowing"]
+                        ? Colors.black
+                        : Colors.white,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      user["isFollowing"] = !user["isFollowing"];
+                    });
+                  },
+                  child: Text(
+                    user["isFollowing"] ? "Following" : "Follow",
+                  ),
+                ),
+              ],
             ),
           );
         },
