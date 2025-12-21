@@ -27,7 +27,10 @@ class _ProfilePageState extends State<ProfilePage> {
     if (user == null) return;
 
     try {
-      final doc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .get();
       if (doc.exists) {
         final data = doc.data();
         nameCtrl.text = data?['nama'] ?? '';
@@ -98,13 +101,25 @@ class _ProfilePageState extends State<ProfilePage> {
                   CircleAvatar(
                     radius: 45,
                     backgroundColor: Colors.grey[300],
-                    backgroundImage: user?.photoURL != null ? NetworkImage(user!.photoURL!) : null,
-                    child: user?.photoURL == null ? const Icon(Icons.person, size: 50, color: Colors.white) : null,
+                    backgroundImage: user?.photoURL != null
+                        ? NetworkImage(user!.photoURL!)
+                        : null,
+                    child: user?.photoURL == null
+                        ? const Icon(
+                            Icons.person,
+                            size: 50,
+                            color: Colors.white,
+                          )
+                        : null,
                   ),
                   const SizedBox(height: 12),
                   Text(
                     nameCtrl.text.isEmpty ? "Fotografer" : nameCtrl.text,
-                    style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -119,14 +134,12 @@ class _ProfilePageState extends State<ProfilePage> {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
-                  _buildField("Nama pengguna", name),
-                  _buildEmailField("Email", email),
-                  _buildField("UID Firebase", user?.uid ?? "-", enabled: false),
-                  _buildField(
-                    "Tentang saya",
-                    "Fotografer Momen Berharga",
-                    maxLines: 3,
-                  ),
+                  _buildField("Nama Lengkap", nameCtrl),
+                  _buildField("Jenis Kelamin", genderCtrl),
+                  _buildEmailField("Email", user?.email ?? ""),
+                  _buildField("Alamat", addressCtrl),
+                  _buildField("Sosial Media (Link)", socialMediaCtrl),
+                  _buildField("Tentang saya", descCtrl, maxLines: 3),
 
                   const SizedBox(height: 24),
                   const Text(
@@ -134,7 +147,19 @@ class _ProfilePageState extends State<ProfilePage> {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _saveProfile,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF7F7FD5),
+                      ),
+                      child: const Text(
+                        "Simpan Perubahan",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
                   TextButton(
                     onPressed: () {},
                     child: const Text(
