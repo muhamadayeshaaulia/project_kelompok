@@ -19,6 +19,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     _fetchUserData();
   }
+
   Future<void> _fetchUserData() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -30,14 +31,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
         if (doc.exists && doc.data() != null) {
           setState(() {
-            _displayName = doc.data()!['nama'] ?? 
-                           user.displayName ?? 
-                           user.email?.split('@')[0] ?? 
-                           "Fotografer";
+            _displayName =
+                doc.data()!['nama'] ??
+                user.displayName ??
+                user.email?.split('@')[0] ??
+                "Fotografer";
           });
         } else {
           setState(() {
-            _displayName = user.displayName ?? user.email?.split('@')[0] ?? "Fotografer";
+            _displayName =
+                user.displayName ?? user.email?.split('@')[0] ?? "Fotografer";
           });
         }
       } catch (e) {
@@ -162,7 +165,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: const CustomButtomNav(currentIndex: 0),
-
     );
   }
 }
