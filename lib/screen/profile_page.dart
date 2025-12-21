@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -34,14 +35,16 @@ class _ProfilePageState extends State<ProfilePage> {
           .get();
       if (doc.exists) {
         final data = doc.data();
-        nameCtrl.text = data?['nama'] ?? '';
-        genderCtrl.text = data?['jenis_kelamin'] ?? '';
-        addressCtrl.text = data?['alamat'] ?? '';
-        descCtrl.text = data?['keterangan'] ?? '';
-        socialMediaCtrl.text = data?['sosmed_link'] ?? '';
+        setState(() {
+          nameCtrl.text = data?['nama'] ?? '';
+          genderCtrl.text = data?['jenis_kelamin'] ?? '';
+          addressCtrl.text = data?['alamat'] ?? '';
+          descCtrl.text = data?['keterangan'] ?? '';
+          socialMediaCtrl.text = data?['sosmed_link'] ?? '';
+        });
       }
     } catch (e) {
-      print(e);
+      print("Error loading user data: $e");
     }
   }
 
@@ -91,7 +94,10 @@ class _ProfilePageState extends State<ProfilePage> {
             },
             child: Text(
               isEditing ? "Batal" : "Edit",
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -102,7 +108,7 @@ class _ProfilePageState extends State<ProfilePage> {
             Container(
               height: 200,
               width: double.infinity,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
                     Color(0xFF7F7FD5),
@@ -156,8 +162,17 @@ class _ProfilePageState extends State<ProfilePage> {
                   _buildField("Jenis Kelamin", genderCtrl, enabled: isEditing),
                   _buildEmailField("Email", user?.email ?? ""),
                   _buildField("Alamat", addressCtrl, enabled: isEditing),
-                  _buildField("Sosial Media (Link)", socialMediaCtrl, enabled: isEditing),
-                  _buildField("Tentang saya", descCtrl, maxLines: 3, enabled: isEditing),
+                  _buildField(
+                    "Sosial Media (Link)",
+                    socialMediaCtrl,
+                    enabled: isEditing,
+                  ),
+                  _buildField(
+                    "Tentang saya",
+                    descCtrl,
+                    maxLines: 3,
+                    enabled: isEditing,
+                  ),
 
                   const SizedBox(height: 24),
                   const Text(
@@ -192,12 +207,24 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        backgroundColor: Colors.yellow[800],
+        child: const Icon(Icons.camera_alt),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: const CustomBottomNav(currentIndex: 3),
     );
   }
 
-Widget _buildField(String label, TextEditingController controller, {int maxLines = 1, bool enabled = true}) {
+  Widget _buildField(
+    String label,
+    TextEditingController controller, {
+    int maxLines = 1,
+    bool enabled = true,
+  }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 14), 
+      padding: const EdgeInsets.only(bottom: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
