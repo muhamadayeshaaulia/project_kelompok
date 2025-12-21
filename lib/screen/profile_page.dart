@@ -17,10 +17,32 @@ class _ProfilePageState extends State<ProfilePage> {
   final socialMediaCtrl = TextEditingController();
 
   final user = FirebaseAuth.instance.currentUser;
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    if (user == null) return;
+
+    try {
+      final doc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
+      if (doc.exists) {
+        final data = doc.data();
+        nameCtrl.text = data?['nama'] ?? '';
+        genderCtrl.text = data?['jenis_kelamin'] ?? '';
+        addressCtrl.text = data?['alamat'] ?? '';
+        descCtrl.text = data?['keterangan'] ?? '';
+        socialMediaCtrl.text = data?['sosmed_link'] ?? '';
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
 
   Future<void> _saveProfile() async {
     if (user == null) return;
-
     try {
       await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
         'nama': nameCtrl.text,
