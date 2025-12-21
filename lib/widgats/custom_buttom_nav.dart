@@ -40,6 +40,8 @@ class CustomButtomNav extends StatelessWidget {
     int index,
   ) {
     bool isActive = index == currentIndex;
-    return MaterialButton(minWidth: 40, onPressed: () {});
+    return MaterialButton(minWidth: 40, onPressed: () {
+      if (isActive) return;
+    });
   }
 }
