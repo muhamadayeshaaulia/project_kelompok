@@ -178,15 +178,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
 Widget _buildField(String label, TextEditingController controller, {int maxLines = 1, bool enabled = true}) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.only(bottom: 14), 
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label, style: const TextStyle(color: Colors.grey)),
           const SizedBox(height: 6),
           TextField(
-            controller: TextEditingController(text: value),
-            obscureText: obscure,
+            controller: controller,
             maxLines: maxLines,
             enabled: enabled,
             decoration: InputDecoration(
