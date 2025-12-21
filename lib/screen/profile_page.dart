@@ -8,8 +8,8 @@ class ProfilePage extends StatelessWidget {
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
-  class _ProfilePageState extends State<ProfilePage> {
-  // 1. Definisikan Controller
+
+class _ProfilePageState extends State<ProfilePage> {
   final nameCtrl = TextEditingController();
   final genderCtrl = TextEditingController();
   final addressCtrl = TextEditingController();
@@ -17,13 +17,35 @@ class ProfilePage extends StatelessWidget {
   final socialMediaCtrl = TextEditingController();
 
   final user = FirebaseAuth.instance.currentUser;
+
+  Future<void> _saveProfile() async {
+    if (user == null) return;
+
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
+        'nama': nameCtrl.text,
+        'jenis_kelamin': genderCtrl.text,
+        'alamat': addressCtrl.text,
+        'keterangan': descCtrl.text,
+        'sosmed_link': socialMediaCtrl.text,
+        'email': user!.email,
+        'updated_at': DateTime.now(),
+      }, SetOptions(merge: true));
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Profil berhasil diperbarui!')),
+      );
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
 
-    final String name = user?.displayName ?? user?.email?.split('@')[0] ?? 'Fotografer';
+    final String name =
+        user?.displayName ?? user?.email?.split('@')[0] ?? 'Fotografer';
     final String email = user?.email ?? "Email tidak ditemukan";
     final String photoUrl = user?.photoURL ?? "";
 
@@ -65,7 +87,7 @@ class ProfilePage extends StatelessWidget {
                         width: 110,
                         height: 110,
                         child: CircularProgressIndicator(
-                          value: 0.8, 
+                          value: 0.8,
                           strokeWidth: 6,
                           backgroundColor: Colors.white30,
                           valueColor: const AlwaysStoppedAnimation<Color>(
@@ -126,11 +148,7 @@ class ProfilePage extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildField("Nama pengguna", name),
                   _buildEmailField("Email", email),
-                  _buildField(
-                    "UID Firebase",
-                    user?.uid ?? "-",
-                    enabled: false,
-                  ),
+                  _buildField("UID Firebase", user?.uid ?? "-", enabled: false),
                   _buildField(
                     "Tentang saya",
                     "Fotografer Momen Berharga",
@@ -145,9 +163,7 @@ class ProfilePage extends StatelessWidget {
                   const SizedBox(height: 8),
 
                   TextButton(
-                    onPressed: () {
-
-                    },
+                    onPressed: () {},
                     child: const Text(
                       "Hapus Profil",
                       style: TextStyle(color: Colors.red),
@@ -161,6 +177,7 @@ class ProfilePage extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildField(
     String label,
     String value, {
@@ -192,6 +209,7 @@ class ProfilePage extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildEmailField(String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
@@ -205,7 +223,7 @@ class ProfilePage extends StatelessWidget {
               Expanded(
                 child: TextField(
                   controller: TextEditingController(text: value),
-                  enabled: false, 
+                  enabled: false,
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.grey[100],
