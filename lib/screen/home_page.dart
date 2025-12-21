@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Pastikan ini sudah ada
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key});
@@ -10,6 +10,7 @@ class MyHomePage extends StatelessWidget {
     final String userName =
         user?.displayName ?? user?.email?.split('@')[0] ?? 'Fotografer';
     return Scaffold(
+      extendBody: true,
       appBar: AppBar(
         title: const Text('Photo Booth App'),
         backgroundColor: Colors.yellow[700],
@@ -111,14 +112,81 @@ class MyHomePage extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-        },
-        label: const Text('Ambil Foto'),
-        icon: const Icon(Icons.camera_alt),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
         backgroundColor: Colors.yellow[800],
+        elevation: 4,
+        child: const Icon(Icons.camera_alt, size: 28, color: Colors.white),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+
+      bottomNavigationBar: BottomAppBar(
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 8.0,
+        color: Colors.white,
+        child: SizedBox(
+          height: 60,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  MaterialButton(
+                    minWidth: 40,
+                    onPressed: () {},
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.home, color: Colors.yellow),
+                        Text('Home', style: TextStyle(fontSize: 12)),
+                      ],
+                    ),
+                  ),
+                  MaterialButton(
+                    minWidth: 40,
+                    onPressed: () {},
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.people, color: Colors.grey),
+                        Text('Following', style: TextStyle(fontSize: 12)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  MaterialButton(
+                    minWidth: 40,
+                    onPressed: () {},
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.info, color: Colors.grey),
+                        Text('Info', style: TextStyle(fontSize: 12)),
+                      ],
+                    ),
+                  ),
+                  MaterialButton(
+                    minWidth: 40,
+                    onPressed: () {},
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.person, color: Colors.grey),
+                        Text('Profil', style: TextStyle(fontSize: 12)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
