@@ -161,7 +161,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: const Icon(Icons.camera_alt, size: 28, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: const CustomBottomNav(currentIndex: 0),
+      bottomNavigationBar: const CustomButtomNav(currentIndex: 0),
 
     );
   }

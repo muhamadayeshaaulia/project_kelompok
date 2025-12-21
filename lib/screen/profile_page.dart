@@ -213,7 +213,7 @@ class _ProfilePageState extends State<ProfilePage> {
         child: const Icon(Icons.camera_alt),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: const CustomBottomNav(currentIndex: 3),
+      bottomNavigationBar: const CustomButtomNav(currentIndex: 3),
     );
   }
 
