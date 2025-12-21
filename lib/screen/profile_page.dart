@@ -165,19 +165,20 @@ class _ProfilePageState extends State<ProfilePage> {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _saveProfile,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF7F7FD5),
-                      ),
-                      child: const Text(
-                        "Simpan Perubahan",
-                        style: TextStyle(color: Colors.white),
+                  if (isEditing)
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _saveProfile,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF7F7FD5),
+                        ),
+                        child: const Text(
+                          "Simpan Perubahan",
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
                     ),
-                  ),
                   TextButton(
                     onPressed: () {},
                     child: const Text(
