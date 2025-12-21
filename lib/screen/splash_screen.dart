@@ -32,7 +32,7 @@ class _MySplashScreenState extends State<MySplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Lottie.asset(
-              'assets/annimations/Running_Cat.json',
+              'assets/animations/Running_Cat.json',
               width: 300,
               height: 300,
               fit: BoxFit.contain,

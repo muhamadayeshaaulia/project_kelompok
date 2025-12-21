@@ -4,9 +4,14 @@ import 'package:project_kelompok/screen/login.dart';
 import 'package:project_kelompok/screen/page1.dart';
 import 'package:project_kelompok/screen/page2.dart';
 import 'package:project_kelompok/screen/page3.dart';
+import 'package:project_kelompok/screen/register.dart';
 import 'package:project_kelompok/screen/splash_screen.dart';
+import 'firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(MyApp());
 }
 
@@ -16,7 +21,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Lottie splash demo',
+      title: 'Booth Art Apps',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.yellow),
       initialRoute: '/',
@@ -25,8 +30,9 @@ class MyApp extends StatelessWidget {
         '/page1': (context) => const MyPage1(),
         '/page2': (context) => const MyPage2(),
         '/page3': (context) => const MyPage3(),
-        '/login' : (context) => const MyLogin(),
+        '/login': (context) => const MyLogin(),
         '/home': (context) => const HomeScreen(),
+        '/register': (context) => const MyRegis(),
       },
     );
   }

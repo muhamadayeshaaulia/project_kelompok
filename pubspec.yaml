@@ -35,6 +35,9 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   lottie: ^3.3.2
+  firebase_core: ^4.2.1
+  firebase_auth: ^6.1.2
+  cloud_firestore: ^6.1.1
 
 dev_dependencies:
   flutter_test:
@@ -59,12 +62,11 @@ flutter:
   uses-material-design: true
 
   assets:
-      - assets/annimations/Running_Cat.json
-      - assets/annimations/Bus_Loader.json
-      - assets/images/images1.webp
-      - assets/images/images2.webp
-      - assets/images/images3.webp
-      - assets/images/images4.png
+      - assets/animations/Running_Cat.json
+      - assets/animations/Bus_Loader.json
+      - assets/animations/Photography.json
+      - assets/animations/Camera_Click.json
+      - assets/images/
 
 
   # To add assets to your application, add an assets section, like this:
