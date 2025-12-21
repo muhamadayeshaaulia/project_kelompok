@@ -109,7 +109,6 @@ class ProfilePage extends StatelessWidget {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
-
                   _buildField("Nama pengguna", name),
                   _buildEmailField("Email", email),
                   _buildField(
@@ -147,7 +146,6 @@ class ProfilePage extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildField(
     String label,
     String value, {
@@ -179,7 +177,6 @@ class ProfilePage extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildEmailField(String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
