@@ -83,7 +83,7 @@ class _MyLoginState extends State<MyLogin> {
                   textAlign: TextAlign.center,
                 ),
                 Lottie.asset(
-                  'assets/annimations/Photography.json',
+                  'assets/animations/Photography.json',
                   height: 200,
                   width: 200,
                   fit: BoxFit.contain,

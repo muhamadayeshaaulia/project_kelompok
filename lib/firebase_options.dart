@@ -50,18 +50,18 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: "AIzaSyDMWUpytaEHpykTDDXsCNYTIjTD5-4h0AA",
-    authDomain: "myfristproject-dd7da.firebaseapp.com",
-    projectId: "myfristproject-dd7da",
-    storageBucket: "myfristproject-dd7da.firebasestorage.app",
-    messagingSenderId: "1043234910102",
-    appId: "1:1043234910102:web:8bce53cba2080fe048f7b7",
-    measurementId: "G-2Y1JNER5TK",
+    apiKey: 'AIzaSyDMWUpytaEHpykTDDXsCNYTIjTD5-4h0AA',
+    appId: '1:1043234910102:web:8bce53cba2080fe048f7b7',
+    messagingSenderId: '1043234910102',
+    projectId: 'myfristproject-dd7da',
+    authDomain: 'myfristproject-dd7da.firebaseapp.com',
+    storageBucket: 'myfristproject-dd7da.firebasestorage.app',
+    measurementId: 'G-2Y1JNER5TK',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDMWUpytaEHpykTDDXsCNYTIjTD5-4h0AA',
-    appId: '1:1043234910102:web:8bce53cba2080fe048f7b7',
+    apiKey: 'AIzaSyAmsZFAuEUr8Olj9bYpVIvgiyVhC5rZkR0',
+    appId: '1:1043234910102:android:e1751651e447945648f7b7',
     messagingSenderId: '1043234910102',
     projectId: 'myfristproject-dd7da',
     storageBucket: 'myfristproject-dd7da.firebasestorage.app',

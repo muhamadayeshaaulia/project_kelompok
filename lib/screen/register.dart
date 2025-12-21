@@ -100,10 +100,8 @@ class _MyRegisState extends State<MyRegis> {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
-
-                // 🔥 LOTTIE SAMA BIAR KONSISTEN
                 Lottie.asset(
-                  'assets/annimations/Camera_Click.json',
+                  'assets/animations/Camera_Click.json',
                   height: 200,
                   width: 200,
                   fit: BoxFit.contain,
