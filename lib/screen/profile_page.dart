@@ -1,8 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+  class _ProfilePageState extends State<ProfilePage> {
+  // 1. Definisikan Controller
+  final nameCtrl = TextEditingController();
+  final genderCtrl = TextEditingController();
+  final addressCtrl = TextEditingController();
+  final descCtrl = TextEditingController();
+  final socialMediaCtrl = TextEditingController();
+
+  final user = FirebaseAuth.instance.currentUser;
+  }
 
   @override
   Widget build(BuildContext context) {
