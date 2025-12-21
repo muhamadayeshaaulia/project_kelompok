@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'profile_page.dart';
 
 class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key});
@@ -172,8 +173,15 @@ class MyHomePage extends StatelessWidget {
                   ),
                   MaterialButton(
                     minWidth: 40,
-                    onPressed: () {},
-                    child: const Column(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ProfilePage(),
+                        ),
+                      );
+                    },
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.person, color: Colors.grey),
