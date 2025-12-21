@@ -1,17 +1,80 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:project_kelompok/screen/home_page.dart';
+import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
   @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  final nameCtrl = TextEditingController();
+  final genderCtrl = TextEditingController();
+  final addressCtrl = TextEditingController();
+  final descCtrl = TextEditingController();
+  final socialMediaCtrl = TextEditingController();
+
+  final user = FirebaseAuth.instance.currentUser;
+  bool isEditing = false;
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    if (user == null) return;
+
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .get();
+      if (doc.exists) {
+        final data = doc.data();
+        setState(() {
+          nameCtrl.text = data?['nama'] ?? '';
+          genderCtrl.text = data?['jenis_kelamin'] ?? '';
+          addressCtrl.text = data?['alamat'] ?? '';
+          descCtrl.text = data?['keterangan'] ?? '';
+          socialMediaCtrl.text = data?['sosmed_link'] ?? '';
+        });
+      }
+    } catch (e) {
+      print("Error loading user data: $e");
+    }
+  }
+
+  Future<void> _saveProfile() async {
+    if (user == null) return;
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
+        'nama': nameCtrl.text,
+        'jenis_kelamin': genderCtrl.text,
+        'alamat': addressCtrl.text,
+        'keterangan': descCtrl.text,
+        'sosmed_link': socialMediaCtrl.text,
+        'email': user!.email,
+        'updated_at': DateTime.now(),
+      }, SetOptions(merge: true));
+      setState(() {
+        isEditing = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Profil berhasil diperbarui!')),
+      );
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-
-    final String name = user?.displayName ?? user?.email?.split('@')[0] ?? 'Fotografer';
-    final String email = user?.email ?? "Email tidak ditemukan";
-    final String photoUrl = user?.photoURL ?? "";
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -19,9 +82,37 @@ class ProfilePage extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            } else {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MyHomePage(),
+                ),
+              );
+            }
+          },
         ),
         title: const Text("Profil", style: TextStyle(color: Colors.white)),
+        actions: [
+          TextButton(
+            onPressed: () {
+              setState(() {
+                isEditing = !isEditing;
+                if (!isEditing) _loadUserData();
+              });
+            },
+            child: Text(
+              isEditing ? "Batal" : "Edit",
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -29,7 +120,7 @@ class ProfilePage extends StatelessWidget {
             Container(
               height: 200,
               width: double.infinity,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
                     Color(0xFF7F7FD5),
@@ -43,53 +134,23 @@ class ProfilePage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      SizedBox(
-                        width: 110,
-                        height: 110,
-                        child: CircularProgressIndicator(
-                          value: 0.8, 
-                          strokeWidth: 6,
-                          backgroundColor: Colors.white30,
-                          valueColor: const AlwaysStoppedAnimation<Color>(
-                            Colors.purple,
-                          ),
-                        ),
-                      ),
-                      CircleAvatar(
-                        radius: 45,
-                        backgroundColor: Colors.grey[300],
-                        backgroundImage: photoUrl.isNotEmpty
-                            ? NetworkImage(photoUrl)
-                            : null,
-                        child: photoUrl.isEmpty
-                            ? const Icon(
-                                Icons.person,
-                                size: 50,
-                                color: Colors.white,
-                              )
-                            : null,
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: CircleAvatar(
-                          radius: 16,
-                          backgroundColor: Colors.white,
-                          child: Icon(
-                            Icons.camera_alt,
-                            size: 18,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ],
+                  CircleAvatar(
+                    radius: 45,
+                    backgroundColor: Colors.grey[300],
+                    backgroundImage: user?.photoURL != null
+                        ? NetworkImage(user!.photoURL!)
+                        : null,
+                    child: user?.photoURL == null
+                        ? const Icon(
+                            Icons.person,
+                            size: 50,
+                            color: Colors.white,
+                          )
+                        : null,
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    name,
+                    nameCtrl.text.isEmpty ? "Fotografer" : nameCtrl.text,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -109,17 +170,20 @@ class ProfilePage extends StatelessWidget {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
-                  _buildField("Nama pengguna", name),
-                  _buildEmailField("Email", email),
+                  _buildField("Nama Lengkap", nameCtrl, enabled: isEditing),
+                  _buildField("Jenis Kelamin", genderCtrl, enabled: isEditing),
+                  _buildEmailField("Email", user?.email ?? ""),
+                  _buildField("Alamat", addressCtrl, enabled: isEditing),
                   _buildField(
-                    "UID Firebase",
-                    user?.uid ?? "-",
-                    enabled: false,
+                    "Sosial Media (Link)",
+                    socialMediaCtrl,
+                    enabled: isEditing,
                   ),
                   _buildField(
                     "Tentang saya",
-                    "Fotografer Momen Berharga",
+                    descCtrl,
                     maxLines: 3,
+                    enabled: isEditing,
                   ),
 
                   const SizedBox(height: 24),
@@ -128,11 +192,22 @@ class ProfilePage extends StatelessWidget {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-
+                  if (isEditing)
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _saveProfile,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF7F7FD5),
+                        ),
+                        child: const Text(
+                          "Simpan Perubahan",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
                   TextButton(
-                    onPressed: () {
-
-                    },
+                    onPressed: () {},
                     child: const Text(
                       "Hapus Profil",
                       style: TextStyle(color: Colors.red),
@@ -144,12 +219,19 @@ class ProfilePage extends StatelessWidget {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        backgroundColor: Colors.yellow[800],
+        child: const Icon(Icons.camera_alt, color: Colors.white),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: const CustomButtomNav(currentIndex: 3),
     );
   }
+
   Widget _buildField(
     String label,
-    String value, {
-    bool obscure = false,
+    TextEditingController controller, {
     int maxLines = 1,
     bool enabled = true,
   }) {
@@ -161,8 +243,7 @@ class ProfilePage extends StatelessWidget {
           Text(label, style: const TextStyle(color: Colors.grey)),
           const SizedBox(height: 6),
           TextField(
-            controller: TextEditingController(text: value),
-            obscureText: obscure,
+            controller: controller,
             maxLines: maxLines,
             enabled: enabled,
             decoration: InputDecoration(
@@ -177,6 +258,7 @@ class ProfilePage extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildEmailField(String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
@@ -190,7 +272,7 @@ class ProfilePage extends StatelessWidget {
               Expanded(
                 child: TextField(
                   controller: TextEditingController(text: value),
-                  enabled: false, 
+                  enabled: false,
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.grey[100],
