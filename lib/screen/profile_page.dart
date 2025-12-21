@@ -8,7 +8,7 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
 
-    final String displayName = user?.displayName ?? "Belum diatur";
+    final String name = user?.displayName ?? user?.email?.split('@')[0] ?? 'Fotografer';
     final String email = user?.email ?? "Email tidak ditemukan";
     final String photoUrl = user?.photoURL ?? "";
 
@@ -89,7 +89,7 @@ class ProfilePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    displayName,
+                    name,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -110,7 +110,7 @@ class ProfilePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
 
-                  _buildField("Nama pengguna", displayName),
+                  _buildField("Nama pengguna", name),
                   _buildEmailField("Email", email),
                   _buildField(
                     "UID Firebase",
