@@ -100,7 +100,6 @@ class _MyRegisState extends State<MyRegis> {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
-
                 Lottie.asset(
                   'assets/animations/Camera_Click.json',
                   height: 200,
