@@ -13,6 +13,15 @@ class ProfilePage extends StatelessWidget {
     final String photoUrl = user?.photoURL ?? "";
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF7F7FD5),
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text("Profil", style: TextStyle(color: Colors.white)),
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
