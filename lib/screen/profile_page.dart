@@ -210,7 +210,7 @@ class _ProfilePageState extends State<ProfilePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: Colors.yellow[800],
-        child: const Icon(Icons.camera_alt),
+        child: const Icon(Icons.camera_alt, color: Colors.white,),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: const CustomButtomNav(currentIndex: 3),
