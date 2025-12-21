@@ -29,6 +29,20 @@ class CustomButtomNav extends StatelessWidget {
                 ),
               ],
             ),
+            Row(
+              children: [
+                _buildNavItem(
+                  context,
+                  icon: Icons.info,
+                  index: 2,
+                ),
+                _buildNavItem(
+                  context,
+                  icon: Icons.person,
+                  index: 3,
+                ),
+              ],
+            ),
           ],
         ),
       ),
