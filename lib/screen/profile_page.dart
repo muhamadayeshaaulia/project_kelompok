@@ -113,7 +113,7 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Text(
               isEditing ? "Batal" : "Edit",
               style: const TextStyle(
-                color: Colors.white,
+                color: Colors.black,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -200,7 +200,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: ElevatedButton(
                         onPressed: _saveProfile,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF7F7FD5),
+                          backgroundColor: Colors.yellow[800],
                         ),
                         child: const Text(
                           "Simpan Perubahan",
