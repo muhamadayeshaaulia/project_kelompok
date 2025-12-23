@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:project_kelompok/screen/following_page.dart';
 import 'package:project_kelompok/screen/home_page.dart';
+import 'package:project_kelompok/screen/info_page.dart';
 import 'package:project_kelompok/screen/profile_page.dart';
 
 class CustomButtomNav extends StatelessWidget {
@@ -48,6 +50,10 @@ class CustomButtomNav extends StatelessWidget {
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MyHomePage()));
         } else if (index == 3) {
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ProfilePage()));
+        } else if (index == 2) {
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const InfoAplikasiPage()));
+        } else if (index == 1) {
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const FollowingPage()));
         }
     }, child: Column(
       mainAxisAlignment: MainAxisAlignment.center,

@@ -88,9 +88,7 @@ class _ProfilePageState extends State<ProfilePage> {
             } else {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const MyHomePage(),
-                ),
+                MaterialPageRoute(builder: (context) => const MyHomePage()),
               );
             }
           },
