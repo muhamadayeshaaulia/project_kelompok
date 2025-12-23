@@ -108,12 +108,6 @@ class _FollowingPageState extends State<FollowingPage> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: Colors.yellow[800],
-        child: const Icon(Icons.camera_alt, color: Colors.white),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: const CustomButtomNav(currentIndex: 1),
     );
   }
