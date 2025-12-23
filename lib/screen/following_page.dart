@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_kelompok/screen/home_page.dart';
 
 class FollowingPage extends StatefulWidget {
   const FollowingPage({super.key});
@@ -34,7 +35,28 @@ class _FollowingPageState extends State<FollowingPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Following"),
-        backgroundColor: Colors.purple,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color.fromRGBO(255, 192, 45, 1), Colors.white],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+         leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            } else {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const MyHomePage()),
+              );
+            }
+          },
+        ),
       ),
       body: ListView.builder(
         itemCount: users.length,
