@@ -78,7 +78,15 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF7F7FD5),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color.fromRGBO(255, 192, 45, 1), Colors.white],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -88,14 +96,12 @@ class _ProfilePageState extends State<ProfilePage> {
             } else {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const MyHomePage(),
-                ),
+                MaterialPageRoute(builder: (context) => const MyHomePage()),
               );
             }
           },
         ),
-        title: const Text("Profil", style: TextStyle(color: Colors.white)),
+        title: const Text("Profil", style: TextStyle(color: Colors.black)),
         actions: [
           TextButton(
             onPressed: () {
@@ -107,7 +113,7 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Text(
               isEditing ? "Batal" : "Edit",
               style: const TextStyle(
-                color: Colors.white,
+                color: Colors.black,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -122,11 +128,7 @@ class _ProfilePageState extends State<ProfilePage> {
               width: double.infinity,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Color(0xFF7F7FD5),
-                    Color(0xFF86A8E7),
-                    Color(0xFF91EAE4),
-                  ],
+                  colors: [Color.fromRGBO(255, 192, 45, 1), Colors.white],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -152,7 +154,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   Text(
                     nameCtrl.text.isEmpty ? "Fotografer" : nameCtrl.text,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
@@ -198,7 +200,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: ElevatedButton(
                         onPressed: _saveProfile,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF7F7FD5),
+                          backgroundColor: Colors.yellow[800],
                         ),
                         child: const Text(
                           "Simpan Perubahan",
@@ -219,12 +221,6 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: Colors.yellow[800],
-        child: const Icon(Icons.camera_alt, color: Colors.white),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: const CustomButtomNav(currentIndex: 3),
     );
   }

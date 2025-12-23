@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:project_kelompok/screen/home_page.dart';
+import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 
 class InfoAplikasiPage extends StatelessWidget {
   const InfoAplikasiPage({super.key});
@@ -8,7 +10,28 @@ class InfoAplikasiPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Info Aplikasi"),
-        backgroundColor: Colors.purple,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color.fromRGBO(255, 192, 45, 1), Colors.white],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            } else {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const MyHomePage()),
+              );
+            }
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -19,23 +42,13 @@ class InfoAplikasiPage extends StatelessWidget {
             Center(
               child: Column(
                 children: const [
-                  Icon(
-                    Icons.apps,
-                    size: 80,
-                    color: Colors.purple,
-                  ),
+                  Icon(Icons.apps, size: 80, color: Colors.purple),
                   SizedBox(height: 12),
                   Text(
                     "Nama Aplikasi",
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
-                  Text(
-                    "Versi 1.0.0",
-                    style: TextStyle(color: Colors.grey),
-                  ),
+                  Text("Versi 1.0.0", style: TextStyle(color: Colors.grey)),
                 ],
               ),
             ),
@@ -45,10 +58,7 @@ class InfoAplikasiPage extends StatelessWidget {
             /// 🔹 Deskripsi Aplikasi
             const Text(
               "Tentang Aplikasi",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             const Text(
@@ -91,6 +101,7 @@ class InfoAplikasiPage extends StatelessWidget {
           ],
         ),
       ),
+      bottomNavigationBar: const CustomButtomNav(currentIndex: 2),
     );
   }
 }
