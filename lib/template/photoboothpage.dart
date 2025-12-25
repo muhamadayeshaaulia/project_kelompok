@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:project_kelompok/services/supabase_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 class PhotoBoothPage extends StatefulWidget {
   const PhotoBoothPage({super.key});
@@ -25,8 +26,25 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
     final XFile? pickedFile = await _picker.pickImage(
       source: ImageSource.gallery,
     );
-    if (pickedFile != null) {
-      setState(() => _imageFiles[index] = File(pickedFile.path));
+    if (pickedFile == null) return;
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: pickedFile.path,
+      aspectRatio: const CropAspectRatio(ratioX: 4, ratioY: 3),
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'Atur Posisi Foto',
+          toolbarColor: Colors.yellow[700],
+          toolbarWidgetColor: Colors.white,
+          initAspectRatio: CropAspectRatioPreset.original,
+          lockAspectRatio: true,
+        ),
+        IOSUiSettings(title: 'Atur Posisi Foto'),
+      ],
+    );
+    if (croppedFile != null) {
+      setState(() {
+        _imageFiles[index] = File(croppedFile.path);
+      });
     }
   }
 
@@ -36,7 +54,10 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
           _boundaryKey.currentContext?.findRenderObject()
               as RenderRepaintBoundary?;
       if (boundary == null) return null;
-      ui.Image image = await boundary.toImage(pixelRatio: 2.0);
+
+      ui.Image image = await boundary.toImage(
+        pixelRatio: 3.0,
+      );
       ByteData? byteData = await image.toByteData(
         format: ui.ImageByteFormat.png,
       );
@@ -60,10 +81,9 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
     try {
       final userId = FirebaseAuth.instance.currentUser?.uid;
       if (userId == null) throw "Sesi login habis.";
-      final imageBytes = await _capturePng();
 
-      if (imageBytes == null)
-        throw "Gagal mengambil gambar. Coba tekan simpan lagi.";
+      final imageBytes = await _capturePng();
+      if (imageBytes == null) throw "Gagal mengambil gambar. Coba lagi.";
 
       final tempDir = await getTemporaryDirectory();
       final file = await File(
@@ -77,11 +97,8 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
           .from('photos')
           .upload('uploads/$userId/$fileName', file);
 
-      if (mounted) {
-        Navigator.pop(context, true);
-      }
+      if (mounted) Navigator.pop(context, true);
     } catch (e) {
-      debugPrint("Error detail: $e");
       if (mounted) {
         showDialog(
           context: context,
