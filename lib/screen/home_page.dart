@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'profile_page.dart';
-import 'package:project_kelompok/template/photoboothpage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:project_kelompok/template/photoboothpage.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 import 'package:project_kelompok/services/supabase_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -34,14 +33,10 @@ class _MyHomePageState extends State<MyHomePage> {
             .collection('users')
             .doc(user.uid)
             .get();
-
-        if (doc.exists && doc.data() != null) {
+        if (doc.exists && doc.data() != null && mounted) {
           setState(() {
             _displayName =
-                doc.data()!['nama'] ??
-                user.displayName ??
-                user.email?.split('@')[0] ??
-                "Fotografer";
+                doc.data()!['nama'] ?? user.displayName ?? "Fotografer";
           });
         }
       } catch (e) {
@@ -55,24 +50,33 @@ class _MyHomePageState extends State<MyHomePage> {
     if (userId == null) return;
 
     try {
-      setState(() => _isLoading = true);
-      final objects = await SupabaseService.client.storage
+      final List<FileObject> objects = await SupabaseService.client.storage
           .from('photos')
           .list(path: 'uploads/$userId');
 
-      final List<String> urls = objects.map((obj) {
-        return SupabaseService.client.storage
-            .from('photos')
-            .getPublicUrl('uploads/$userId/${obj.name}');
-      }).toList();
+      final List<String> urls = objects
+          .where((obj) {
+            final name = obj.name.toLowerCase();
+            return name.endsWith('.png') ||
+                name.endsWith('.jpg') ||
+                name.endsWith('.jpeg');
+          })
+          .map(
+            (obj) => SupabaseService.client.storage
+                .from('photos')
+                .getPublicUrl('uploads/$userId/${obj.name}'),
+          )
+          .toList();
 
-      setState(() {
-        _photoUrls = urls;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _photoUrls = urls;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       debugPrint("Error load photos: $e");
-      setState(() => _isLoading = true);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -116,14 +120,13 @@ class _MyHomePageState extends State<MyHomePage> {
           context: context,
           builder: (context) => Dialog(
             backgroundColor: Colors.transparent,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+            child: ListView(
+              shrinkWrap: true,
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(15),
                   child: Image.network(_photoUrls[index]),
                 ),
-                const SizedBox(height: 10),
                 IconButton(
                   icon: const Icon(Icons.close, color: Colors.white, size: 30),
                   onPressed: () => Navigator.pop(context),
@@ -159,23 +162,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  4,
-                  (i) => Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 2),
-                    width: 6,
-                    height: 6,
-                    decoration: const BoxDecoration(
-                      color: Colors.orange,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-              ),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Icon(Icons.more_horiz, color: Colors.orange, size: 20),
             ),
           ],
         ),
@@ -210,100 +199,92 @@ class _MyHomePageState extends State<MyHomePage> {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Halo, $_displayName!',
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Text(
-                    'Pilih template untuk mulai memotret:',
-                    style: TextStyle(fontSize: 16, color: Colors.black54),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 120,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                children: [
-                  _buildTemplateCard(
-                    title: "Classic 4",
-                    icon: Icons.filter_4,
-                    color: Colors.orange[100]!,
-                    onTap: () async {
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const PhotoBoothPage(),
-                        ),
-                      );
-                      if (result == true) _loadPhotos();
-                    },
-                  ),
-                  _buildTemplateCard(
-                    title: "Grid 2x2",
-                    icon: Icons.grid_view,
-                    color: Colors.blue[100]!,
-                    onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Coming Soon!")),
-                    ),
-                  ),
-                  _buildTemplateCard(
-                    title: "Vintage",
-                    icon: Icons.camera_roll,
-                    color: Colors.green[100]!,
-                    onTap: () {},
-                  ),
-                ],
-              ),
-            ),
-
-            const Padding(
-              padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
-              child: Text(
-                'Hasil Karya Saya',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-
-            Expanded(
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _photoUrls.isEmpty
-                  ? const Center(
-                      child: Text(
-                        "Belum ada foto buatanmu.",
-                        style: TextStyle(color: Colors.black45),
+        child: SafeArea(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Halo, $_displayName!',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
                       ),
-                    )
-                  : GridView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 15,
-                            mainAxisSpacing: 15,
-                            childAspectRatio: 0.6,
+                    ),
+                    const Text(
+                      'Pilih template untuk mulai memotret:',
+                      style: TextStyle(fontSize: 16, color: Colors.black54),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 120,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  children: [
+                    _buildTemplateCard(
+                      title: "Classic 4",
+                      icon: Icons.filter_4,
+                      color: Colors.orange[100]!,
+                      onTap: () async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const PhotoBoothPage(),
                           ),
-                      itemCount: _photoUrls.length,
-                      itemBuilder: (context, index) {
-                        return _buildPhotoItem(index);
+                        );
+                        if (result == true) _loadPhotos();
                       },
                     ),
-            ),
-          ],
+                    _buildTemplateCard(
+                      title: "Grid 2x2",
+                      icon: Icons.grid_view,
+                      color: Colors.blue[100]!,
+                      onTap: () {},
+                    ),
+                    _buildTemplateCard(
+                      title: "Vintage",
+                      icon: Icons.camera_roll,
+                      color: Colors.green[100]!,
+                      onTap: () {},
+                    ),
+                  ],
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
+                child: Text(
+                  'Hasil Karya Saya',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 15,
+                              mainAxisSpacing: 15,
+                              childAspectRatio: 0.6,
+                            ),
+                        itemCount: _photoUrls.length,
+                        itemBuilder: (context, index) => _buildPhotoItem(index),
+                      ),
+              ),
+              const SizedBox(height: 150),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: const CustomButtomNav(currentIndex: 0),
