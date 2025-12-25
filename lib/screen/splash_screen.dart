@@ -26,29 +26,39 @@ class _MySplashScreenState extends State<MySplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Lottie.asset(
-              'assets/animations/Running_Cat.json',
-              width: 300,
-              height: 300,
-              fit: BoxFit.contain,
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              'Sabar Boss..!',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.yellow[700]!, Colors.white],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Lottie.asset(
+                'assets/animations/Running_Cat.json',
+                width: 300,
+                height: 300,
+                fit: BoxFit.contain,
               ),
-            ),
-            const SizedBox(height: 16),
-            const CircularProgressIndicator(),
-          ],
+              const SizedBox(height: 4),
+              const Text(
+                'Sabar Boss..!',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
+                ),
+              ),
+              const SizedBox(height: 16),
+              const CircularProgressIndicator(),
+            ],
+          ),
         ),
       ),
     );
