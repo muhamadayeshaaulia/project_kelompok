@@ -18,6 +18,19 @@ class MyPage1 extends StatelessWidget {
           ),
 
           Positioned(
+            top: 20,
+            left: 20,
+            
+              child: Image.asset(
+                'assets/images/global.png',
+                width: 140,
+                height: 140,
+                fit: BoxFit.contain,
+                filterQuality: FilterQuality.high,
+              ),
+          ),
+
+          Positioned(
             top: 80,
             left: 0,
             right: 0,
