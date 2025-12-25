@@ -37,7 +37,11 @@ class MyPage1 extends StatelessWidget {
             child: Center(
               child: ShaderMask(
                 shaderCallback: (bounds) => LinearGradient(
-                  colors: [Colors.yellow[700]!, Colors.white],
+                  colors: [
+                    Colors.yellow[800]!,
+                    Colors.yellow[300]!,
+                    Colors.white,
+                  ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ).createShader(bounds),
