@@ -20,14 +20,14 @@ class MyPage1 extends StatelessWidget {
           Positioned(
             top: 20,
             left: 20,
-            
-              child: Image.asset(
-                'assets/images/global.png',
-                width: 140,
-                height: 140,
-                fit: BoxFit.contain,
-                filterQuality: FilterQuality.high,
-              ),
+
+            child: Image.asset(
+              'assets/images/global.png',
+              width: 140,
+              height: 140,
+              fit: BoxFit.contain,
+              filterQuality: FilterQuality.high,
+            ),
           ),
 
           Positioned(
@@ -35,12 +35,19 @@ class MyPage1 extends StatelessWidget {
             left: 0,
             right: 0,
             child: Center(
-              child: Text(
-                'MyPhotoBooth',
-                style: TextStyle(
-                  fontSize: 48,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+              child: ShaderMask(
+                shaderCallback: (bounds) => LinearGradient(
+                  colors: [Colors.yellow[700]!, Colors.white],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ).createShader(bounds),
+                child: const Text(
+                  'MyPhotoBooth',
+                  style: TextStyle(
+                    fontSize: 48,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
