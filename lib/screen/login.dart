@@ -16,6 +16,7 @@ class _MyLoginState extends State<MyLogin> {
   final emailCtrl = TextEditingController();
   final passCtrl = TextEditingController();
   bool _isLoading = false;
+  bool _obscurePassword = true;
   String? _error;
 
   Future<void> _login() async {
@@ -111,7 +112,7 @@ class _MyLoginState extends State<MyLogin> {
                     const SizedBox(height: 15),
                     TextField(
                       controller: passCtrl,
-                      obscureText: true,
+                      obscureText: _obscurePassword,
                       decoration: InputDecoration(
                         border: const OutlineInputBorder(),
                         focusedBorder: OutlineInputBorder(
@@ -120,8 +121,21 @@ class _MyLoginState extends State<MyLogin> {
                         ),
                         prefixIcon: const Icon(Icons.lock),
                         labelText: 'Password',
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
+                        ),
                       ),
                     ),
+
                     if (_error != null) ...[
                       const SizedBox(height: 10),
                       Text(
