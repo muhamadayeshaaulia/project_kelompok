@@ -185,32 +185,14 @@ class _MyLoginState extends State<MyLogin> {
                         ),
                       ],
                     ),
+                    
                   ],
                 ),
               ),
             ),
           ),
 
-          Positioned(
-            top: 40,
-            right: 20,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 6)],
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const MyPage1()),
-                  );
-                },
-              ),
-            ),
-          ),
+         
         ],
       ),
     );
