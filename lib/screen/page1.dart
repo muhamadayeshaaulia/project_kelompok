@@ -50,7 +50,7 @@ class MyPage1 extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       _authButton(
-                        imagePath: 'assets/images/google1.jpg',
+                        imagePath: 'assets/images/icongoogle.png',
                         text: 'Sambungkan dengan Google',
                         onTap: () {},
                       ),
@@ -58,7 +58,7 @@ class MyPage1 extends StatelessWidget {
                       const SizedBox(height: 12),
 
                       _authButton(
-                        imagePath: 'assets/images/email.jpg',
+                        imagePath: 'assets/images/email-icon.png',
                         text: 'Lanjut dengan Email',
                         onTap: () {
                           Navigator.pushReplacement(
