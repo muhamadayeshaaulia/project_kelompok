@@ -58,7 +58,7 @@ class MyPage1 extends StatelessWidget {
                       const SizedBox(height: 12),
 
                       _authButton(
-                        imagePath: 'assets/images/email-icon.png',
+                        imagePath: 'assets/images/email3.png',
                         text: 'Lanjut dengan Email',
                         onTap: () {
                           Navigator.pushReplacement(
