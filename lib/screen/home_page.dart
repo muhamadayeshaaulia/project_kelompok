@@ -15,6 +15,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String _displayName = "Fotografer";
+  String? _profileImageUrl;
   List<String> _photoUrls = [];
   bool _isLoading = true;
 
@@ -33,10 +34,12 @@ class _MyHomePageState extends State<MyHomePage> {
             .collection('users')
             .doc(user.uid)
             .get();
+            
         if (doc.exists && doc.data() != null && mounted) {
+          final data = doc.data()!;
           setState(() {
-            _displayName =
-                doc.data()!['nama'] ?? user.displayName ?? "Fotografer";
+            _displayName = data['nama'] ?? user.displayName ?? "Fotografer";
+            _profileImageUrl = data['photo_url']; 
           });
         }
       } catch (e) {
@@ -193,7 +196,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   actions: [
                     TextButton(
                       onPressed: () {
-                        Navigator.pop(context); // tutup dialog
+                        Navigator.pop(context); 
                       },
                       child: const Text('Batal'),
                     ),
@@ -202,7 +205,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         backgroundColor: Colors.red,
                       ),
                       onPressed: () async {
-                        Navigator.pop(context); // tutup dialog
+                        Navigator.pop(context); 
                         await FirebaseAuth.instance.signOut();
                         Navigator.pushReplacementNamed(context, '/login');
                       },
@@ -232,23 +235,57 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
                   children: [
-                    Text(
-                      'Halo, $_displayName!',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                          )
+                        ],
+                      ),
+                      child: CircleAvatar(
+                        radius: 30,
+                        backgroundColor: Colors.grey[200],
+                        backgroundImage: (_profileImageUrl != null && _profileImageUrl!.isNotEmpty)
+                            ? NetworkImage(_profileImageUrl!)
+                            : null,
+                        child: (_profileImageUrl == null || _profileImageUrl!.isEmpty)
+                            ? const Icon(Icons.person, size: 35, color: Colors.grey)
+                            : null,
                       ),
                     ),
-                    const Text(
-                      'Pilih template untuk mulai memotret:',
-                      style: TextStyle(fontSize: 16, color: Colors.black54),
+                    
+                    const SizedBox(width: 15),
+                    
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Halo, $_displayName!',
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const Text(
+                            'Pilih template untuk mulai memotret:',
+                            style: TextStyle(fontSize: 14, color: Colors.black54),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
+              // ---------------------------------------------
+              
               SizedBox(
                 height: 120,
                 child: ListView(
