@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:project_kelompok/screen/home_screen.dart';
 import 'package:project_kelompok/screen/login.dart';
 import 'package:project_kelompok/screen/page1.dart';
@@ -8,10 +9,13 @@ import 'package:project_kelompok/screen/register.dart';
 import 'package:project_kelompok/screen/splash_screen.dart';
 import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'services/supabase_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await dotenv.load(fileName: ".env");
+  await SupabaseService.init();
   runApp(MyApp());
 }
 

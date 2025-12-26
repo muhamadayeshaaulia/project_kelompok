@@ -35,23 +35,12 @@ class MyPage1 extends StatelessWidget {
             left: 0,
             right: 0,
             child: Center(
-              child: ShaderMask(
-                shaderCallback: (bounds) => LinearGradient(
-                  colors: [
-                    Colors.yellow[800]!,
-                    Colors.yellow[300]!,
-                    Colors.white,
-                  ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ).createShader(bounds),
-                child: const Text(
-                  'MyPhotoBooth',
-                  style: TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+              child: Text(
+                'MyPhotoBooth',
+                style: TextStyle(
+                  fontSize: 48,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
