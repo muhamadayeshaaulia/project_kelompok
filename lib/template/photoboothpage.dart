@@ -38,12 +38,9 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
   final GlobalKey _boundaryKey = GlobalKey();
   bool _isLoading = false;
 
-  /// Fungsi Pick Image
   Future<void> _pickImage(int index) async {
     try {
-      final XFile? pickedFile = await _picker.pickImage(
-        source: ImageSource.gallery,
-      );
+      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
       if (pickedFile == null) return;
 
       CroppedFile? croppedFile = await ImageCropper().cropImage(
@@ -67,7 +64,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
         });
       }
     } catch (e) {
-      debugPrint("Error: $e");
+      debugPrint("Error pick image: $e");
     }
   }
 
@@ -79,54 +76,77 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
       return;
     }
 
+    // 1. Mulai Loading (Tampilan foto TETAP ADA di background)
     setState(() => _isLoading = true);
 
     try {
       final userId = FirebaseAuth.instance.currentUser?.uid;
       if (userId == null) throw "Login dulu bro.";
 
-      await Future.delayed(const Duration(milliseconds: 100));
+      // 2. Tunggu sebentar biar UI stabil
+      await Future.delayed(const Duration(milliseconds: 200));
+
+      // 3. Ambil Screenshot
       RenderRepaintBoundary? boundary =
-          _boundaryKey.currentContext?.findRenderObject()
-              as RenderRepaintBoundary?;
-      if (boundary == null) throw "Gagal render.";
+          _boundaryKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      
+      // Kalau boundary null, berarti widget hilang dari layar
+      if (boundary == null) throw "Gagal render. Widget tidak ditemukan.";
 
       ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-      ByteData? byteData = await image.toByteData(
-        format: ui.ImageByteFormat.png,
-      );
+      ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       final fullImageBytes = byteData?.buffer.asUint8List();
 
       if (fullImageBytes == null) throw "Gambar kosong.";
 
-      // Simpan ke Galeri HP
+      // 4. Simpan ke Galeri (Android/iOS)
       if (!kIsWeb) {
-        final tempDir = await getTemporaryDirectory();
-        final file = await File('${tempDir.path}/photostrip.png').create();
-        await file.writeAsBytes(fullImageBytes);
-        await Gal.putImage(file.path, album: 'PhotoBooth');
+        try {
+          await Gal.requestAccess(); 
+          final tempDir = await getTemporaryDirectory();
+          final file = await File('${tempDir.path}/photostrip_${DateTime.now().millisecondsSinceEpoch}.png').create();
+          await file.writeAsBytes(fullImageBytes);
+          await Gal.putImage(file.path, album: 'PhotoBooth');
+          
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Berhasil disimpan ke Galeri!"), backgroundColor: Colors.green),
+            );
+          }
+        } catch (e) {
+          debugPrint("Skip galeri: $e");
+        }
       }
 
+      // 5. Upload ke Supabase
       final fileName = 'strip_${DateTime.now().millisecondsSinceEpoch}.png';
       await SupabaseService.client.storage
           .from('photos')
           .uploadBinary(
             'uploads/$userId/$fileName',
             fullImageBytes,
-            fileOptions: const FileOptions(
-              contentType: 'image/png',
-              upsert: true,
-            ),
+            fileOptions: const FileOptions(contentType: 'image/png', upsert: true),
           );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Mantap! Tersimpan & Terupload.")),
+          const SnackBar(content: Text("Upload Berhasil!")),
         );
         Navigator.pop(context, true);
       }
+
     } catch (e) {
       debugPrint("Error: $e");
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Gagal"),
+            content: Text(e.toString()),
+            actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK"))],
+          ),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -140,170 +160,139 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
 
     return Scaffold(
       appBar: AppBar(title: const Text("Custom Photostrip")),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 50),
-              child: Column(
-                children: [
-                  const SizedBox(height: 20),
-
-                  Center(
-                    child: RepaintBoundary(
-                      key: _boundaryKey,
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        width: 240,
-                        padding: const EdgeInsets.all(15),
-                        decoration: BoxDecoration(
-                          color: _frameColor,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 15,
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            ...List.generate(4, (index) {
-                              return GestureDetector(
-                                onTap: () => _pickImage(index),
-                                child: Container(
-                                  height: 150,
-                                  width: double.infinity,
-                                  margin: const EdgeInsets.only(bottom: 10),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[200],
-                                    border: Border.all(
-                                      color: borderColor,
-                                      width: 2,
-                                    ),
-                                  ),
-                                  child: _imageBytesList[index] == null
-                                      ? Icon(
-                                          Icons.add_a_photo,
-                                          color: Colors.grey[400],
-                                        )
-                                      : Image.memory(
-                                          _imageBytesList[index]!,
-                                          fit: BoxFit.cover,
-                                        ),
+      // PERBAIKAN DI SINI: Gunakan Stack agar foto tidak hilang saat loading
+      body: Stack(
+        children: [
+          // LAYER 1: KONTEN UTAMA (Scrollable)
+          SingleChildScrollView(
+            padding: const EdgeInsets.only(bottom: 50),
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                Center(
+                  child: RepaintBoundary(
+                    key: _boundaryKey,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      width: 240,
+                      padding: const EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        color: _frameColor,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 15,
+                          )
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          ...List.generate(4, (index) {
+                            return GestureDetector(
+                              onTap: () => _pickImage(index),
+                              child: Container(
+                                height: 150,
+                                width: double.infinity,
+                                margin: const EdgeInsets.only(bottom: 10),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[200],
+                                  border: Border.all(color: borderColor, width: 2),
                                 ),
-                              );
-                            }),
-
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8),
-                              child: Text(
-                                "PHOTOBOOTH MOMENTS",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 4,
-                                  fontSize: 12,
-                                  color: textColor,
-                                ),
+                                child: _imageBytesList[index] == null
+                                    ? Icon(Icons.add_a_photo, color: Colors.grey[400])
+                                    : Image.memory(
+                                        _imageBytesList[index]!,
+                                        fit: BoxFit.cover,
+                                      ),
                               ),
-                            ),
-                            Text(
-                              "2025",
+                            );
+                          }),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Text(
+                              "PHOTOBOOTH MOMENTS",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                fontSize: 10,
-                                color: textColor.withOpacity(0.7),
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 4,
+                                fontSize: 12,
+                                color: textColor,
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  const Text(
-                    "Pilih Warna Frame:",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  SizedBox(
-                    height: 60,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      itemCount: _colorOptions.length,
-                      itemBuilder: (context, index) {
-                        final color = _colorOptions[index];
-                        final isSelected = _frameColor == color;
-
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _frameColor = color;
-                            });
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 5),
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color: color,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: isSelected
-                                    ? Colors.blue
-                                    : Colors.grey[300]!,
-                                width: isSelected ? 3 : 1,
-                              ),
-                              boxShadow: [
-                                if (isSelected)
-                                  BoxShadow(
-                                    color: Colors.blue.withOpacity(0.3),
-                                    blurRadius: 8,
-                                    spreadRadius: 2,
-                                  ),
-                              ],
-                            ),
-                            child: isSelected
-                                ? Icon(
-                                    Icons.check,
-                                    color: color.computeLuminance() > 0.5
-                                        ? Colors.black
-                                        : Colors.white,
-                                  )
-                                : null,
                           ),
-                        );
-                      },
-                    ),
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  ElevatedButton.icon(
-                    onPressed: _captureAndUpload,
-                    icon: const Icon(Icons.save_alt, color: Colors.white),
-                    label: const Text(
-                      "Simpan Photostrip",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
-                        vertical: 15,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                          Text(
+                            "2025",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: textColor.withOpacity(0.7),
+                            ),
+                          )
+                        ],
                       ),
                     ),
                   ),
-                ],
+                ),
+                const SizedBox(height: 30),
+                const Text("Pilih Warna Frame:", style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 60,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    itemCount: _colorOptions.length,
+                    itemBuilder: (context, index) {
+                      final color = _colorOptions[index];
+                      final isSelected = _frameColor == color;
+                      return GestureDetector(
+                        onTap: () => setState(() => _frameColor = color),
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 5),
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isSelected ? Colors.blue : Colors.grey[300]!,
+                              width: isSelected ? 3 : 1,
+                            ),
+                            boxShadow: [if (isSelected) BoxShadow(color: Colors.blue.withOpacity(0.3), blurRadius: 8, spreadRadius: 2)],
+                          ),
+                          child: isSelected ? Icon(Icons.check, color: color.computeLuminance() > 0.5 ? Colors.black : Colors.white) : null,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 30),
+                ElevatedButton.icon(
+                  onPressed: _isLoading ? null : _captureAndUpload, // Disable tombol saat loading
+                  icon: const Icon(Icons.save_alt, color: Colors.white),
+                  label: const Text("Simpan Photostrip", style: TextStyle(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // LAYER 2: LOADING OVERLAY (Tampil di atas Layer 1)
+          if (_isLoading)
+            Container(
+              color: Colors.black.withOpacity(0.5),
+              child: const Center(
+                child: CircularProgressIndicator(color: Colors.white),
               ),
             ),
+        ],
+      ),
     );
   }
 }
