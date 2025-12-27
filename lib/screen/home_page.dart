@@ -26,7 +26,6 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     _fetchUserData();
     _loadPhotos();
-
     if (!hasShownWelcome) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _showWelcomeMessage();
@@ -329,8 +328,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   ],
                 ),
               ),
-
-              // ---------------------------------------------
               SizedBox(
                 height: 120,
                 child: ListView(
@@ -353,14 +350,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
 
                     _buildTemplateCard(
-                      title: "Classic 4",
-                      icon: Icons.filter_4,
-                      color: Colors.orange[100]!,
-                      onTap: () async {
-                        final result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const PhotoBoothPage(),
                           ),
                         );
                         if (result == true) _loadPhotos();
