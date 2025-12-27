@@ -338,7 +338,15 @@ class _MyHomePageState extends State<MyHomePage> {
                       title: "Vintage",
                       icon: Icons.camera_roll,
                       color: Colors.green[100]!,
-                      onTap: () {},
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Fitur Vintage segera hadir!"),
+                            backgroundColor: Colors.orange,
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
