@@ -12,14 +12,14 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:project_kelompok/services/supabase_service.dart';
 
-class PhotoBoothPage extends StatefulWidget {
-  const PhotoBoothPage({super.key});
+class PhotoBoothPage2 extends StatefulWidget {
+  const PhotoBoothPage2({super.key});
 
   @override
-  State<PhotoBoothPage> createState() => _PhotoBoothPageState();
+  State<PhotoBoothPage2> createState() => _PhotoBoothPageState();
 }
 
-class _PhotoBoothPageState extends State<PhotoBoothPage> {
+class _PhotoBoothPageState extends State<PhotoBoothPage2> {
   Color _frameColor = Colors.white;
 
   final List<Color> _colorOptions = [
@@ -33,7 +33,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
     Colors.blueGrey,
   ];
 
-  final List<Uint8List?> _imageBytesList = List.filled(4, null);
+  final List<Uint8List?> _imageBytesList = List.filled(2, null);
   final ImagePicker _picker = ImagePicker();
   final GlobalKey _boundaryKey = GlobalKey();
   bool _isLoading = false;
@@ -71,7 +71,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
   Future<void> _captureAndUpload() async {
     if (_imageBytesList.contains(null)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Isi semua 4 foto dulu ya!")),
+        const SnackBar(content: Text("Isi semua 2 foto dulu ya!")),
       );
       return;
     }
@@ -183,7 +183,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          ...List.generate(4, (index) {
+                          ...List.generate(2, (index) {
                             return GestureDetector(
                               onTap: () => _pickImage(index),
                               child: Container(
