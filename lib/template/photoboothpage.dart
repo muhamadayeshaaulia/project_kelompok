@@ -20,17 +20,15 @@ class PhotoBoothPage extends StatefulWidget {
 }
 
 class _PhotoBoothPageState extends State<PhotoBoothPage> {
-  // 1. VARIABLE WARNA FRAME (Default Putih)
   Color _frameColor = Colors.white;
 
-  // Daftar Pilihan Warna
   final List<Color> _colorOptions = [
     Colors.white,
     Colors.black,
-    const Color(0xFFF8BBD0), // Pink Soft
-    const Color(0xFFBBDEFB), // Biru Soft
-    const Color(0xFFC8E6C9), // Hijau Soft
-    const Color(0xFFFFF9C4), // Kuning Soft
+    const Color(0xFFF8BBD0),
+    const Color(0xFFBBDEFB),
+    const Color(0xFFC8E6C9),
+    const Color(0xFFFFF9C4),
     Colors.redAccent,
     Colors.blueGrey,
   ];
@@ -40,7 +38,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
   final GlobalKey _boundaryKey = GlobalKey();
   bool _isLoading = false;
 
-  /// Fungsi Pick Image (Simple tanpa ribet setting web)
+  /// Fungsi Pick Image
   Future<void> _pickImage(int index) async {
     try {
       final XFile? pickedFile = await _picker.pickImage(
@@ -51,7 +49,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
       CroppedFile? croppedFile = await ImageCropper().cropImage(
         sourcePath: pickedFile.path,
         aspectRatio: const CropAspectRatio(ratioX: 4, ratioY: 3),
-        // Kita pakai setting standard saja biar gak error
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: 'Potong Foto',
@@ -74,7 +71,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
     }
   }
 
-  /// Fungsi Capture & Upload
   Future<void> _captureAndUpload() async {
     if (_imageBytesList.contains(null)) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -111,7 +107,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
         await Gal.putImage(file.path, album: 'PhotoBooth');
       }
 
-      // Upload Supabase
       final fileName = 'strip_${DateTime.now().millisecondsSinceEpoch}.png';
       await SupabaseService.client.storage
           .from('photos')
@@ -139,7 +134,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Tentukan warna teks (Kalau background gelap, teks jadi putih)
     bool isDark = _frameColor.computeLuminance() < 0.5;
     Color textColor = isDark ? Colors.white : Colors.black87;
     Color borderColor = isDark ? Colors.white24 : Colors.grey[300]!;
@@ -154,18 +148,15 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
                 children: [
                   const SizedBox(height: 20),
 
-                  // --- PREVIEW PHOTOSTRIP ---
                   Center(
                     child: RepaintBoundary(
-                      // Area yang akan di-screenshot
                       key: _boundaryKey,
                       child: AnimatedContainer(
-                        // Pakai Animated biar mulus transisi warnanya
                         duration: const Duration(milliseconds: 300),
-                        width: 240, // Lebar strip
+                        width: 240,
                         padding: const EdgeInsets.all(15),
                         decoration: BoxDecoration(
-                          color: _frameColor, // INI WARNA CUSTOMNYA
+                          color: _frameColor,
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.2),
@@ -175,8 +166,8 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
                         ),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            // Loop 4 Foto
                             ...List.generate(4, (index) {
                               return GestureDetector(
                                 onTap: () => _pickImage(index),
@@ -204,22 +195,22 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
                               );
                             }),
 
-                            // Tulisan Bawah
                             Padding(
                               padding: const EdgeInsets.only(top: 8),
                               child: Text(
                                 "PHOTOBOOTH MOMENTS",
+                                textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 4,
                                   fontSize: 12,
-                                  color:
-                                      textColor, // Warna teks menyesuaikan background
+                                  color: textColor,
                                 ),
                               ),
                             ),
                             Text(
                               "2025",
+                              textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 10,
                                 color: textColor.withOpacity(0.7),
@@ -233,7 +224,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
 
                   const SizedBox(height: 30),
 
-                  // --- PILIHAN WARNA (COLOR PICKER) ---
                   const Text(
                     "Pilih Warna Frame:",
                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -293,7 +283,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
 
                   const SizedBox(height: 30),
 
-                  // --- TOMBOL SAVE ---
                   ElevatedButton.icon(
                     onPressed: _captureAndUpload,
                     icon: const Icon(Icons.save_alt, color: Colors.white),
