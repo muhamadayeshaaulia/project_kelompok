@@ -82,7 +82,7 @@ class _MyLoginState extends State<MyLogin> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      'Login untuk melanjutkan perjalanan mu',
+                      'Login untuk menangkap momen terbaru mu',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
