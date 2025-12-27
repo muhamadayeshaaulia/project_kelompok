@@ -339,7 +339,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     _buildTemplateCard(
                       title: "Classic 2",
-                      icon: Icons.grid_view,
+                      icon: Icons.filter_2,
                       color: Colors.blue[100]!,
                       onTap: () async {
                         final result = await Navigator.push(
