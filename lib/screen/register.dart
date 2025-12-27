@@ -15,6 +15,8 @@ class _MyRegisState extends State<MyRegis> {
   final passCtrl = TextEditingController();
   final confirmCtrl = TextEditingController();
   bool _isLoading = false;
+    bool _obscurePassword = true;
+    bool _obscureConfirmPassword = true;
   String? _error;
 
   Future<void> _register() async {
@@ -126,34 +128,58 @@ class _MyRegisState extends State<MyRegis> {
                 const SizedBox(height: 15),
 
                 TextField(
-                  controller: passCtrl,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(color: Colors.blue),
-                      borderRadius: BorderRadius.circular(20),
+                      controller: passCtrl,
+                      obscureText: _obscurePassword,
+                      decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: Colors.blue),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        prefixIcon: const Icon(Icons.lock),
+                        labelText: 'Password',
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
+                        ),
+                      ),
                     ),
-                    prefixIcon: const Icon(Icons.lock),
-                    labelText: 'Password',
-                  ),
-                ),
 
                 const SizedBox(height: 15),
 
                 TextField(
-                  controller: confirmCtrl,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(color: Colors.blue),
-                      borderRadius: BorderRadius.circular(20),
+                      controller: confirmCtrl,
+                      obscureText: _obscureConfirmPassword,
+                      decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: Colors.blue),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        prefixIcon: const Icon(Icons.lock),
+                        labelText: 'Konfirmasi Password',
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureConfirmPassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscureConfirmPassword = !_obscureConfirmPassword;
+                            });
+                          },
+                        ),
+                      ),
                     ),
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    labelText: 'Konfirmasi Password',
-                  ),
-                ),
 
                 if (_error != null) ...[
                   const SizedBox(height: 10),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_kelompok/template/photoboothpage.dart';
+import 'package:project_kelompok/template/photoboothpage2.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 import 'package:project_kelompok/services/supabase_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -14,7 +15,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  static bool hasShownWelcome = false;
   String _displayName = "Fotografer";
+  String? _profileImageUrl;
   List<String> _photoUrls = [];
   bool _isLoading = true;
 
@@ -23,6 +26,35 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     _fetchUserData();
     _loadPhotos();
+    if (!hasShownWelcome) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showWelcomeMessage();
+        hasShownWelcome = true;
+      });
+    }
+  }
+
+  void _showWelcomeMessage() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: const [
+            Icon(Icons.waving_hand, color: Colors.white),
+            SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                "Selamat datang! Nikmati & tangkap momen mu ✨",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.blueAccent,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        duration: const Duration(seconds: 3),
+      ),
+    );
   }
 
   Future<void> _fetchUserData() async {
@@ -33,10 +65,12 @@ class _MyHomePageState extends State<MyHomePage> {
             .collection('users')
             .doc(user.uid)
             .get();
+
         if (doc.exists && doc.data() != null && mounted) {
+          final data = doc.data()!;
           setState(() {
-            _displayName =
-                doc.data()!['nama'] ?? user.displayName ?? "Fotografer";
+            _displayName = data['nama'] ?? user.displayName ?? "Fotografer";
+            _profileImageUrl = data['photo_url'];
           });
         }
       } catch (e) {
@@ -193,7 +227,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   actions: [
                     TextButton(
                       onPressed: () {
-                        Navigator.pop(context); // tutup dialog
+                        Navigator.pop(context);
                       },
                       child: const Text('Batal'),
                     ),
@@ -202,7 +236,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         backgroundColor: Colors.red,
                       ),
                       onPressed: () async {
-                        Navigator.pop(context); // tutup dialog
+                        Navigator.pop(context);
+                        hasShownWelcome = false;
+
                         await FirebaseAuth.instance.signOut();
                         Navigator.pushReplacementNamed(context, '/login');
                       },
@@ -232,19 +268,62 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
                   children: [
-                    Text(
-                      'Halo, $_displayName!',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                      child: CircleAvatar(
+                        radius: 30,
+                        backgroundColor: Colors.grey[200],
+                        backgroundImage:
+                            (_profileImageUrl != null &&
+                                _profileImageUrl!.isNotEmpty)
+                            ? NetworkImage(_profileImageUrl!)
+                            : null,
+                        child:
+                            (_profileImageUrl == null ||
+                                _profileImageUrl!.isEmpty)
+                            ? const Icon(
+                                Icons.person,
+                                size: 35,
+                                color: Colors.grey,
+                              )
+                            : null,
                       ),
                     ),
-                    const Text(
-                      'Pilih template untuk mulai memotret:',
-                      style: TextStyle(fontSize: 16, color: Colors.black54),
+
+                    const SizedBox(width: 15),
+
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Halo, $_displayName!',
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const Text(
+                            'Pilih template untuk mulai memotret:',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -256,34 +335,45 @@ class _MyHomePageState extends State<MyHomePage> {
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   children: [
                     _buildTemplateCard(
-                      title: "Classic 4",
-                      icon: Icons.filter_4,
-                      color: Colors.orange[100]!,
+                      title: "Classic 2",
+                      icon: Icons.filter_2,
+                      color: Colors.blue[100]!,
                       onTap: () async {
                         final result = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const PhotoBoothPage(),
+                            builder: (context) => const PhotoBoothPage2(),
                           ),
                         );
                         if (result == true) _loadPhotos();
                       },
                     ),
+
                     _buildTemplateCard(
-                      title: "Grid 2x2",
-                      icon: Icons.grid_view,
-                      color: Colors.blue[100]!,
-                      onTap: () {},
+                          ),
+                        );
+                        if (result == true) _loadPhotos();
+                      },
                     ),
+
                     _buildTemplateCard(
                       title: "Vintage",
                       icon: Icons.camera_roll,
                       color: Colors.green[100]!,
-                      onTap: () {},
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Fitur Vintage segera hadir!"),
+                            backgroundColor: Colors.orange,
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
               ),
+
               const Padding(
                 padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
                 child: Text(

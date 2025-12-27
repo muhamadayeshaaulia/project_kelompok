@@ -82,7 +82,7 @@ class _MyLoginState extends State<MyLogin> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      'Login untuk melanjutkan perjalanan mu',
+                      'Login untuk menangkap momen terbaru mu',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -161,53 +161,79 @@ class _MyLoginState extends State<MyLogin> {
                             : const Text('Login'),
                       ),
                     ),
-                    const SizedBox(height: 30),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          "Belum punya akun?",
-                          style: TextStyle(color: Colors.black54),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const MyRegis(),
-                              ),
-                            );
-                          },
-                          child: const Text(
-                            "Daftar sekarang",
-                            style: TextStyle(color: Colors.teal),
+
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      width: double.infinity,
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          const Text(
+                            "Belum punya akun? ",
+                            style: TextStyle(color: Colors.black54),
                           ),
-                        ),
-                      ],
+
+                          TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const MyRegis(),
+                                ),
+                              );
+                            },
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            child: const Text(
+                              "Daftar sekarang",
+                              style: TextStyle(
+                                color: Colors.teal,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+
+                          const Text(
+                            " atau ",
+                            style: TextStyle(color: Colors.black54),
+                          ),
+
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const MyPage1(),
+                                ),
+                              );
+                            },
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            child: const Text(
+                              "kembali ke halaman awal",
+                              style: TextStyle(
+                                color: Colors.teal,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ),
-          ),
-
-          Positioned(
-            top: 40,
-            right: 20,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 6)],
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const MyPage1()),
-                  );
-                },
               ),
             ),
           ),

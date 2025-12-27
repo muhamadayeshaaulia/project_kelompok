@@ -17,99 +17,96 @@ class MyPage1 extends StatelessWidget {
             child: Container(color: Colors.black.withOpacity(0.25)),
           ),
 
-          Positioned(
-            top: 20,
-            left: 20,
-            
-              child: Image.asset(
-                'assets/images/global.png',
-                width: 140,
-                height: 140,
-                fit: BoxFit.contain,
-                filterQuality: FilterQuality.high,
-              ),
-          ),
+          SafeArea(
+            child: Column(
+              children: [
+                const SizedBox(height: 40),
 
-          Positioned(
-            top: 80,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Text(
-                'MyPhotoBooth',
-                style: TextStyle(
-                  fontSize: 48,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+                Image.asset(
+                  'assets/images/global.png',
+                  width: 140,
+                  height: 140,
+                  fit: BoxFit.contain,
+                  filterQuality: FilterQuality.high,
                 ),
-              ),
-            ),
-          ),
 
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _authButton(
-                    imagePath: 'assets/images/google1.jpg',
-                    text: 'Sambungkan dengan Google',
-                    onTap: () {},
+                const SizedBox(height: 10),
+
+                const Text(
+                  'MyPhotoBooth',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 48,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
                   ),
+                ),
 
-                  const SizedBox(height: 12),
+                const Spacer(),
 
-                  _authButton(
-                    imagePath: 'assets/images/email.jpg',
-                    text: 'Lanjut dengan Email',
-                    onTap: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              const MySplashScreen(nextRoute: '/register'),
-                        ),
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  const Text(
-                    'Dengan mendaftar, kamu menyetujui\nKetentuan Penggunaan dan Kebijakan Privasi kami',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white70, fontSize: 12),
-                  ),
-
-                  const SizedBox(height: 15),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
-                        'Sudah punya akun? ',
-                        style: TextStyle(color: Colors.white),
+                      _authButton(
+                        imagePath: 'assets/images/icongoogle.png',
+                        text: 'Sambungkan dengan Google',
+                        onTap: () {},
                       ),
-                      InkWell(
+
+                      const SizedBox(height: 12),
+
+                      _authButton(
+                        imagePath: 'assets/images/email3.png',
+                        text: 'Lanjut dengan Email',
                         onTap: () {
-                          Navigator.pushReplacementNamed(context, '/login');
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const MySplashScreen(nextRoute: '/register'),
+                            ),
+                          );
                         },
-                        child: const Text(
-                          'Masuk',
-                          style: TextStyle(
-                            color: Colors.lightBlueAccent,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
                       ),
+
+                      const SizedBox(height: 20),
+
+                      const Text(
+                        'Dengan mendaftar, kamu menyetujui\nKetentuan Penggunaan dan Kebijakan Privasi kami',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white70, fontSize: 12),
+                      ),
+
+                      const SizedBox(height: 15),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'Sudah punya akun? ',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              Navigator.pushReplacementNamed(context, '/login');
+                            },
+                            child: const Text(
+                              'Masuk',
+                              style: TextStyle(
+                                color: Colors.lightBlueAccent,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
                     ],
                   ),
-
-                  const SizedBox(height: 20),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
