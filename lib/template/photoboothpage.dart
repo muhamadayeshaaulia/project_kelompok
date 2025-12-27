@@ -95,7 +95,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
 
       if (fullImageBytes == null) throw "Gambar kosong.";
 
-      // 4. Simpan ke Galeri (Android/iOS)
       if (!kIsWeb) {
         try {
           await Gal.requestAccess(); 
