@@ -88,13 +88,16 @@ class _MyHomePageState extends State<MyHomePage> {
           .from('photos')
           .list(path: 'uploads/$userId');
 
-      final List<String> urls = objects
-          .where((obj) {
-            final name = obj.name.toLowerCase();
-            return name.endsWith('.png') ||
-                name.endsWith('.jpg') ||
-                name.endsWith('.jpeg');
-          })
+      final images = objects.where((obj) {
+        final name = obj.name.toLowerCase();
+        return name.endsWith('.png') ||
+            name.endsWith('.jpg') ||
+            name.endsWith('.jpeg');
+      }).toList();
+
+      images.sort((a, b) => b.name.compareTo(a.name));
+
+      final List<String> urls = images
           .map(
             (obj) => SupabaseService.client.storage
                 .from('photos')
@@ -348,14 +351,20 @@ class _MyHomePageState extends State<MyHomePage> {
                         if (result == true) _loadPhotos();
                       },
                     ),
-
                     _buildTemplateCard(
+                      title: "Classic 4",
+                      icon: Icons.filter_4,
+                      color: Colors.purple[100]!,
+                      onTap: () async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const PhotoBoothPage(),
                           ),
                         );
                         if (result == true) _loadPhotos();
                       },
                     ),
-
                     _buildTemplateCard(
                       title: "Vintage",
                       icon: Icons.camera_roll,
