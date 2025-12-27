@@ -15,6 +15,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  static bool hasShownWelcome = false;
   String _displayName = "Fotografer";
   String? _profileImageUrl;
   List<String> _photoUrls = [];
@@ -25,6 +26,36 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     _fetchUserData();
     _loadPhotos();
+
+    if (!hasShownWelcome) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showWelcomeMessage();
+        hasShownWelcome = true;
+      });
+    }
+  }
+
+  void _showWelcomeMessage() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: const [
+            Icon(Icons.waving_hand, color: Colors.white),
+            SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                "Selamat datang! Nikmati & tangkap momen mu ✨",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.blueAccent,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        duration: const Duration(seconds: 3),
+      ),
+    );
   }
 
   Future<void> _fetchUserData() async {
@@ -207,6 +238,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       onPressed: () async {
                         Navigator.pop(context);
+                        hasShownWelcome = false;
+
                         await FirebaseAuth.instance.signOut();
                         Navigator.pushReplacementNamed(context, '/login');
                       },
