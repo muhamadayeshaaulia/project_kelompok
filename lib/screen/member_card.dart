@@ -17,7 +17,7 @@ class MemberCardPage extends StatelessWidget {
             children: [
               const Center(
                 child: Text(
-                  "Anggota Kelompok 1",
+                  "Anggota Kelompok",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
