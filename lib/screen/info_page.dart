@@ -70,7 +70,7 @@ class InfoAplikasiPage extends StatelessWidget {
 
           /// 🔹 Informasi Tambahan
           const Divider(),
-          const ListTile(
+          ListTile(
             leading: Icon(Icons.developer_mode),
             title: Text("Developer"),
             subtitle: Text("Kelompok Flutter"),
@@ -79,6 +79,12 @@ class InfoAplikasiPage extends StatelessWidget {
               size: 16,
               color: Colors.grey,
             ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MemberCardPage()),
+              );
+            },
           ),
           const ListTile(
             leading: Icon(Icons.email),
