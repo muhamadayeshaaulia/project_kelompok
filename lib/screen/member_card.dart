@@ -50,6 +50,16 @@ Widget _buildMemberCard({
           ),
           child: const Icon(Icons.person, size: 40, color: Colors.grey),
         ),
+        const SizedBox(width: 16),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              nama,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
       ],
     ),
   );
