@@ -22,13 +22,18 @@ class MemberCardPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-
-              // 3. Muhamad Ayesha Aulia
               _buildMemberCard(
                 nama: "Muhamad Ayesha Aulia",
                 nim: "NIM: 1123150188",
                 role: "Frontend Developer",
                 warna: Colors.pink.shade100,
+              ),
+              const SizedBox(height: 20),
+              _buildMemberCard(
+                nama: "Muhammad Abdul Rozak",
+                nim: "NIM: 1123150006",
+                role: "Project Manager",
+                warna: Colors.blue.shade100,
               ),
             ],
           ),
