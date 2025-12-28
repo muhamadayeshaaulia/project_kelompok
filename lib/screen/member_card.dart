@@ -35,6 +35,13 @@ class MemberCardPage extends StatelessWidget {
                 role: "Project Manager",
                 warna: Colors.blue.shade100,
               ),
+              const SizedBox(height: 10),
+              _buildMemberCard(
+                nama: "Muhammad Ilham Maulana",
+                nim: "NIM: 1123150141",
+                role: "UI/UX Designer",
+                warna: Colors.green.shade100,
+              ),
             ],
           ),
         ),
