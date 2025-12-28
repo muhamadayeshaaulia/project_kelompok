@@ -40,36 +40,42 @@ Widget _buildMemberCard({
     elevation: 2,
     color: warna,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-    child: Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
+    child: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.person, size: 40, color: Colors.grey),
           ),
-          child: const Icon(Icons.person, size: 40, color: Colors.grey),
-        ),
-        const SizedBox(width: 16),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              nama,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4),
-            Text(nim),
-            Text(
-              role,
-              style: TextStyle(
-                color: Colors.grey[700],
-                fontStyle: FontStyle.italic,
+          const SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                nama,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
+              const SizedBox(height: 4),
+              Text(nim),
+              Text(
+                role,
+                style: TextStyle(
+                  color: Colors.grey[700],
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     ),
   );
 }
