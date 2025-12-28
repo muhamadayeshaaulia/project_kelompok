@@ -13,7 +13,7 @@ class MemberCardPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.all(20.0),
-          child: const Column(
+          child: Column(
             children: [
               const Center(
                 child: Text(
@@ -21,7 +21,15 @@ class MemberCardPage extends StatelessWidget {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 10),
+
+              // 3. Muhamad Ayesha Aulia
+              _buildMemberCard(
+                nama: "Muhamad Ayesha Aulia",
+                nim: "NIM: 1123150188",
+                role: "Frontend Developer",
+                warna: Colors.pink.shade100,
+              ),
             ],
           ),
         ),
