@@ -40,5 +40,17 @@ Widget _buildMemberCard({
     elevation: 2,
     color: warna,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    child: Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(Icons.person, size: 40, color: Colors.grey),
+        ),
+      ],
+    ),
   );
 }
