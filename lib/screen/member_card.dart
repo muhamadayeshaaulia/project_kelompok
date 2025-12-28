@@ -31,8 +31,14 @@ class MemberCardPage extends StatelessWidget {
 }
 
 Widget _buildMemberCard({
-    required String nama, 
-    required String nim, 
-    required String role,
-    required Color warna
-  })
+  required String nama,
+  required String nim,
+  required String role,
+  required Color warna,
+}) {
+  return Card(
+    elevation: 2,
+    color: warna,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+  );
+}
