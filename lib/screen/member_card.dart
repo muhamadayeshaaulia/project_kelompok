@@ -5,6 +5,17 @@ class MemberCardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Tim Developer"),
+        backgroundColor: const Color.fromRGBO(255, 192, 45, 1),
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(20.0),
+          child: const Column(children: []),
+        ),
+      ),
+    );
   }
 }
