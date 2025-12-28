@@ -21,6 +21,7 @@ class MemberCardPage extends StatelessWidget {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
+              SizedBox(height: 20),
             ],
           ),
         ),
@@ -28,3 +29,10 @@ class MemberCardPage extends StatelessWidget {
     );
   }
 }
+
+Widget _buildMemberCard({
+    required String nama, 
+    required String nim, 
+    required String role,
+    required Color warna
+  })
