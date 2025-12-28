@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_kelompok/screen/home_page.dart';
+import 'package:project_kelompok/screen/member_card.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 
 class InfoAplikasiPage extends StatelessWidget {
