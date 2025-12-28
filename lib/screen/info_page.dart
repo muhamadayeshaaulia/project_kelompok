@@ -74,6 +74,11 @@ class InfoAplikasiPage extends StatelessWidget {
             leading: Icon(Icons.developer_mode),
             title: Text("Developer"),
             subtitle: Text("Kelompok Flutter"),
+            trailing: const Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: Colors.grey,
+            ),
           ),
           const ListTile(
             leading: Icon(Icons.email),
