@@ -58,6 +58,15 @@ Widget _buildMemberCard({
               nama,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
+            const SizedBox(height: 4),
+            Text(nim),
+            Text(
+              role,
+              style: TextStyle(
+                color: Colors.grey[700],
+                fontStyle: FontStyle.italic,
+              ),
+            ),
           ],
         ),
       ],
