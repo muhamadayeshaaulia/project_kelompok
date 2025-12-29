@@ -51,7 +51,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: 'Potong Foto',
-            toolbarColor: Colors.deepOrange,
+            toolbarColor: Colors.yellow[700],
             toolbarWidgetColor: Colors.white,
             lockAspectRatio: true,
           ),
@@ -100,7 +100,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
 
       if (fullImageBytes == null) throw "Gambar kosong.";
 
-      // 4. Simpan ke Galeri (Android/iOS)
       if (!kIsWeb) {
         try {
           await Gal.requestAccess();
@@ -124,7 +123,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
         }
       }
 
-      // 5. Upload ke Supabase
       final fileName = 'strip_${DateTime.now().millisecondsSinceEpoch}.png';
       await SupabaseService.client.storage
           .from('photos')
@@ -172,7 +170,8 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
     Color borderColor = isDark ? Colors.white24 : Colors.grey[300]!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Custom Photostrip")),
+      appBar: AppBar(title: const Text("Custom Photostrip"),
+      backgroundColor: Colors.yellow[700]),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -313,7 +312,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
                     style: TextStyle(color: Colors.white),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
+                    backgroundColor: Colors.yellow[700],
                     padding: const EdgeInsets.symmetric(
                       horizontal: 40,
                       vertical: 15,
