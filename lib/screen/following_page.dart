@@ -53,6 +53,27 @@ class _FollowingPageState extends State<FollowingPage> {
     }
   }
 
+  Future<void> _saveSearchHistory(String text) async {
+    if (text.isEmpty || currentUser == null) return;
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('search_history')
+        .doc(text.toLowerCase())
+        .set({'query': text, 'timestamp': FieldValue.serverTimestamp()});
+  }
+
+  Stream<QuerySnapshot> _getSearchHistory() {
+    DateTime limitDate = DateTime.now().subtract(const Duration(days: 7));
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('search_history')
+        .where('timestamp', isGreaterThan: limitDate)
+        .orderBy('timestamp', descending: true)
+        .snapshots();
+  }
+
   Future<void> _toggleFollow(String targetUid) async {
     if (currentUser == null) return;
     final myFollowingDoc = FirebaseFirestore.instance
@@ -108,13 +129,57 @@ class _FollowingPageState extends State<FollowingPage> {
               ),
               onChanged: (val) {
                 setState(() => searchQuery = val.trim());
+                if (val.trim().length > 2) {
+                  _saveSearchHistory(val.trim());
+                }
               },
             ),
           ),
         ),
       ),
       body: searchQuery.isEmpty
-          ? const Center(child: Text("Belum ada pencarian."))
+          ? StreamBuilder<QuerySnapshot>(
+              stream: _getSearchHistory(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return const Center(child: Text("Belum ada pencarian."));
+                }
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Text(
+                        "Pencarian Terakhir (7 Hari)",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+                          final data =
+                              snapshot.data!.docs[index].data()
+                                  as Map<String, dynamic>;
+                          return ListTile(
+                            leading: const Icon(Icons.history),
+                            title: Text(data['query'] ?? ""),
+                            onTap: () =>
+                                setState(() => searchQuery = data['query']),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
+            )
           : StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('users')
@@ -144,6 +209,7 @@ class _FollowingPageState extends State<FollowingPage> {
                   itemBuilder: (context, index) {
                     final targetUid = docs[index].id;
                     final userData = docs[index].data() as Map<String, dynamic>;
+
                     final bool amIFollowingHim = myFollowingList.contains(
                       targetUid,
                     );
@@ -164,6 +230,7 @@ class _FollowingPageState extends State<FollowingPage> {
                       buttonText = "Follow Back";
                       buttonColor = Colors.blue;
                     }
+
                     return ListTile(
                       leading: CircleAvatar(
                         backgroundImage: userData['photo_url'] != null
