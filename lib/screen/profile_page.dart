@@ -105,45 +105,43 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<String?> _uploadImageToSupabase() async {
-    if (_imageBytes == null) return null;
+    if (_imageBytes == null || user == null) return null;
 
     try {
-      String safeExt = _imageExtension ?? "jpg";
-      if (!['jpg', 'jpeg', 'png'].contains(safeExt.toLowerCase())) {
-        safeExt = 'jpg';
+      if (_currentPhotoUrl != null && _currentPhotoUrl!.isNotEmpty) {
+        try {
+          final uri = Uri.parse(_currentPhotoUrl!);
+          final oldFileName = uri.pathSegments.last;
+          await SupabaseService.client.storage.from('photos').remove([
+            'profile/${user!.uid}/$oldFileName',
+          ]);
+          print("Foto lama berhasil dihapus");
+        } catch (e) {
+          print("Gagal hapus foto lama (mungkin tidak ada): $e");
+        }
       }
+      String safeExt = _imageExtension ?? "jpg";
 
       final fileName = '${DateTime.now().millisecondsSinceEpoch}.$safeExt';
-      final path = 'uploads/$fileName';
-
-      final contentType = 'image/$safeExt';
-
-      print("Mencoba upload: $path dengan type $contentType");
+      final path = 'profile/${user!.uid}/$fileName';
 
       await SupabaseService.client.storage
           .from('photos')
           .uploadBinary(
             path,
             _imageBytes!,
-            fileOptions: FileOptions(contentType: contentType, upsert: true),
+            fileOptions: FileOptions(
+              contentType: 'image/$safeExt',
+              upsert: true,
+            ),
           );
 
       final imageUrl = SupabaseService.client.storage
           .from('photos')
           .getPublicUrl(path);
-
-      print("Upload Sukses. URL Baru: $imageUrl");
       return imageUrl;
     } catch (e) {
-      print("GAGAL UPLOAD KE SUPABASE: $e");
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Gagal Upload: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      print("GAGAL PROSES SUPABASE: $e");
       return null;
     }
   }
