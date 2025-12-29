@@ -154,70 +154,105 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildPhotoItem(int index) {
     final imageUrl = _photoUrls[index];
+    final user = FirebaseAuth.instance.currentUser;
 
-    return GestureDetector(
-      onLongPress: () => _showPostConfirmation(imageUrl),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(12),
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('posts')
+          .where('uid', isEqualTo: user?.uid)
+          .where('post_image', isEqualTo: imageUrl)
+          .snapshots(),
+      builder: (context, snapshot) {
+        bool isAlreadyPosted =
+            snapshot.hasData && snapshot.data!.docs.isNotEmpty;
+
+        return GestureDetector(
+          onLongPress: isAlreadyPosted
+              ? null
+              : () => _showPostConfirmation(imageUrl),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
                 ),
-                child: Image.network(
-                  imageUrl,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return const Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    );
-                  },
+              ],
+            ),
+            child: Column(
+              children: [
+                Expanded(
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(12),
+                        ),
+                        child: Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  IconButton(
-                    tooltip: "Posting ke Publik",
-                    icon: const Icon(
-                      Icons.send_rounded,
-                      color: Colors.orange,
-                      size: 22,
-                    ),
-                    onPressed: () => _showPostConfirmation(imageUrl),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      IconButton(
+                        tooltip: isAlreadyPosted
+                            ? "Sudah Diposting"
+                            : "Posting ke Publik",
+                        icon: Icon(
+                          isAlreadyPosted
+                              ? Icons.cloud_done
+                              : Icons.send_rounded,
+                          color: isAlreadyPosted ? Colors.green : Colors.orange,
+                          size: 22,
+                        ),
+                        onPressed: isAlreadyPosted
+                            ? () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      "Foto ini sudah ada di postingan publik!",
+                                    ),
+                                    duration: Duration(seconds: 1),
+                                  ),
+                                );
+                              }
+                            : () => _showPostConfirmation(imageUrl),
+                      ),
+                      IconButton(
+                        tooltip: "Lihat Detail",
+                        icon: const Icon(
+                          Icons.fullscreen_rounded,
+                          color: Colors.blue,
+                          size: 24,
+                        ),
+                        onPressed: () => _showDetailPhoto(imageUrl),
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    tooltip: "Lihat Detail",
-                    icon: const Icon(
-                      Icons.fullscreen_rounded,
-                      color: Colors.blue,
-                      size: 24,
-                    ),
-                    onPressed: () => _showDetailPhoto(imageUrl),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -373,10 +408,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('posts')
-          .where(
-            'uid',
-            isEqualTo: user?.uid,
-          )
+          .where('uid', isEqualTo: user?.uid)
           .orderBy('timestamp', descending: true)
           .snapshots(),
       builder: (context, snapshot) {
