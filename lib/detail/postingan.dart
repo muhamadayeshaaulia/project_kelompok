@@ -32,19 +32,20 @@ class _PostDetailPageState extends State<PostDetailPage> {
     _fetchMyName();
   }
 
-Future<void> _fetchMyName() async {
-  if (currentUser == null) return;
-  final doc = await FirebaseFirestore.instance
-      .collection('users')
-      .doc(currentUser!.uid)
-      .get();
+  Future<void> _fetchMyName() async {
+    if (currentUser == null) return;
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser!.uid)
+        .get();
 
-  if (doc.exists && mounted) {
-    setState(() {
-      _myUserName = doc.data()?['nama'] ?? "User";
-    });
+    if (doc.exists && mounted) {
+      setState(() {
+        _myUserName = doc.data()?['nama'] ?? "User";
+      });
+    }
   }
-}
+
   void _checkIfLiked() async {
     if (currentUser == null) return;
     final doc = await FirebaseFirestore.instance
@@ -94,6 +95,44 @@ Future<void> _fetchMyName() async {
       replyingToId = null;
       replyingToName = null;
     });
+  }
+
+  void _deleteComment(String commentId) async {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Hapus Komentar"),
+        content: const Text("Apakah Anda yakin ingin menghapus komentar ini?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Batal"),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              try {
+                await FirebaseFirestore.instance
+                    .collection('posts')
+                    .doc(widget.postId)
+                    .collection('comments')
+                    .doc(commentId)
+                    .delete();
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Komentar berhasil dihapus")),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Gagal menghapus komentar: $e")),
+                );
+              }
+            },
+            child: const Text("Hapus", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
   }
 
   void _toggleCommentLike(String commentId, List likes) async {
@@ -289,18 +328,36 @@ Future<void> _fetchMyName() async {
   }) {
     List likes = data['likes'] ?? [];
     bool isCommentLiked = likes.contains(currentUser?.uid);
+    bool isMyComment = data['uid'] == currentUser?.uid;
 
     return ListTile(
+      onLongPress: isMyComment ? () => _deleteComment(id) : null,
       dense: true,
-      leading: isReply ? null : const Icon(Icons.account_circle, size: 30),
-      title: Text(
-        data['nama'],
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+      leading: isReply
+          ? null
+          : const Icon(Icons.account_circle, size: 30, color: Colors.grey),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            data['nama'] ?? "User",
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+          if (isMyComment)
+            GestureDetector(
+              onTap: () => _deleteComment(id),
+              child: const Icon(
+                Icons.delete_outline,
+                size: 16,
+                color: Colors.grey,
+              ),
+            ),
+        ],
       ),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(data['komentar']),
+          Text(data['komentar'] ?? ""),
           const SizedBox(height: 4),
           Row(
             children: [
