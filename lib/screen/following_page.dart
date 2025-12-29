@@ -74,6 +74,31 @@ class _FollowingPageState extends State<FollowingPage> {
         .snapshots();
   }
 
+  Future<void> _deleteSingleHistory(String docId) async {
+    if (currentUser == null) return;
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('search_history')
+        .doc(docId)
+        .delete();
+  }
+
+  Future<void> _clearAllHistory() async {
+    if (currentUser == null) return;
+    final batch = FirebaseFirestore.instance.batch();
+    final snapshots = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('search_history')
+        .get();
+
+    for (var doc in snapshots.docs) {
+      batch.delete(doc.reference);
+    }
+    await batch.commit();
+  }
+
   Future<void> _toggleFollow(String targetUid) async {
     if (currentUser == null) return;
     final myFollowingDoc = FirebaseFirestore.instance
@@ -147,31 +172,57 @@ class _FollowingPageState extends State<FollowingPage> {
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return const Center(child: Text("Belum ada pencarian."));
                 }
+
                 return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Text(
-                        "Pencarian Terakhir (7 Hari)",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey,
-                        ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Pencarian Terakhir",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: _clearAllHistory,
+                            child: const Text(
+                              "Hapus Semua",
+                              style: TextStyle(color: Colors.red, fontSize: 12),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     Expanded(
                       child: ListView.builder(
                         itemCount: snapshot.data!.docs.length,
                         itemBuilder: (context, index) {
-                          final data =
-                              snapshot.data!.docs[index].data()
-                                  as Map<String, dynamic>;
+                          final doc = snapshot.data!.docs[index];
+                          final data = doc.data() as Map<String, dynamic>;
+
                           return ListTile(
-                            leading: const Icon(Icons.history),
+                            leading: const Icon(Icons.history, size: 20),
                             title: Text(data['query'] ?? ""),
-                            onTap: () =>
-                                setState(() => searchQuery = data['query']),
+                            onTap: () {
+                              setState(() {
+                                searchQuery = data['query'];
+                              });
+                            },
+                            trailing: IconButton(
+                              icon: const Icon(
+                                Icons.close,
+                                size: 18,
+                                color: Colors.grey,
+                              ),
+                              onPressed: () => _deleteSingleHistory(doc.id),
+                            ),
                           );
                         },
                       ),
