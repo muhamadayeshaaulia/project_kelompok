@@ -20,6 +20,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String? _profileImageUrl;
   List<String> _photoUrls = [];
   bool _isLoading = true;
+  int _selectedTab = 0;
 
   @override
   void initState() {
@@ -154,8 +155,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final imageUrl = _photoUrls[index];
 
     return GestureDetector(
-      onLongPress: () =>
-          _showPostConfirmation(imageUrl),
+      onLongPress: () => _showPostConfirmation(imageUrl),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -307,6 +307,141 @@ class _MyHomePageState extends State<MyHomePage> {
         context,
       ).showSnackBar(const SnackBar(content: Text("Gagal memposting foto.")));
     }
+  }
+
+  Widget _buildTabButton(int index, String title) {
+    bool isActive = _selectedTab == index;
+    return GestureDetector(
+      onTap: () => setState(() => _selectedTab = index),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: isActive ? Colors.black : Colors.black38,
+            ),
+          ),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            margin: const EdgeInsets.only(top: 4),
+            height: 3,
+            width: isActive ? 40 : 0,
+            decoration: BoxDecoration(
+              color: Colors.orange,
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGalleryGrid() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_photoUrls.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.only(top: 20),
+          child: Text("Belum ada karya yang tersimpan."),
+        ),
+      );
+    }
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 15,
+        mainAxisSpacing: 15,
+        childAspectRatio: 0.6,
+      ),
+      itemCount: _photoUrls.length,
+      itemBuilder: (context, index) => _buildPhotoItem(index),
+    );
+  }
+
+  Widget _buildPostingsGrid() {
+    final user = FirebaseAuth.instance.currentUser;
+
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('posts')
+          .where('uid', isEqualTo: user?.uid)
+          .orderBy('timestamp', descending: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.only(top: 20),
+              child: Text("Kamu belum memposting karya ke publik."),
+            ),
+          );
+        }
+
+        final posts = snapshot.data!.docs;
+
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 15,
+            mainAxisSpacing: 15,
+            childAspectRatio: 0.65,
+          ),
+          itemCount: posts.length,
+          itemBuilder: (context, index) {
+            final postData = posts[index].data() as Map<String, dynamic>;
+            return Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.network(postData['post_image'], fit: BoxFit.cover),
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.black45,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Icon(
+                          Icons.public,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -483,30 +618,21 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
 
-              const Padding(
-                padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
-                child: Text(
-                  'Hasil Karya Saya',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+                child: Row(
+                  children: [
+                    _buildTabButton(0, "Karya Saya"),
+                    const SizedBox(width: 25),
+                    _buildTabButton(1, "Postingan"),
+                  ],
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: _isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 15,
-                              mainAxisSpacing: 15,
-                              childAspectRatio: 0.6,
-                            ),
-                        itemCount: _photoUrls.length,
-                        itemBuilder: (context, index) => _buildPhotoItem(index),
-                      ),
+                child: _selectedTab == 0
+                    ? _buildGalleryGrid()
+                    : _buildPostingsGrid(),
               ),
               const SizedBox(height: 150),
             ],
