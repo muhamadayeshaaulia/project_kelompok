@@ -159,9 +159,18 @@ class _ProfilePageState extends State<ProfilePage> {
           throw Exception("Gagal upload gambar. Cek koneksi atau format file.");
         }
       }
+      List<String> generateSearchKeywords(String name) {
+        String cleanedName = name
+            .toLowerCase()
+            .replaceAll('.', '')
+            .replaceAll(',', '');
+        List<String> words = cleanedName.split(' ');
+        return words.where((word) => word.isNotEmpty).toList();
+      }
 
       Map<String, dynamic> updateData = {
         'nama': nameCtrl.text,
+        'search_keywords': generateSearchKeywords(nameCtrl.text),
         'jenis_kelamin': genderCtrl.text,
         'alamat': addressCtrl.text,
         'keterangan': descCtrl.text,

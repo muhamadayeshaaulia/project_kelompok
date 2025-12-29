@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:project_kelompok/screen/login.dart';
 import 'package:project_kelompok/screen/page1.dart';
 import 'package:project_kelompok/screen/register.dart';
 import 'package:project_kelompok/screen/splash_screen.dart';
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const MySplashScreen(),
         '/page1': (context) => const MyPage1(),
+        '/login': (context) => const MyLogin(),
         '/register': (context) => const MyRegis(),
       },
     );
