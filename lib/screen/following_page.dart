@@ -129,6 +129,14 @@ class _FollowingPageState extends State<FollowingPage> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
+                final docs =
+                    snapshot.data?.docs
+                        .where((doc) => doc.id != currentUser?.uid)
+                        .toList() ??
+                    [];
+                if (docs.isEmpty) {
+                  return const Center(child: Text("User tidak ditemukan."));
+                }
               },
             ),
     );
