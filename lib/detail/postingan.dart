@@ -104,6 +104,17 @@ class _PostDetailPageState extends State<PostDetailPage> {
           'likes': [],
         });
 
+    if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Komentar berhasil dikirim! 💬"),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+      
     setState(() {
       _commentController.clear();
       replyingToId = null;
