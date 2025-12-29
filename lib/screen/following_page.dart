@@ -15,6 +15,7 @@ class _FollowingPageState extends State<FollowingPage> {
   String searchQuery = "";
   List<String> myFollowingList = [];
   List<String> myFollowersList = [];
+  bool showAllHistory = false;
 
   @override
   void initState() {
@@ -153,7 +154,10 @@ class _FollowingPageState extends State<FollowingPage> {
                 fillColor: Colors.white,
               ),
               onChanged: (val) {
-                setState(() => searchQuery = val.trim());
+                setState(() {
+                  searchQuery = val.trim();
+                  showAllHistory = false;
+                });
                 if (val.trim().length > 2) {
                   _saveSearchHistory(val.trim());
                 }
@@ -172,6 +176,11 @@ class _FollowingPageState extends State<FollowingPage> {
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return const Center(child: Text("Belum ada pencarian."));
                 }
+
+                final allDocs = snapshot.data!.docs;
+                final displayedDocs = showAllHistory
+                    ? allDocs
+                    : allDocs.take(5).toList();
 
                 return Column(
                   children: [
@@ -201,30 +210,36 @@ class _FollowingPageState extends State<FollowingPage> {
                       ),
                     ),
                     Expanded(
-                      child: ListView.builder(
-                        itemCount: snapshot.data!.docs.length,
-                        itemBuilder: (context, index) {
-                          final doc = snapshot.data!.docs[index];
-                          final data = doc.data() as Map<String, dynamic>;
-
-                          return ListTile(
-                            leading: const Icon(Icons.history, size: 20),
-                            title: Text(data['query'] ?? ""),
-                            onTap: () {
-                              setState(() {
-                                searchQuery = data['query'];
-                              });
-                            },
-                            trailing: IconButton(
-                              icon: const Icon(
-                                Icons.close,
-                                size: 18,
-                                color: Colors.grey,
+                      child: ListView(
+                        children: [
+                          ...displayedDocs.map((doc) {
+                            final data = doc.data() as Map<String, dynamic>;
+                            return ListTile(
+                              leading: const Icon(Icons.history, size: 20),
+                              title: Text(data['query'] ?? ""),
+                              onTap: () =>
+                                  setState(() => searchQuery = data['query']),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.close, size: 18),
+                                onPressed: () => _deleteSingleHistory(doc.id),
                               ),
-                              onPressed: () => _deleteSingleHistory(doc.id),
+                            );
+                          }).toList(),
+
+                          if (allDocs.length > 5 && !showAllHistory)
+                            TextButton(
+                              onPressed: () =>
+                                  setState(() => showAllHistory = true),
+                              child: const Text("Lihat Semua"),
                             ),
-                          );
-                        },
+
+                          if (showAllHistory)
+                            TextButton(
+                              onPressed: () =>
+                                  setState(() => showAllHistory = false),
+                              child: const Text("Sembunyikan"),
+                            ),
+                        ],
                       ),
                     ),
                   ],
