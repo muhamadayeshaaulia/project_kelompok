@@ -25,3 +25,13 @@ class _PostDetailPageState extends State<PostDetailPage> {
     super.initState();
     _checkIfLiked();
   }
+  void _checkIfLiked() async {
+    if (currentUser == null) return;
+    final doc = await FirebaseFirestore.instance
+        .collection('posts')
+        .doc(widget.postId)
+        .collection('likes')
+        .doc(currentUser!.uid)
+        .get();
+    if (mounted) setState(() => isLiked = doc.exists);
+  }
