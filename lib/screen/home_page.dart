@@ -313,7 +313,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           Text(
                             'Halo, $_displayName!',
                             style: const TextStyle(
-                              fontSize: 22,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                             overflow: TextOverflow.ellipsis,
