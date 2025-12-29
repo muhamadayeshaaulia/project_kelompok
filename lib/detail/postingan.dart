@@ -24,7 +24,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   String? replyingToId;
   String? replyingToName;
   String _myUserName = "Loading...";
-
+  String? _myProfilePic;
 
   @override
   void initState() {
@@ -43,6 +43,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     if (doc.exists && mounted) {
       setState(() {
         _myUserName = doc.data()?['nama'] ?? "User";
+        _myProfilePic = doc.data()?['photo_url'];
       });
     }
   }
@@ -95,6 +96,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
         .add({
           'uid': currentUser!.uid,
           'nama': _myUserName,
+          'photo_url': _myProfilePic,
           'komentar': _commentController.text.trim(),
           'parent_id': replyingToId,
           'reply_to_name': replyingToName,
@@ -345,9 +347,15 @@ class _PostDetailPageState extends State<PostDetailPage> {
     return ListTile(
       onLongPress: isMyComment ? () => _deleteComment(id) : null,
       dense: true,
-      leading: isReply
-          ? null
-          : const Icon(Icons.account_circle, size: 30, color: Colors.grey),
+      leading: CircleAvatar(
+      radius: isReply ? 12 : 15,
+      backgroundImage: data['photo_url'] != null 
+          ? NetworkImage(data['photo_url']) 
+          : null,
+      child: data['photo_url'] == null 
+          ? const Icon(Icons.person, size: 18) 
+          : null,
+    ),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -361,7 +369,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
               child: const Icon(
                 Icons.delete_outline,
                 size: 16,
-                color: Colors.grey,
+                color: Colors.red,
               ),
             ),
         ],
