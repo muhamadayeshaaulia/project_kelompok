@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_kelompok/screen/home_page.dart';
+import 'package:project_kelompok/screen/member_card.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 
 class InfoAplikasiPage extends StatelessWidget {
@@ -70,10 +71,21 @@ class InfoAplikasiPage extends StatelessWidget {
 
           /// 🔹 Informasi Tambahan
           const Divider(),
-          const ListTile(
+          ListTile(
             leading: Icon(Icons.developer_mode),
             title: Text("Developer"),
             subtitle: Text("Kelompok Flutter"),
+            trailing: const Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: Colors.grey,
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MemberCardPage()),
+              );
+            },
           ),
           const ListTile(
             leading: Icon(Icons.email),
