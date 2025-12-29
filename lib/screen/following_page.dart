@@ -53,7 +53,20 @@ class _FollowingPageState extends State<FollowingPage> {
     }
   }
 
+  Future<void> _toggleFollow(String targetUid) async {
+    if (currentUser == null) return;
+    final myFollowingDoc = FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('following')
+        .doc(targetUid);
+    final targetFollowersDoc = FirebaseFirestore.instance
+        .collection('users')
+        .doc(targetUid)
+        .collection('followers')
+        .doc(currentUser!.uid);
 
+  }
 
   @override
   Widget build(BuildContext context) {
