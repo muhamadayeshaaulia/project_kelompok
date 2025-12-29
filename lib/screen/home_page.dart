@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:project_kelompok/detail/postingan.dart';
 import 'package:project_kelompok/template/photoboothpage.dart';
 import 'package:project_kelompok/template/photoboothpage2.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
@@ -20,6 +21,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String? _profileImageUrl;
   List<String> _photoUrls = [];
   bool _isLoading = true;
+  int _selectedTab = 0;
 
   @override
   void initState() {
@@ -151,61 +153,352 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildPhotoItem(int index) {
-    return GestureDetector(
-      onTap: () {
-        showDialog(
-          context: context,
-          builder: (context) => Dialog(
-            backgroundColor: Colors.transparent,
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: Image.network(_photoUrls[index]),
+    final imageUrl = _photoUrls[index];
+    final user = FirebaseAuth.instance.currentUser;
+
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('posts')
+          .where('uid', isEqualTo: user?.uid)
+          .where('post_image', isEqualTo: imageUrl)
+          .snapshots(),
+      builder: (context, snapshot) {
+        bool isAlreadyPosted =
+            snapshot.hasData && snapshot.data!.docs.isNotEmpty;
+
+        return GestureDetector(
+          onLongPress: isAlreadyPosted
+              ? null
+              : () => _showPostConfirmation(imageUrl),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white, size: 30),
-                  onPressed: () => Navigator.pop(context),
+              ],
+            ),
+            child: Column(
+              children: [
+                Expanded(
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(12),
+                        ),
+                        child: Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      IconButton(
+                        tooltip: isAlreadyPosted
+                            ? "Sudah Diposting"
+                            : "Posting ke Publik",
+                        icon: Icon(
+                          isAlreadyPosted
+                              ? Icons.cloud_done
+                              : Icons.send_rounded,
+                          color: isAlreadyPosted ? Colors.green : Colors.orange,
+                          size: 22,
+                        ),
+                        onPressed: isAlreadyPosted
+                            ? () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      "Foto ini sudah ada di postingan publik!",
+                                    ),
+                                    duration: Duration(seconds: 1),
+                                  ),
+                                );
+                              }
+                            : () => _showPostConfirmation(imageUrl),
+                      ),
+                      IconButton(
+                        tooltip: "Lihat Detail",
+                        icon: const Icon(
+                          Icons.fullscreen_rounded,
+                          color: Colors.blue,
+                          size: 24,
+                        ),
+                        onPressed: () => _showDetailPhoto(imageUrl),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
         );
       },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Column(
+    );
+  }
+
+  void _showDetailPhoto(String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(10),
+        child: Stack(
+          alignment: Alignment.center,
           children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(12),
-                ),
-                child: Image.network(
-                  _photoUrls[index],
-                  fit: BoxFit.cover,
-                  width: double.infinity,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: Image.network(imageUrl, fit: BoxFit.contain),
+            ),
+            Positioned(
+              top: 10,
+              right: 10,
+              child: CircleAvatar(
+                backgroundColor: Colors.black54,
+                child: IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white),
+                  onPressed: () => Navigator.pop(context),
                 ),
               ),
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 8),
-              child: Icon(Icons.more_horiz, color: Colors.orange, size: 20),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  void _showPostConfirmation(String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: const Text("Posting ke Explore?"),
+        content: const Text(
+          "Karya kamu akan muncul di halaman publik dan bisa dilihat oleh pengguna lain.",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Batal", style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              _postImage(imageUrl);
+            },
+            child: const Text(
+              "Ya, Posting!",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _postImage(String imageUrl) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    try {
+      await FirebaseFirestore.instance.collection('posts').add({
+        'uid': user.uid,
+        'nama': _displayName,
+        'user_image': _profileImageUrl,
+        'post_image': imageUrl,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Berhasil diposting ke publik! 🚀")),
+      );
+    } catch (e) {
+      debugPrint("Error posting image: $e");
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Gagal memposting foto.")));
+    }
+  }
+
+  Widget _buildTabButton(int index, String title) {
+    bool isActive = _selectedTab == index;
+    return GestureDetector(
+      onTap: () => setState(() => _selectedTab = index),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: isActive ? Colors.black : Colors.black38,
+            ),
+          ),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            margin: const EdgeInsets.only(top: 4),
+            height: 3,
+            width: isActive ? 40 : 0,
+            decoration: BoxDecoration(
+              color: Colors.orange,
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGalleryGrid() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_photoUrls.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.only(top: 20),
+          child: Text("Belum ada karya yang tersimpan."),
+        ),
+      );
+    }
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 15,
+        mainAxisSpacing: 15,
+        childAspectRatio: 0.6,
+      ),
+      itemCount: _photoUrls.length,
+      itemBuilder: (context, index) => _buildPhotoItem(index),
+    );
+  }
+
+  Widget _buildPostingsGrid() {
+    final user = FirebaseAuth.instance.currentUser;
+
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('posts')
+          .where('uid', isEqualTo: user?.uid)
+          .orderBy('timestamp', descending: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.only(top: 20),
+              child: Text("Kamu belum memposting karya ke publik."),
+            ),
+          );
+        }
+
+        final posts = snapshot.data!.docs;
+
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 15,
+            mainAxisSpacing: 15,
+            childAspectRatio: 0.65,
+          ),
+          itemCount: posts.length,
+          itemBuilder: (context, index) {
+            final postData = posts[index].data() as Map<String, dynamic>;
+            final postId = posts[index].id;
+
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        PostDetailPage(postId: postId, postData: postData),
+                  ),
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 8,
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.network(
+                        postData['post_image'],
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return const Center(
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          );
+                        },
+                      ),
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.black45,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Icon(
+                            Icons.public,
+                            color: Colors.white,
+                            size: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -313,7 +606,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           Text(
                             'Halo, $_displayName!',
                             style: const TextStyle(
-                              fontSize: 22,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                             overflow: TextOverflow.ellipsis,
@@ -383,30 +676,21 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
 
-              const Padding(
-                padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
-                child: Text(
-                  'Hasil Karya Saya',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+                child: Row(
+                  children: [
+                    _buildTabButton(0, "Karya Saya"),
+                    const SizedBox(width: 25),
+                    _buildTabButton(1, "Postingan"),
+                  ],
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: _isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 15,
-                              mainAxisSpacing: 15,
-                              childAspectRatio: 0.6,
-                            ),
-                        itemCount: _photoUrls.length,
-                        itemBuilder: (context, index) => _buildPhotoItem(index),
-                      ),
+                child: _selectedTab == 0
+                    ? _buildGalleryGrid()
+                    : _buildPostingsGrid(),
               ),
               const SizedBox(height: 150),
             ],

@@ -49,7 +49,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: 'Potong Foto',
-            toolbarColor: Colors.deepOrange,
+            toolbarColor: Colors.yellow[700],
             toolbarWidgetColor: Colors.white,
             lockAspectRatio: true,
           ),
@@ -113,7 +113,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
         }
       }
 
-      // 5. Upload ke Supabase
       final fileName = 'strip_${DateTime.now().millisecondsSinceEpoch}.png';
       await SupabaseService.client.storage
           .from('photos')
@@ -154,7 +153,8 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
     Color borderColor = isDark ? Colors.white24 : Colors.grey[300]!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Custom Photostrip")),
+      appBar: AppBar(title: const Text("Custom Photostrip"),
+      backgroundColor: Colors.yellow[700]),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -267,7 +267,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
                   icon: const Icon(Icons.save_alt, color: Colors.white),
                   label: const Text("Simpan Photostrip", style: TextStyle(color: Colors.white)),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
+                    backgroundColor: Colors.yellow[700],
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   ),

@@ -7,6 +7,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:project_kelompok/screen/home_page.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 import 'package:project_kelompok/services/supabase_service.dart';
+import 'dart:io';
+import 'package:image_cropper/image_cropper.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -24,13 +26,13 @@ class _ProfilePageState extends State<ProfilePage> {
 
   final user = FirebaseAuth.instance.currentUser;
 
-  bool isEditing = false; 
-  bool isSaving = false; 
-  bool isFetching = true; 
+  bool isEditing = false;
+  bool isSaving = false;
+  bool isFetching = true;
 
   Uint8List? _imageBytes;
   String? _imageExtension;
-  String? _currentPhotoUrl; 
+  String? _currentPhotoUrl;
 
   @override
   void initState() {
@@ -38,10 +40,9 @@ class _ProfilePageState extends State<ProfilePage> {
     _loadUserData();
   }
 
-
   Future<void> _loadUserData() async {
     if (user == null) return;
-    
+
     setState(() => isFetching = true);
 
     try {
@@ -52,7 +53,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (doc.exists && mounted) {
         final data = doc.data();
-        
+
         setState(() {
           nameCtrl.text = data?['nama'] ?? '';
           genderCtrl.text = data?['jenis_kelamin'] ?? '';
@@ -69,7 +70,6 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-
   Future<void> _pickImage() async {
     if (!isEditing) return;
 
@@ -77,56 +77,71 @@ class _ProfilePageState extends State<ProfilePage> {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      final bytes = await pickedFile.readAsBytes();
-      
+      CroppedFile? croppedFile = await ImageCropper().cropImage(
+        sourcePath: pickedFile.path,
+        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Atur Foto Profil',
+            toolbarColor: Colors.yellow[700],
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.square,
+            lockAspectRatio: true,
+          ),
+          IOSUiSettings(title: 'Atur Foto Profil'),
+        ],
+      );
 
-      final extension = pickedFile.name.split('.').last; 
+      if (croppedFile != null) {
+        final bytes = await croppedFile.readAsBytes();
+        final extension = croppedFile.path.split('.').last;
 
-      setState(() {
-        _imageBytes = bytes;
-        _imageExtension = extension;
-      });
+        setState(() {
+          _imageBytes = bytes;
+          _imageExtension = extension;
+        });
+      }
     }
   }
 
   Future<String?> _uploadImageToSupabase() async {
-    if (_imageBytes == null) return null;
+    if (_imageBytes == null || user == null) return null;
 
     try {
-      String safeExt = _imageExtension ?? "jpg";
-      if (!['jpg', 'jpeg', 'png'].contains(safeExt.toLowerCase())) {
-        safeExt = 'jpg';
+      if (_currentPhotoUrl != null && _currentPhotoUrl!.isNotEmpty) {
+        try {
+          final uri = Uri.parse(_currentPhotoUrl!);
+          final oldFileName = uri.pathSegments.last;
+          await SupabaseService.client.storage.from('photos').remove([
+            'profile/${user!.uid}/$oldFileName',
+          ]);
+          print("Foto lama berhasil dihapus");
+        } catch (e) {
+          print("Gagal hapus foto lama (mungkin tidak ada): $e");
+        }
       }
+      String safeExt = _imageExtension ?? "jpg";
 
       final fileName = '${DateTime.now().millisecondsSinceEpoch}.$safeExt';
-      final path = 'uploads/$fileName';
+      final path = 'profile/${user!.uid}/$fileName';
 
-      final contentType = 'image/$safeExt';
-
-      print("Mencoba upload: $path dengan type $contentType");
-
-      await SupabaseService.client.storage.from('photos').uploadBinary(
-        path,
-        _imageBytes!,
-        fileOptions: FileOptions(
-          contentType: contentType, 
-          upsert: true,
-        ),
-      );
+      await SupabaseService.client.storage
+          .from('photos')
+          .uploadBinary(
+            path,
+            _imageBytes!,
+            fileOptions: FileOptions(
+              contentType: 'image/$safeExt',
+              upsert: true,
+            ),
+          );
 
       final imageUrl = SupabaseService.client.storage
           .from('photos')
           .getPublicUrl(path);
-
-      print("Upload Sukses. URL Baru: $imageUrl");
       return imageUrl;
     } catch (e) {
-      print("GAGAL UPLOAD KE SUPABASE: $e");
-      if (mounted) {
-         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal Upload: $e'), backgroundColor: Colors.red),
-        );
-      }
+      print("GAGAL PROSES SUPABASE: $e");
       return null;
     }
   }
@@ -141,12 +156,21 @@ class _ProfilePageState extends State<ProfilePage> {
       if (_imageBytes != null) {
         newPhotoUrl = await _uploadImageToSupabase();
         if (newPhotoUrl == null) {
-           throw Exception("Gagal upload gambar. Cek koneksi atau format file.");
+          throw Exception("Gagal upload gambar. Cek koneksi atau format file.");
         }
+      }
+      List<String> generateSearchKeywords(String name) {
+        String cleanedName = name
+            .toLowerCase()
+            .replaceAll('.', '')
+            .replaceAll(',', '');
+        List<String> words = cleanedName.split(' ');
+        return words.where((word) => word.isNotEmpty).toList();
       }
 
       Map<String, dynamic> updateData = {
         'nama': nameCtrl.text,
+        'search_keywords': generateSearchKeywords(nameCtrl.text),
         'jenis_kelamin': genderCtrl.text,
         'alamat': addressCtrl.text,
         'keterangan': descCtrl.text,
@@ -157,7 +181,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (newPhotoUrl != null) {
         updateData['photo_url'] = newPhotoUrl;
-        await user!.updatePhotoURL(newPhotoUrl); 
+        await user!.updatePhotoURL(newPhotoUrl);
       }
 
       await FirebaseFirestore.instance
@@ -168,10 +192,10 @@ class _ProfilePageState extends State<ProfilePage> {
       if (mounted) {
         setState(() {
           if (newPhotoUrl != null) _currentPhotoUrl = newPhotoUrl;
-          _imageBytes = null; 
+          _imageBytes = null;
           isEditing = false;
         });
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Profil berhasil disimpan!')),
         );
@@ -213,15 +237,17 @@ class _ProfilePageState extends State<ProfilePage> {
         title: const Text("Profil", style: TextStyle(color: Colors.black)),
         actions: [
           TextButton(
-            onPressed: isSaving ? null : () {
-              setState(() {
-                isEditing = !isEditing;
-                if (!isEditing) {
-                  _imageBytes = null;
-                  _loadUserData();
-                }
-              });
-            },
+            onPressed: isSaving
+                ? null
+                : () {
+                    setState(() {
+                      isEditing = !isEditing;
+                      if (!isEditing) {
+                        _imageBytes = null;
+                        _loadUserData();
+                      }
+                    });
+                  },
             child: Text(
               isEditing ? "Batal" : "Edit",
               style: const TextStyle(
@@ -232,8 +258,8 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ],
       ),
-      body: isFetching 
-          ? const Center(child: CircularProgressIndicator()) 
+      body: isFetching
+          ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               child: Column(
                 children: [
@@ -257,10 +283,16 @@ class _ProfilePageState extends State<ProfilePage> {
                               child: Container(
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.white, width: 3),
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 3,
+                                  ),
                                   boxShadow: [
-                                    BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10)
-                                  ]
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 10,
+                                    ),
+                                  ],
                                 ),
                                 child: ClipOval(
                                   child: SizedBox(
@@ -281,9 +313,15 @@ class _ProfilePageState extends State<ProfilePage> {
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     shape: BoxShape.circle,
-                                    border: Border.all(color: Colors.grey[300]!),
+                                    border: Border.all(
+                                      color: Colors.grey[300]!,
+                                    ),
                                   ),
-                                  child: const Icon(Icons.camera_alt, size: 20, color: Colors.orange),
+                                  child: const Icon(
+                                    Icons.camera_alt,
+                                    size: 20,
+                                    color: Colors.orange,
+                                  ),
                                 ),
                               ),
                           ],
@@ -300,25 +338,51 @@ class _ProfilePageState extends State<ProfilePage> {
                       ],
                     ),
                   ),
-                  
+
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("Pengaturan Personal", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        const Text(
+                          "Pengaturan Personal",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         const SizedBox(height: 16),
-                        _buildField("Nama Lengkap", nameCtrl, enabled: isEditing),
-                        _buildField("Jenis Kelamin", genderCtrl, enabled: isEditing),
+                        _buildField(
+                          "Nama Lengkap",
+                          nameCtrl,
+                          enabled: isEditing,
+                        ),
+                        _buildField(
+                          "Jenis Kelamin",
+                          genderCtrl,
+                          enabled: isEditing,
+                        ),
                         _buildEmailField("Email", user?.email ?? ""),
                         _buildField("Alamat", addressCtrl, enabled: isEditing),
-                        _buildField("Sosial Media (Link)", socialMediaCtrl, enabled: isEditing),
-                        _buildField("Tentang saya", descCtrl, maxLines: 3, enabled: isEditing),
+                        _buildField(
+                          "Sosial Media (Link)",
+                          socialMediaCtrl,
+                          enabled: isEditing,
+                        ),
+                        _buildField(
+                          "Tentang saya",
+                          descCtrl,
+                          maxLines: 3,
+                          enabled: isEditing,
+                        ),
 
                         const SizedBox(height: 24),
-                        const Text("Kontrol Akun", style: TextStyle(fontWeight: FontWeight.bold)),
+                        const Text(
+                          "Kontrol Akun",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         const SizedBox(height: 8),
-                        
+
                         if (isEditing)
                           SizedBox(
                             width: double.infinity,
@@ -326,17 +390,35 @@ class _ProfilePageState extends State<ProfilePage> {
                               onPressed: isSaving ? null : _saveProfile,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.yellow[800],
-                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
                               ),
                               child: isSaving
-                                ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                                : const Text("Simpan Perubahan", style: TextStyle(color: Colors.white, fontSize: 16)),
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Text(
+                                      "Simpan Perubahan",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                      ),
+                                    ),
                             ),
                           ),
-                          
+
                         TextButton(
                           onPressed: () {},
-                          child: const Text("Hapus Profil", style: TextStyle(color: Colors.red)),
+                          child: const Text(
+                            "Hapus Profil",
+                            style: TextStyle(color: Colors.red),
+                          ),
                         ),
                       ],
                     ),
@@ -352,7 +434,7 @@ class _ProfilePageState extends State<ProfilePage> {
     if (_imageBytes != null) {
       return Image.memory(_imageBytes!, fit: BoxFit.cover);
     }
-    
+
     if (_currentPhotoUrl != null && _currentPhotoUrl!.isNotEmpty) {
       return Image.network(
         _currentPhotoUrl!,
@@ -376,7 +458,12 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildField(String label, TextEditingController controller, {int maxLines = 1, bool enabled = true}) {
+  Widget _buildField(
+    String label,
+    TextEditingController controller, {
+    int maxLines = 1,
+    bool enabled = true,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: Column(
@@ -391,8 +478,13 @@ class _ProfilePageState extends State<ProfilePage> {
             decoration: InputDecoration(
               filled: !enabled,
               fillColor: Colors.grey[100],
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Colors.orange))
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(color: Colors.orange),
+              ),
             ),
           ),
         ],
@@ -417,7 +509,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.grey[100],
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
               ),
@@ -425,7 +519,10 @@ class _ProfilePageState extends State<ProfilePage> {
               Container(
                 height: 56,
                 width: 56,
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.teal)),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.teal),
+                ),
                 child: const Icon(Icons.verified, color: Colors.teal),
               ),
             ],
