@@ -35,3 +35,18 @@ class _PostDetailPageState extends State<PostDetailPage> {
         .get();
     if (mounted) setState(() => isLiked = doc.exists);
   }
+  void _toggleLike() async {
+    if (currentUser == null) return;
+    final likeRef = FirebaseFirestore.instance
+        .collection('posts')
+        .doc(widget.postId)
+        .collection('likes')
+        .doc(currentUser!.uid);
+
+    if (isLiked) {
+      await likeRef.delete();
+    } else {
+      await likeRef.set({'timestamp': FieldValue.serverTimestamp()});
+    }
+    setState(() => isLiked = !isLiked);
+  }
