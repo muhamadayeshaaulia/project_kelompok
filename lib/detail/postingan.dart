@@ -23,13 +23,28 @@ class _PostDetailPageState extends State<PostDetailPage> {
   bool isLiked = false;
   String? replyingToId;
   String? replyingToName;
+  String _myUserName = "Loading...";
 
   @override
   void initState() {
     super.initState();
     _checkIfLiked();
+    _fetchMyName();
   }
 
+Future<void> _fetchMyName() async {
+  if (currentUser == null) return;
+  final doc = await FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser!.uid)
+      .get();
+
+  if (doc.exists && mounted) {
+    setState(() {
+      _myUserName = doc.data()?['nama'] ?? "User";
+    });
+  }
+}
   void _checkIfLiked() async {
     if (currentUser == null) return;
     final doc = await FirebaseFirestore.instance
@@ -66,7 +81,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
         .collection('comments')
         .add({
           'uid': currentUser!.uid,
-          'nama': currentUser!.displayName ?? "User",
+          'nama': _myUserName,
           'komentar': _commentController.text.trim(),
           'parent_id': replyingToId,
           'reply_to_name': replyingToName,
