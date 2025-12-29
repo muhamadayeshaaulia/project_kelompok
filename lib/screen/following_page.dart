@@ -162,6 +162,32 @@ class _FollowingPageState extends State<FollowingPage> {
                       buttonText = "Follow Back";
                       buttonColor = Colors.blue;
                     }
+                    return ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage: userData['photo_url'] != null
+                            ? NetworkImage(userData['photo_url'])
+                            : null,
+                        child: userData['photo_url'] == null
+                            ? const Icon(Icons.person)
+                            : null,
+                      ),
+                      title: Text(userData['nama'] ?? "User"),
+                      subtitle: Text(userData['email'] ?? ""),
+                      trailing: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: buttonColor,
+                        ),
+                        onPressed: () => _toggleFollow(targetUid),
+                        child: Text(
+                          buttonText,
+                          style: TextStyle(
+                            color: amIFollowingHim
+                                ? Colors.black
+                                : Colors.white,
+                          ),
+                        ),
+                      ),
+                    );
                   },
                 );
               },
