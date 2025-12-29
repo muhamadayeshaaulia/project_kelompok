@@ -66,6 +66,16 @@ class _FollowingPageState extends State<FollowingPage> {
         .collection('followers')
         .doc(currentUser!.uid);
 
+    if (myFollowingList.contains(targetUid)) {
+      await myFollowingDoc.delete();
+      await targetFollowersDoc.delete();
+      setState(() => myFollowingList.remove(targetUid));
+    } else {
+      final timestamp = {'timestamp': FieldValue.serverTimestamp()};
+      await myFollowingDoc.set(timestamp);
+      await targetFollowersDoc.set(timestamp);
+      setState(() => myFollowingList.add(targetUid));
+    }
   }
 
   @override
