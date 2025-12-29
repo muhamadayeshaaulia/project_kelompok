@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:project_kelompok/screen/home_screen.dart';
-import 'package:project_kelompok/screen/login.dart';
 import 'package:project_kelompok/screen/page1.dart';
-import 'package:project_kelompok/screen/page2.dart';
-import 'package:project_kelompok/screen/page3.dart';
 import 'package:project_kelompok/screen/register.dart';
 import 'package:project_kelompok/screen/splash_screen.dart';
 import 'firebase_options.dart';
@@ -32,10 +28,6 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const MySplashScreen(),
         '/page1': (context) => const MyPage1(),
-        '/page2': (context) => const MyPage2(),
-        '/page3': (context) => const MyPage3(),
-        '/login': (context) => const MyLogin(),
-        '/home': (context) => const HomeScreen(),
         '/register': (context) => const MyRegis(),
       },
     );
