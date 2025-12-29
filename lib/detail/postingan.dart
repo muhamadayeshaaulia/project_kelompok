@@ -50,3 +50,41 @@ class _PostDetailPageState extends State<PostDetailPage> {
     }
     setState(() => isLiked = !isLiked);
   }
+  void _addComment() async {
+    if (_commentController.text.trim().isEmpty || currentUser == null) return;
+
+    await FirebaseFirestore.instance
+        .collection('posts')
+        .doc(widget.postId)
+        .collection('comments')
+        .add({
+      'uid': currentUser!.uid,
+      'nama': currentUser!.displayName ?? "User",
+      'komentar': _commentController.text.trim(),
+      'parent_id': replyingToId, 
+      'reply_to_name': replyingToName,
+      'timestamp': FieldValue.serverTimestamp(),
+      'likes': [],
+    });
+
+    setState(() {
+      _commentController.clear();
+      replyingToId = null;
+      replyingToName = null;
+    });
+  }
+
+  void _toggleCommentLike(String commentId, List likes) async {
+    if (currentUser == null) return;
+    final docRef = FirebaseFirestore.instance
+        .collection('posts')
+        .doc(widget.postId)
+        .collection('comments')
+        .doc(commentId);
+
+    if (likes.contains(currentUser!.uid)) {
+      await docRef.update({'likes': FieldValue.arrayRemove([currentUser!.uid])});
+    } else {
+      await docRef.update({'likes': FieldValue.arrayUnion([currentUser!.uid])});
+    }
+  }
