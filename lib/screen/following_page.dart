@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
+
 
 class FollowingPage extends StatefulWidget {
   const FollowingPage({super.key});
@@ -139,6 +141,7 @@ class _FollowingPageState extends State<FollowingPage> {
                 }
               },
             ),
+      bottomNavigationBar: const CustomButtomNav(currentIndex: 1),
     );
   }
 }
