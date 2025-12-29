@@ -25,6 +25,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   String? replyingToName;
   String _myUserName = "Loading...";
 
+
   @override
   void initState() {
     super.initState();
@@ -75,6 +76,17 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
   void _addComment() async {
     if (_commentController.text.trim().isEmpty || currentUser == null) return;
+    if (_commentController.text.trim().isEmpty || 
+      currentUser == null || 
+      _myUserName == "Loading...") {
+  
+    if (_myUserName == "Loading...") {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Mohon tunggu, sedang memuat profil..."))
+      );
+    }
+    return;
+  }
 
     await FirebaseFirestore.instance
         .collection('posts')
