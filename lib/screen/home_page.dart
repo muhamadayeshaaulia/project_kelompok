@@ -151,28 +151,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildPhotoItem(int index) {
+    final imageUrl = _photoUrls[index];
+
     return GestureDetector(
-      onTap: () {
-        showDialog(
-          context: context,
-          builder: (context) => Dialog(
-            backgroundColor: Colors.transparent,
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: Image.network(_photoUrls[index]),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white, size: 30),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+      onLongPress: () =>
+          _showPostConfirmation(imageUrl),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -193,20 +176,137 @@ class _MyHomePageState extends State<MyHomePage> {
                   top: Radius.circular(12),
                 ),
                 child: Image.network(
-                  _photoUrls[index],
+                  imageUrl,
                   fit: BoxFit.cover,
                   width: double.infinity,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return const Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    );
+                  },
                 ),
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 8),
-              child: Icon(Icons.more_horiz, color: Colors.orange, size: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  IconButton(
+                    tooltip: "Posting ke Publik",
+                    icon: const Icon(
+                      Icons.send_rounded,
+                      color: Colors.orange,
+                      size: 22,
+                    ),
+                    onPressed: () => _showPostConfirmation(imageUrl),
+                  ),
+                  IconButton(
+                    tooltip: "Lihat Detail",
+                    icon: const Icon(
+                      Icons.fullscreen_rounded,
+                      color: Colors.blue,
+                      size: 24,
+                    ),
+                    onPressed: () => _showDetailPhoto(imageUrl),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  void _showDetailPhoto(String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(10),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: Image.network(imageUrl, fit: BoxFit.contain),
+            ),
+            Positioned(
+              top: 10,
+              right: 10,
+              child: CircleAvatar(
+                backgroundColor: Colors.black54,
+                child: IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showPostConfirmation(String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: const Text("Posting ke Explore?"),
+        content: const Text(
+          "Karya kamu akan muncul di halaman publik dan bisa dilihat oleh pengguna lain.",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Batal", style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              _postImage(imageUrl);
+            },
+            child: const Text(
+              "Ya, Posting!",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _postImage(String imageUrl) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    try {
+      await FirebaseFirestore.instance.collection('posts').add({
+        'uid': user.uid,
+        'nama': _displayName,
+        'user_image': _profileImageUrl,
+        'post_image': imageUrl,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Berhasil diposting ke publik! 🚀")),
+      );
+    } catch (e) {
+      debugPrint("Error posting image: $e");
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Gagal memposting foto.")));
+    }
   }
 
   @override
