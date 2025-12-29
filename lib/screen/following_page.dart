@@ -112,6 +112,25 @@ class _FollowingPageState extends State<FollowingPage> {
           ),
         ),
       ),
+      body: searchQuery.isEmpty
+          ? const Center(child: Text("Belum ada pencarian."))
+          : StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('users')
+                  .where(
+                    'search_keywords',
+                    arrayContains: searchQuery.toLowerCase().replaceAll(
+                      '.',
+                      '',
+                    ),
+                  )
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
     );
   }
 }
