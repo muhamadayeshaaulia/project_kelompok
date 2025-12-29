@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 
-
 class FollowingPage extends StatefulWidget {
   const FollowingPage({super.key});
 
@@ -139,6 +138,32 @@ class _FollowingPageState extends State<FollowingPage> {
                 if (docs.isEmpty) {
                   return const Center(child: Text("User tidak ditemukan."));
                 }
+
+                return ListView.builder(
+                  itemCount: docs.length,
+                  itemBuilder: (context, index) {
+                    final targetUid = docs[index].id;
+                    final userData = docs[index].data() as Map<String, dynamic>;
+                    final bool amIFollowingHim = myFollowingList.contains(
+                      targetUid,
+                    );
+                    final bool isHeFollowingMe = myFollowersList.contains(
+                      targetUid,
+                    );
+                    String buttonText = "Follow";
+                    Color buttonColor = Colors.orange;
+                    if (amIFollowingHim && isHeFollowingMe) {
+                      buttonText = "Teman";
+                      buttonColor = Colors.yellow[700]!;
+                    } else if (amIFollowingHim) {
+                      buttonText = "Following";
+                      buttonColor = Colors.grey[300]!;
+                    } else if (isHeFollowingMe) {
+                      buttonText = "Follow Back";
+                      buttonColor = Colors.blue;
+                    }
+                  },
+                );
               },
             ),
       bottomNavigationBar: const CustomButtomNav(currentIndex: 1),
