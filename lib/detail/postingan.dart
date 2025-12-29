@@ -153,9 +153,22 @@ class _PostDetailPageState extends State<PostDetailPage> {
                         const Spacer(),
                         IconButton(
                           icon: const Icon(Icons.share_outlined),
-                          onPressed: () => Share.share(
-                            "Lihat karya keren ini: ${widget.postData['post_image']}",
-                          ),
+                          onPressed: () async {
+                            try {
+                              await Share.share(
+                                "Lihat karya keren ini: ${widget.postData['post_image']}\nDiposting oleh: ${widget.postData['nama']}",
+                                subject: "Karya Fotografi",
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Tidak dapat membuka menu berbagi: $e",
+                                  ),
+                                ),
+                              );
+                            }
+                          },
                         ),
                       ],
                     ),
