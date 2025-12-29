@@ -150,9 +150,11 @@ class _FollowingPageState extends State<FollowingPage> {
                     final bool isHeFollowingMe = myFollowersList.contains(
                       targetUid,
                     );
+                    final bool isFriend = amIFollowingHim && isHeFollowingMe;
+
                     String buttonText = "Follow";
                     Color buttonColor = Colors.orange;
-                    if (amIFollowingHim && isHeFollowingMe) {
+                    if (isFriend) {
                       buttonText = "Teman";
                       buttonColor = Colors.yellow[700]!;
                     } else if (amIFollowingHim) {
@@ -176,12 +178,17 @@ class _FollowingPageState extends State<FollowingPage> {
                       trailing: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: buttonColor,
+                          elevation: isFriend ? 0 : 2,
+                          disabledBackgroundColor: buttonColor,
+                          disabledForegroundColor: Colors.black,
                         ),
-                        onPressed: () => _toggleFollow(targetUid),
+                        onPressed: isFriend
+                            ? null
+                            : () => _toggleFollow(targetUid),
                         child: Text(
                           buttonText,
                           style: TextStyle(
-                            color: amIFollowingHim
+                            color: (amIFollowingHim || isFriend)
                                 ? Colors.black
                                 : Colors.white,
                           ),
