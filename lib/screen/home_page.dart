@@ -36,6 +36,14 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  int _getGridCount(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    if (width > 1200) return 5;
+    if (width > 900) return 4;
+    if (width > 600) return 3;
+    return 2;
+  }
+
   void _showWelcomeMessage() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -391,8 +399,8 @@ class _MyHomePageState extends State<MyHomePage> {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: _getGridCount(context),
         crossAxisSpacing: 15,
         mainAxisSpacing: 15,
         childAspectRatio: 0.6,
@@ -429,8 +437,8 @@ class _MyHomePageState extends State<MyHomePage> {
         return GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: _getGridCount(context),
             crossAxisSpacing: 15,
             mainAxisSpacing: 15,
             childAspectRatio: 0.65,
