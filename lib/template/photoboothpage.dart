@@ -144,7 +144,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
         }
       }
 
-      final fileName = 'strip_${DateTime.now().millisecondsSinceEpoch}.png';
+      final fileName = 'C4_strip_${DateTime.now().millisecondsSinceEpoch}.png';
       final filePath = 'uploads/${user.uid}/$fileName';
 
       await SupabaseService.client.storage
@@ -192,7 +192,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Classic 4 Grid"),
+        title: const Text("Custom Photostrip"),
         backgroundColor: Colors.yellow[700],
       ),
       body: Stack(

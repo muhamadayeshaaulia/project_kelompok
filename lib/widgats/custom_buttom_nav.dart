@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_kelompok/screen/explor.dart';
 import 'package:project_kelompok/screen/following_page.dart';
 import 'package:project_kelompok/screen/home_page.dart';
 import 'package:project_kelompok/screen/info_page.dart';
@@ -93,7 +94,7 @@ class CustomButtomNav extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildNavItem(context, Icons.home, 'Home', 0),
-            _buildNavItem(context, Icons.people, 'People', 1),
+            _buildNavItem(context, Icons.explore_outlined, 'Explore', 1),
             
             GestureDetector(
               onTap: () {
