@@ -275,4 +275,16 @@ class _ExplorPageState extends State<ExplorPage> {
       },
     );
   }
+  void _openDetail(String postId, Map<String, dynamic> data) {
+    FirebaseFirestore.instance.collection('posts').doc(postId).update({
+      'views': FieldValue.increment(1),
+    });
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PostDetailPage(postId: postId, postData: data),
+      ),
+    );
+  }
 }
