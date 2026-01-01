@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project_kelompok/screen/home_page.dart';
 import 'package:project_kelompok/screen/member_card.dart';
+import 'package:project_kelompok/screen/privacy_policy_page.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 
 class InfoAplikasiPage extends StatelessWidget {
@@ -96,8 +97,17 @@ class InfoAplikasiPage extends StatelessWidget {
             leading: const Icon(Icons.privacy_tip),
             title: const Text("Kebijakan Privasi"),
             subtitle: const Text("Lihat kebijakan privasi"),
-            onTap: () {},
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const PrivacyPolicyPage(),
+                ),
+              );
+            },
           ),
+
           ListTile(
             leading: const Icon(Icons.description),
             title: const Text("Syarat & Ketentuan"),
