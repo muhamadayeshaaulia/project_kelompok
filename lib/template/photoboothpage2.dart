@@ -141,7 +141,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
         }
       }
 
-      final fileName = 'strip_${DateTime.now().millisecondsSinceEpoch}.png';
+      final fileName = 'C2_strip_${DateTime.now().millisecondsSinceEpoch}.png';
       final filePath = 'uploads/${user.uid}/$fileName'; 
       
       await SupabaseService.client.storage

@@ -185,9 +185,9 @@ class _MyHomePageState extends State<MyHomePage> {
         _isLoading = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Foto berhasil dihapus.")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Foto berhasil dihapus.")));
     } catch (e) {
       debugPrint("Error deleting photo: $e");
       setState(() => _isLoading = false);
@@ -299,7 +299,6 @@ class _MyHomePageState extends State<MyHomePage> {
                               ? Icons.cloud_done
                               : Icons.send_rounded,
                           color: isAlreadyPosted ? Colors.green : Colors.orange,
-                          size: 20,
                         ),
                         onPressed: isAlreadyPosted
                             ? () {
@@ -374,13 +373,21 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _showPostConfirmation(String imageUrl) {
+    String detectedTemplate = 'classic_2';
+    if (imageUrl.contains('C4_')) {
+      detectedTemplate = 'classic_4';
+    } else if (imageUrl.contains('C2_')) {
+      detectedTemplate = 'classic_2';
+    }
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         title: const Text("Posting ke Explore?"),
-        content: const Text(
-          "Karya kamu akan muncul di halaman publik dan bisa dilihat oleh pengguna lain.",
+        content: Text(
+          "Sistem mendeteksi ini adalah ${detectedTemplate == 'classic_4' ? 'Classic 4' : 'Classic 2'}. "
+          "Karya kamu akan muncul di halaman publik.",
         ),
         actions: [
           TextButton(
@@ -396,7 +403,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             onPressed: () {
               Navigator.pop(context);
-              _postImage(imageUrl);
+              // 3. Panggil fungsi postImage dengan dua parameter
+              _postImage(imageUrl, detectedTemplate);
             },
             child: const Text(
               "Ya, Posting!",
@@ -408,7 +416,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future<void> _postImage(String imageUrl) async {
+  Future<void> _postImage(String imageUrl, String templateType) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
@@ -418,6 +426,7 @@ class _MyHomePageState extends State<MyHomePage> {
         'nama': _displayName,
         'user_image': _profileImageUrl,
         'post_image': imageUrl,
+        'template_type': templateType,
         'timestamp': FieldValue.serverTimestamp(),
         'views': 0,
       });

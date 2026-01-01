@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
+import 'package:project_kelompok/template/photoboothpage.dart';
+import 'package:project_kelompok/template/photoboothpage2.dart';
 
 class PostDetailPage extends StatefulWidget {
   final String postId;
@@ -192,6 +194,11 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    String detectedTemplate = widget.postData['template_type'] ?? 'classic_2';
+    String templateLabel = detectedTemplate == 'classic_4'
+        ? 'Classic 4'
+        : 'Classic 2';
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Postingan"),
@@ -229,6 +236,44 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     width: double.infinity,
                     fit: BoxFit.contain,
                   ),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        if (detectedTemplate == 'classic_4') {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const PhotoBoothPage(),
+                            ),
+                          );
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const PhotoBoothPage2(),
+                            ),
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.auto_awesome, color: Colors.white),
+                      label: Text(
+                        "Gunakan Template $templateLabel",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange[800],
+                        minimumSize: const Size(double.infinity, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
@@ -467,7 +512,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Row(
                   children: [
-                    Text("Membalas ", style: const TextStyle(fontSize: 12)),
+                    const Text("Membalas ", style: TextStyle(fontSize: 12)),
                     Text(
                       replyingToName!,
                       style: const TextStyle(
