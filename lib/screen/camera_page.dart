@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:project_kelompok/template/photoboothpage.dart';
 import 'package:project_kelompok/template/photoboothpage2.dart';
 
 
@@ -42,16 +43,30 @@ class _CameraPageState extends State<CameraPage> {
     });
   }
 
-  // Fungsi Pindah ke Halaman Edit (PhotoBoothPage2)
   void _goToEditingPage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PhotoBoothPage2(
-          initialImages: _capturedPhotos, // <-- KITA LEMPAR FOTO KE SINI
+    if (widget.photoCount == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PhotoBoothPage2(
+            initialImages: _capturedPhotos,
+          ),
         ),
-      ),
-    );
+      );
+    } else if (widget.photoCount == 4) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PhotoBoothPage(
+            initialImages: _capturedPhotos,
+          ),
+        ),
+      );
+    } else {
+       ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Template untuk ${widget.photoCount} foto belum tersedia.")),
+      );
+    }
   }
 
   @override

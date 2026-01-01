@@ -8,12 +8,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:gal/gal.dart';
+import 'package:project_kelompok/screen/home_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:project_kelompok/services/supabase_service.dart';
 
 class PhotoBoothPage extends StatefulWidget {
-  final List<File>? initialImages; 
+  final List<File>? initialImages;
 
   const PhotoBoothPage({super.key, this.initialImages});
 
@@ -62,13 +63,15 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
         _imageBytesList[3] = img4;
       });
     } catch (e) {
-      debugPrint("Error loading images: $e");
+      debugPrint("Error: $e");
     }
   }
 
   Future<void> _pickImage(int index) async {
     try {
-      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      final XFile? pickedFile = await _picker.pickImage(
+        source: ImageSource.gallery,
+      );
       if (pickedFile == null) return;
 
       CroppedFile? croppedFile = await ImageCropper().cropImage(
@@ -92,11 +95,19 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
         });
       }
     } catch (e) {
-      debugPrint("Error pick image: $e");
+      debugPrint("Error: $e");
     }
   }
 
   Future<void> _captureAndUpload() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Kamu belum login.")),
+      );
+      return;
+    }
+
     if (_imageBytesList.contains(null)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Isi semua 4 foto dulu ya!")),
@@ -107,15 +118,11 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
     setState(() => _isLoading = true);
 
     try {
-      final userId = FirebaseAuth.instance.currentUser?.uid;
-      if (userId == null) throw "Login dulu bro.";
-
       await Future.delayed(const Duration(milliseconds: 200));
-
       RenderRepaintBoundary? boundary =
           _boundaryKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
-      
-      if (boundary == null) throw "Gagal render. Widget tidak ditemukan.";
+
+      if (boundary == null) throw "Gagal render widget.";
 
       ui.Image image = await boundary.toImage(pixelRatio: 3.0);
       ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
@@ -125,48 +132,51 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
 
       if (!kIsWeb) {
         try {
-          await Gal.requestAccess(); 
+          await Gal.requestAccess();
           final tempDir = await getTemporaryDirectory();
-          final file = await File('${tempDir.path}/photostrip_${DateTime.now().millisecondsSinceEpoch}.png').create();
+          final file = await File(
+            '${tempDir.path}/photostrip_${DateTime.now().millisecondsSinceEpoch}.png',
+          ).create();
           await file.writeAsBytes(fullImageBytes);
           await Gal.putImage(file.path, album: 'PhotoBooth');
-          
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Berhasil disimpan ke Galeri!"), backgroundColor: Colors.green),
-            );
-          }
         } catch (e) {
-          debugPrint("Skip galeri: $e");
+          debugPrint("Error: $e");
         }
       }
 
       final fileName = 'strip_${DateTime.now().millisecondsSinceEpoch}.png';
+      final filePath = 'uploads/${user.uid}/$fileName';
+
       await SupabaseService.client.storage
           .from('photos')
           .uploadBinary(
-            'uploads/$userId/$fileName',
+            filePath,
             fullImageBytes,
-            fileOptions: const FileOptions(contentType: 'image/png', upsert: true),
+            fileOptions: const FileOptions(
+              contentType: 'image/png',
+              upsert: true,
+            ),
           );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Upload Berhasil!")),
+          const SnackBar(
+            content: Text("Berhasil Disimpan!"),
+            backgroundColor: Colors.green,
+          ),
         );
-        Navigator.pop(context, true);
-      }
 
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const MyHomePage()),
+          (route) => false,
+        );
+      }
     } catch (e) {
       debugPrint("Error: $e");
       if (mounted) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text("Gagal"),
-            content: Text(e.toString()),
-            actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK"))],
-          ),
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Gagal: $e"), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -181,8 +191,10 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
     Color borderColor = isDark ? Colors.white24 : Colors.grey[300]!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Custom Photostrip"),
-      backgroundColor: Colors.yellow[700]),
+      appBar: AppBar(
+        title: const Text("Classic 4 Grid"),
+        backgroundColor: Colors.yellow[700],
+      ),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -203,7 +215,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
                           BoxShadow(
                             color: Colors.black.withOpacity(0.2),
                             blurRadius: 15,
-                          )
+                          ),
                         ],
                       ),
                       child: Column(
@@ -219,10 +231,16 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
                                 margin: const EdgeInsets.only(bottom: 10),
                                 decoration: BoxDecoration(
                                   color: Colors.grey[200],
-                                  border: Border.all(color: borderColor, width: 2),
+                                  border: Border.all(
+                                    color: borderColor,
+                                    width: 2,
+                                  ),
                                 ),
                                 child: _imageBytesList[index] == null
-                                    ? Icon(Icons.add_a_photo, color: Colors.grey[400])
+                                    ? Icon(
+                                        Icons.add_a_photo,
+                                        color: Colors.grey[400],
+                                      )
                                     : Image.memory(
                                         _imageBytesList[index]!,
                                         fit: BoxFit.cover,
@@ -257,7 +275,10 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
                   ),
                 ),
                 const SizedBox(height: 30),
-                const Text("Pilih Warna Frame:", style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text(
+                  "Pilih Warna Frame:",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 10),
                 SizedBox(
                   height: 60,
@@ -278,12 +299,28 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
                             color: color,
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: isSelected ? Colors.blue : Colors.grey[300]!,
+                              color: isSelected
+                                  ? Colors.blue
+                                  : Colors.grey[300]!,
                               width: isSelected ? 3 : 1,
                             ),
-                            boxShadow: [if (isSelected) BoxShadow(color: Colors.blue.withOpacity(0.3), blurRadius: 8, spreadRadius: 2)],
+                            boxShadow: [
+                              if (isSelected)
+                                BoxShadow(
+                                  color: Colors.blue.withOpacity(0.3),
+                                  blurRadius: 8,
+                                  spreadRadius: 2,
+                                ),
+                            ],
                           ),
-                          child: isSelected ? Icon(Icons.check, color: color.computeLuminance() > 0.5 ? Colors.black : Colors.white) : null,
+                          child: isSelected
+                              ? Icon(
+                                  Icons.check,
+                                  color: color.computeLuminance() > 0.5
+                                      ? Colors.black
+                                      : Colors.white,
+                                )
+                              : null,
                         ),
                       );
                     },
@@ -293,17 +330,24 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
                 ElevatedButton.icon(
                   onPressed: _isLoading ? null : _captureAndUpload,
                   icon: const Icon(Icons.save_alt, color: Colors.white),
-                  label: const Text("Simpan Photostrip", style: TextStyle(color: Colors.white)),
+                  label: const Text(
+                    "Simpan Photostrip",
+                    style: TextStyle(color: Colors.white),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.yellow[700],
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 40,
+                      vertical: 15,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-
           if (_isLoading)
             Container(
               color: Colors.black.withOpacity(0.5),
