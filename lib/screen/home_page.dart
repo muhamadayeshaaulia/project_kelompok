@@ -332,6 +332,7 @@ class _MyHomePageState extends State<MyHomePage> {
         'user_image': _profileImageUrl,
         'post_image': imageUrl,
         'timestamp': FieldValue.serverTimestamp(),
+        'views': 0,
       });
 
       ScaffoldMessenger.of(context).showSnackBar(

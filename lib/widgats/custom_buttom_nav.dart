@@ -3,6 +3,7 @@ import 'package:project_kelompok/screen/following_page.dart';
 import 'package:project_kelompok/screen/home_page.dart';
 import 'package:project_kelompok/screen/info_page.dart';
 import 'package:project_kelompok/screen/profile_page.dart';
+import 'package:project_kelompok/screen/explor.dart';
 
 class CustomButtomNav extends StatelessWidget {
   final int currentIndex;
@@ -75,7 +76,7 @@ class CustomButtomNav extends StatelessWidget {
         } else if (index == 1) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const FollowingPage()),
+            MaterialPageRoute(builder: (context) => const ExplorePage()),
           );
         }
       },
