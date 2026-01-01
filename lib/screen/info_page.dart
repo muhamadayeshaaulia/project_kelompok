@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:project_kelompok/screen/home_page.dart';
 import 'package:project_kelompok/screen/member_card.dart';
 import 'package:project_kelompok/screen/privacy_policy_page.dart';
+import 'package:project_kelompok/screen/terms_conditions_page.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 
 class InfoAplikasiPage extends StatelessWidget {
@@ -109,11 +110,20 @@ class InfoAplikasiPage extends StatelessWidget {
           ),
 
           ListTile(
-            leading: const Icon(Icons.description),
-            title: const Text("Syarat & Ketentuan"),
-            subtitle: const Text("Lihat syarat dan ketentuan"),
-            onTap: () {},
-          ),
+  leading: const Icon(Icons.description),
+  title: const Text("Syarat & Ketentuan"),
+  subtitle: const Text("Lihat syarat dan ketentuan"),
+  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const TermsConditionsPage(),
+      ),
+    );
+  },
+),
+
 
           /// 🔹 Jarak aman dari Bottom Nav
           const SizedBox(height: 80),
