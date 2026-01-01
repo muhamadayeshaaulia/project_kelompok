@@ -1,13 +1,13 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:project_kelompok/screen/home_page.dart';
-import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
-import 'package:project_kelompok/services/supabase_service.dart';
+import '../services/supabase_service.dart';
+import '../screen/home_page.dart';
+import '../widgats/custom_buttom_nav.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -17,23 +17,23 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  // ================= CONTROLLER =================
-  final nameCtrl = TextEditingController();
-  final genderCtrl = TextEditingController();
-  final addressCtrl = TextEditingController();
-  final descCtrl = TextEditingController();
-  final socialCtrl = TextEditingController();
-
-  String? selectedGender;
-  Uint8List? _imageBytes;
-  String? _imageExtension;
-  String? _photoUrl;
-
+  // ================= USER =================
   final user = FirebaseAuth.instance.currentUser;
 
+  // ================= CONTROLLER =================
+  final nameCtrl = TextEditingController();
+  final addressCtrl = TextEditingController();
+  final descCtrl = TextEditingController();
+
+  String? selectedGender;
+  String? photoUrl;
+
+  Uint8List? imageBytes;
+  String? imageExt;
+
   bool isEditing = false;
+  bool isLoading = true;
   bool isSaving = false;
-  bool isFetching = true;
 
   // ================= INIT =================
   @override
@@ -42,65 +42,54 @@ class _ProfilePageState extends State<ProfilePage> {
     _loadUser();
   }
 
-  // ================= LOAD USER =================
+  // ================= LOAD DATA =================
   Future<void> _loadUser() async {
     if (user == null) return;
 
-    setState(() => isFetching = true);
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .get();
 
-    try {
-      final doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user!.uid)
-          .get();
-
-      if (doc.exists) {
-        final data = doc.data()!;
-        nameCtrl.text = data['nama'] ?? '';
-        genderCtrl.text = data['jenis_kelamin'] ?? '';
-        selectedGender = genderCtrl.text.isEmpty ? null : genderCtrl.text;
-        addressCtrl.text = data['alamat'] ?? '';
-        descCtrl.text = data['keterangan'] ?? '';
-        socialCtrl.text = data['sosmed_link'] ?? '';
-        _photoUrl = data['photo_url'];
-      }
-    } catch (e) {
-      debugPrint("Load error: $e");
-    } finally {
-      setState(() => isFetching = false);
+    if (doc.exists) {
+      final data = doc.data()!;
+      nameCtrl.text = data['nama'] ?? '';
+      addressCtrl.text = data['alamat'] ?? '';
+      descCtrl.text = data['keterangan'] ?? '';
+      selectedGender = data['jenis_kelamin'];
+      photoUrl = data['photo_url'];
     }
+
+    setState(() => isLoading = false);
   }
 
   // ================= PICK IMAGE =================
   Future<void> _pickImage() async {
-    if (!isEditing) return;
-
     final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery);
+    final img = await picker.pickImage(source: ImageSource.gallery);
 
-    if (picked != null) {
-      _imageBytes = await picked.readAsBytes();
-      _imageExtension = picked.name.split('.').last;
+    if (img != null) {
+      imageBytes = await img.readAsBytes();
+      imageExt = img.name.split('.').last;
       setState(() {});
     }
   }
 
   // ================= UPLOAD IMAGE =================
   Future<String?> _uploadImage() async {
-    if (_imageBytes == null) return null;
+    if (imageBytes == null) return null;
 
-    final ext = (_imageExtension ?? 'jpg').toLowerCase();
-    final safeExt = ['jpg', 'jpeg', 'png'].contains(ext) ? ext : 'jpg';
+    final ext = imageExt ?? 'jpg';
+    final fileName = 'profile_${user!.uid}_${DateTime.now().millisecondsSinceEpoch}.$ext';
 
-    final fileName = '${DateTime.now().millisecondsSinceEpoch}.$safeExt';
     final path = 'profile/$fileName';
 
     await SupabaseService.client.storage.from('photos').uploadBinary(
       path,
-      _imageBytes!,
+      imageBytes!,
       fileOptions: FileOptions(
-        contentType: 'image/$safeExt',
         upsert: true,
+        contentType: 'image/$ext',
       ),
     );
 
@@ -109,14 +98,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
   // ================= SAVE PROFILE =================
   Future<void> _saveProfile() async {
-    if (user == null) return;
-
     setState(() => isSaving = true);
 
     try {
       String? newPhoto;
 
-      if (_imageBytes != null) {
+      if (imageBytes != null) {
         newPhoto = await _uploadImage();
       }
 
@@ -125,86 +112,63 @@ class _ProfilePageState extends State<ProfilePage> {
           .doc(user!.uid)
           .set({
         'nama': nameCtrl.text,
-        'jenis_kelamin': selectedGender,
         'alamat': addressCtrl.text,
         'keterangan': descCtrl.text,
-        'sosmed_link': socialCtrl.text,
-        'email': user!.email,
-        'photo_url': newPhoto ?? _photoUrl,
+        'jenis_kelamin': selectedGender,
+        'photo_url': newPhoto ?? photoUrl,
         'updated_at': Timestamp.now(),
       }, SetOptions(merge: true));
 
-      setState(() {
-        _photoUrl = newPhoto ?? _photoUrl;
-        _imageBytes = null;
-        isEditing = false;
-      });
+      photoUrl = newPhoto ?? photoUrl;
+      imageBytes = null;
+      isEditing = false;
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Profil berhasil disimpan")),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red),
+        SnackBar(content: Text("Error: $e")),
       );
     } finally {
       setState(() => isSaving = false);
     }
   }
 
-  // ================= DELETE ACCOUNT =================
-  Future<void> _deleteAccount() async {
-    if (user == null) return;
-
-    try {
-      // Hapus Firestore
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user!.uid)
-          .delete();
-
-      // Hapus akun Auth
-      await user!.delete();
-
-      // Redirect
-      if (mounted) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) => const MyHomePage()),
-          (route) => false,
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Gagal menghapus akun: $e"),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
+  // ================= REMOVE PHOTO =================
+  void _removePhoto() {
+    setState(() {
+      imageBytes = null;
+      photoUrl = null;
+    });
   }
 
-  // ================= CONFIRM DIALOG =================
-  void _showDeleteDialog() {
-    showDialog(
+  // ================= PHOTO ACTION =================
+  void _showPhotoAction() {
+    if (!isEditing) return;
+
+    showModalBottomSheet(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Hapus Akun"),
-        content: const Text(
-          "Akun dan seluruh data Anda akan dihapus secara permanen. "
-          "Apakah Anda yakin?",
-        ),
-        actions: [
-          TextButton(
-            child: const Text("Batal"),
-            onPressed: () => Navigator.pop(context),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text("Hapus"),
-            onPressed: () {
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.photo),
+            title: const Text("Ganti Foto"),
+            onTap: () {
               Navigator.pop(context);
-              _deleteAccount();
+              _pickImage();
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.delete, color: Colors.red),
+            title: const Text("Hapus Foto"),
+            onTap: () {
+              Navigator.pop(context);
+              _removePhoto();
             },
           ),
         ],
@@ -218,37 +182,24 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        title: const Text("Profil", style: TextStyle(color: Colors.black)),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const MyHomePage()),
-          ),
-        ),
+        title: const Text("Profil"),
         actions: [
           TextButton(
             onPressed: () {
-              setState(() {
-                isEditing = !isEditing;
-                if (!isEditing) _loadUser();
-              });
+              setState(() => isEditing = !isEditing);
             },
             child: Text(isEditing ? "Batal" : "Edit"),
           )
         ],
       ),
-      body: isFetching
+      body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               child: Column(
                 children: [
                   _header(),
                   _avatar(),
-                  _profileCard(),
-                  _accountControlCard(),
+                  _profileForm(),
                 ],
               ),
             ),
@@ -259,7 +210,7 @@ class _ProfilePageState extends State<ProfilePage> {
   // ================= HEADER =================
   Widget _header() {
     return Container(
-      height: 160,
+      height: 150,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [Color(0xFFFFC02D), Color(0xFFFFE082)],
@@ -270,85 +221,69 @@ class _ProfilePageState extends State<ProfilePage> {
 
   // ================= AVATAR =================
   Widget _avatar() {
+    ImageProvider? img;
+
+    if (imageBytes != null) {
+      img = MemoryImage(imageBytes!);
+    } else if (photoUrl != null) {
+      img = NetworkImage(photoUrl!);
+    }
+
     return Transform.translate(
-      offset: const Offset(0, -50),
+      offset: const Offset(0, -40),
       child: GestureDetector(
-        onTap: _pickImage,
-        child: CircleAvatar(
-          radius: 55,
-          backgroundColor: Colors.white,
-          child: CircleAvatar(
-            radius: 50,
-            backgroundImage: _imageBytes != null
-                ? MemoryImage(_imageBytes!)
-                : (_photoUrl != null ? NetworkImage(_photoUrl!) : null)
-                    as ImageProvider?,
-            child: _photoUrl == null && _imageBytes == null
-                ? const Icon(Icons.person, size: 40)
-                : null,
-          ),
+        onTap: _showPhotoAction,
+        child: Stack(
+          children: [
+            CircleAvatar(
+              radius: 55,
+              backgroundColor: Colors.white,
+              child: CircleAvatar(
+                radius: 50,
+                backgroundImage: img,
+                child: img == null
+                    ? const Icon(Icons.person, size: 40)
+                    : null,
+              ),
+            ),
+            if (isEditing)
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: CircleAvatar(
+                  backgroundColor: Colors.black,
+                  radius: 16,
+                  child: const Icon(Icons.edit, size: 16, color: Colors.white),
+                ),
+              ),
+          ],
         ),
       ),
     );
   }
 
-  // ================= PROFILE CARD =================
-  Widget _profileCard() {
-    return _card(
-      title: "Informasi Pribadi",
-      children: [
-        _field("Nama Lengkap", nameCtrl),
-        _genderDropdown(),
-        _readonly("Email", user?.email ?? "-"),
-        _field("Alamat", addressCtrl),
-        _field("Sosial Media", socialCtrl),
-        _field("Tentang Saya", descCtrl, maxLines: 3),
-        if (isEditing)
-          ElevatedButton(
-            onPressed: isSaving ? null : _saveProfile,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFFC02D),
-            ),
-            child: isSaving
-                ? const CircularProgressIndicator(color: Colors.white)
-                : const Text("Simpan Perubahan"),
-          ),
-      ],
-    );
-  }
-
-  // ================= ACCOUNT CONTROL =================
-  Widget _accountControlCard() {
-    return _card(
-      title: "Kontrol Akun",
-      children: [
-        ListTile(
-          leading: const Icon(Icons.delete, color: Colors.red),
-          title: const Text("Hapus Akun"),
-          subtitle: const Text("Hapus akun secara permanen"),
-          onTap: _showDeleteDialog,
-        ),
-      ],
-    );
-  }
-
-  // ================= WIDGET HELPER =================
-  Widget _card({required String title, required List<Widget> children}) {
+  // ================= FORM =================
+  Widget _profileForm() {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        elevation: 5,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold)),
+              _field("Nama Lengkap", nameCtrl),
+              _gender(),
+              _field("Alamat", addressCtrl),
+              _field("Tentang Saya", descCtrl, maxLines: 3),
               const SizedBox(height: 12),
-              ...children,
+              if (isEditing)
+                ElevatedButton(
+                  onPressed: isSaving ? null : _saveProfile,
+                  child: isSaving
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text("Simpan"),
+                ),
             ],
           ),
         ),
@@ -366,56 +301,23 @@ class _ProfilePageState extends State<ProfilePage> {
         maxLines: maxLines,
         decoration: InputDecoration(
           labelText: label,
-          filled: !isEditing,
-          fillColor: Colors.grey[100],
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
     );
   }
 
-  Widget _readonly(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: TextField(
-        enabled: false,
-        decoration: InputDecoration(
-          labelText: label,
-          hintText: value,
-          filled: true,
-          fillColor: Colors.grey[100],
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        ),
-      ),
-    );
-  }
-
-  Widget _genderDropdown() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: DropdownButtonFormField<String>(
-        value: ["Laki laki", "Perempuan"].contains(selectedGender)
-            ? selectedGender
-            : null,
-        items: const [
-          DropdownMenuItem(value: "Laki laki", child: Text("Laki laki")),
-          DropdownMenuItem(value: "Perempuan", child: Text("Perempuan")),
-        ],
-        onChanged: isEditing
-            ? (v) {
-                setState(() {
-                  selectedGender = v;
-                  genderCtrl.text = v ?? '';
-                });
-              }
-            : null,
-        decoration: InputDecoration(
-          labelText: "Jenis Kelamin",
-          filled: !isEditing,
-          fillColor: Colors.grey[100],
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        ),
-      ),
+  Widget _gender() {
+    return DropdownButtonFormField<String>(
+      value: ["Laki laki", "Perempuan"].contains(selectedGender)
+          ? selectedGender
+          : null,
+      items: const [
+        DropdownMenuItem(value: "Laki laki", child: Text("Laki laki")),
+        DropdownMenuItem(value: "Perempuan", child: Text("Perempuan")),
+      ],
+      onChanged: isEditing ? (v) => setState(() => selectedGender = v) : null,
+      decoration: const InputDecoration(labelText: "Jenis Kelamin"),
     );
   }
 }
