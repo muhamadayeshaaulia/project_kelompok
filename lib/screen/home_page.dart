@@ -36,6 +36,14 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  int _getGridCount(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    if (width > 1200) return 5;
+    if (width > 900) return 4;
+    if (width > 600) return 3;
+    return 2;
+  }
+
   void _showWelcomeMessage() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -116,6 +124,76 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (e) {
       debugPrint("Error load photos: $e");
       if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _confirmDelete(String imageUrl) async {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Hapus Foto?"),
+        content: const Text(
+          "Foto ini akan dihapus permanen. Jika sudah diposting, postingan juga akan hilang.",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Batal", style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              _deletePhoto(imageUrl);
+            },
+            child: const Text("Hapus", style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _deletePhoto(String imageUrl) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      final uri = Uri.parse(imageUrl);
+      final fileName = uri.pathSegments.last;
+      final path = 'uploads/${user.uid}/$fileName';
+
+      await SupabaseService.client.storage.from('photos').remove([path]);
+
+      final postsQuery = await FirebaseFirestore.instance
+          .collection('posts')
+          .where('post_image', isEqualTo: imageUrl)
+          .get();
+
+      for (var doc in postsQuery.docs) {
+        await doc.reference.delete();
+      }
+
+      setState(() {
+        _photoUrls.remove(imageUrl);
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Foto berhasil dihapus.")),
+      );
+    } catch (e) {
+      debugPrint("Error deleting photo: $e");
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Gagal menghapus foto.")));
     }
   }
 
@@ -221,7 +299,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               ? Icons.cloud_done
                               : Icons.send_rounded,
                           color: isAlreadyPosted ? Colors.green : Colors.orange,
-                          size: 22,
+                          size: 20,
                         ),
                         onPressed: isAlreadyPosted
                             ? () {
@@ -237,11 +315,20 @@ class _MyHomePageState extends State<MyHomePage> {
                             : () => _showPostConfirmation(imageUrl),
                       ),
                       IconButton(
+                        tooltip: "Hapus Foto",
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: Colors.red,
+                          size: 20,
+                        ),
+                        onPressed: () => _confirmDelete(imageUrl),
+                      ),
+                      IconButton(
                         tooltip: "Lihat Detail",
                         icon: const Icon(
                           Icons.fullscreen_rounded,
                           color: Colors.blue,
-                          size: 24,
+                          size: 22,
                         ),
                         onPressed: () => _showDetailPhoto(imageUrl),
                       ),
@@ -392,8 +479,8 @@ class _MyHomePageState extends State<MyHomePage> {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: _getGridCount(context),
         crossAxisSpacing: 15,
         mainAxisSpacing: 15,
         childAspectRatio: 0.6,
@@ -430,8 +517,8 @@ class _MyHomePageState extends State<MyHomePage> {
         return GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: _getGridCount(context),
             crossAxisSpacing: 15,
             mainAxisSpacing: 15,
             childAspectRatio: 0.65,

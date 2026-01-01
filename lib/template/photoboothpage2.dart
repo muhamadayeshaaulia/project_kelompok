@@ -8,12 +8,15 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:gal/gal.dart';
+import 'package:project_kelompok/screen/home_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:project_kelompok/services/supabase_service.dart';
 
 class PhotoBoothPage2 extends StatefulWidget {
-  const PhotoBoothPage2({super.key});
+  final List<File>? initialImages; 
+
+  const PhotoBoothPage2({super.key, this.initialImages});
 
   @override
   State<PhotoBoothPage2> createState() => _PhotoBoothPageState();
@@ -37,6 +40,29 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
   final ImagePicker _picker = ImagePicker();
   final GlobalKey _boundaryKey = GlobalKey();
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.initialImages != null && widget.initialImages!.length == 2) {
+      _loadCameraImages();
+    }
+  }
+
+  Future<void> _loadCameraImages() async {
+    try {
+      final img1 = await widget.initialImages![0].readAsBytes();
+      final img2 = await widget.initialImages![1].readAsBytes();
+
+      setState(() {
+        _imageBytesList[0] = img1;
+        _imageBytesList[1] = img2;
+      });
+    } catch (e) {
+      debugPrint("Gagal memuat foto: $e");
+    }
+  }
 
   Future<void> _pickImage(int index) async {
     try {
@@ -71,9 +97,17 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
   }
 
   Future<void> _captureAndUpload() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Kamu belum login.")),
+      );
+      return;
+    }
+
     if (_imageBytesList.contains(null)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Isi semua 2 foto dulu ya!")),
+        const SnackBar(content: Text("Isi semua foto dulu ya!")),
       );
       return;
     }
@@ -81,21 +115,14 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
     setState(() => _isLoading = true);
 
     try {
-      final userId = FirebaseAuth.instance.currentUser?.uid;
-      if (userId == null) throw "Login dulu bro.";
-
       await Future.delayed(const Duration(milliseconds: 200));
-
       RenderRepaintBoundary? boundary =
-          _boundaryKey.currentContext?.findRenderObject()
-              as RenderRepaintBoundary?;
-
-      if (boundary == null) throw "Gagal render. Widget tidak ditemukan.";
+          _boundaryKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      
+      if (boundary == null) throw "Gagal render widget.";
 
       ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-      ByteData? byteData = await image.toByteData(
-        format: ui.ImageByteFormat.png,
-      );
+      ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       final fullImageBytes = byteData?.buffer.asUint8List();
 
       if (fullImageBytes == null) throw "Gambar kosong.";
@@ -109,53 +136,45 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
           ).create();
           await file.writeAsBytes(fullImageBytes);
           await Gal.putImage(file.path, album: 'PhotoBooth');
-
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Berhasil disimpan ke Galeri!"),
-                backgroundColor: Colors.green,
-              ),
-            );
-          }
         } catch (e) {
           debugPrint("Skip galeri: $e");
         }
       }
 
       final fileName = 'strip_${DateTime.now().millisecondsSinceEpoch}.png';
+      final filePath = 'uploads/${user.uid}/$fileName'; 
+      
       await SupabaseService.client.storage
           .from('photos')
           .uploadBinary(
-            'uploads/$userId/$fileName',
+            filePath,
             fullImageBytes,
             fileOptions: const FileOptions(
-              contentType: 'image/png',
-              upsert: true,
+              contentType: 'image/png', 
+              upsert: true
             ),
           );
 
       if (mounted) {
-        ScaffoldMessenger.of(
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Berhasil Disimpan!"),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        Navigator.pushAndRemoveUntil(
           context,
-        ).showSnackBar(const SnackBar(content: Text("Upload Berhasil!")));
-        Navigator.pop(context, true);
+          MaterialPageRoute(builder: (context) => const MyHomePage()), 
+          (route) => false,
+        );
       }
+
     } catch (e) {
       debugPrint("Error: $e");
       if (mounted) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text("Gagal"),
-            content: Text(e.toString()),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("OK"),
-              ),
-            ],
-          ),
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Gagal: $e"), backgroundColor: Colors.red),
         );
       }
     } finally {
