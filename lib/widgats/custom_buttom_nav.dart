@@ -76,7 +76,7 @@ class CustomButtomNav extends StatelessWidget {
         } else if (index == 1) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const ExplorePage()),
+            MaterialPageRoute(builder: (context) => const ExplorPage()),
           );
         }
       },
