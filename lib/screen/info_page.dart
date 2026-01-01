@@ -90,7 +90,7 @@ class InfoAplikasiPage extends StatelessWidget {
           const ListTile(
             leading: Icon(Icons.email),
             title: Text("Email"),
-            subtitle: Text("developer@email.com"),
+            subtitle: Text("developer@gmail.com"),
           ),
           ListTile(
             leading: const Icon(Icons.privacy_tip),
