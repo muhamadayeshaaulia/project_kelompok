@@ -35,6 +35,16 @@ class _ExplorPageState extends State<ExplorPage> {
         elevation: 0,
         centerTitle: true,
       ),
+      body: ListView(
+        children: [
+          _buildSectionTitle("🔥 Paling Populer"),
+          _buildPopularGrid(),
+          const SizedBox(height: 20),
+          _buildSectionTitle("✨ Postingan Terbaru"),
+          _buildRecentList(),
+        ],
+      ),
     );
   }
-}
+  }
+
