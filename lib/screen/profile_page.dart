@@ -44,9 +44,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _loadUserData() async {
     if (user == null) return;
     
-    setState(() => isFetching = true)
-    selectedGender = genderCtrl.text.isEmpty ? null : genderCtrl.text;
-;
+    setState(() => isFetching = true);
 
     try {
       final doc = await FirebaseFirestore.instance
@@ -60,6 +58,7 @@ class _ProfilePageState extends State<ProfilePage> {
         setState(() {
           nameCtrl.text = data?['nama'] ?? '';
           genderCtrl.text = data?['jenis_kelamin'] ?? '';
+          selectedGender = genderCtrl.text.isEmpty ? null : genderCtrl.text;
           addressCtrl.text = data?['alamat'] ?? '';
           descCtrl.text = data?['keterangan'] ?? '';
           socialMediaCtrl.text = data?['sosmed_link'] ?? '';
@@ -313,7 +312,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         const Text("Pengaturan Personal", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 16),
                         _buildField("Nama Lengkap", nameCtrl, enabled: isEditing),
-                        _buildField("Jenis Kelamin", genderCtrl, enabled: isEditing),
+                        _buildGenderDropdown(),
                         _buildEmailField("Email", user?.email ?? ""),
                         _buildField("Alamat", addressCtrl, enabled: isEditing),
                         _buildField("Sosial Media (Link)", socialMediaCtrl, enabled: isEditing),
@@ -404,38 +403,47 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildEmailField(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: const TextStyle(color: Colors.grey)),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: TextEditingController(text: value),
-                  enabled: false,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                height: 56,
-                width: 56,
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.teal)),
-                child: const Icon(Icons.verified, color: Colors.teal),
-              ),
-            ],
+  Widget _buildGenderDropdown() {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 14),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text("Jenis Kelamin", style: TextStyle(color: Colors.grey)),
+        const SizedBox(height: 6),
+        DropdownButtonFormField<String>(
+          value: selectedGender,
+          items: const [
+            DropdownMenuItem(
+              value: "Laki-laki",
+              child: Text("Laki-laki"),
+            ),
+            DropdownMenuItem(
+              value: "Perempuan",
+              child: Text("Perempuan"),
+            ),
+          ],
+          onChanged: isEditing
+              ? (value) {
+                  setState(() {
+                    selectedGender = value;
+                    genderCtrl.text = value ?? '';
+                  });
+                }
+              : null,
+          decoration: InputDecoration(
+            filled: !isEditing,
+            fillColor: Colors.grey[100],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: Colors.orange),
+            ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
 }
