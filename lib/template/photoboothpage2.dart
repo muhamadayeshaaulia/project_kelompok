@@ -15,7 +15,6 @@ import 'package:project_kelompok/services/supabase_service.dart';
 class PhotoBoothPage2 extends StatefulWidget {
   final List<File>? initialImages; 
 
-  // Update constructor:
   const PhotoBoothPage2({super.key, this.initialImages});
 
   @override
@@ -40,6 +39,29 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
   final ImagePicker _picker = ImagePicker();
   final GlobalKey _boundaryKey = GlobalKey();
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.initialImages != null && widget.initialImages!.length == 2) {
+      _loadCameraImages();
+    }
+  }
+
+  Future<void> _loadCameraImages() async {
+    try {
+      final img1 = await widget.initialImages![0].readAsBytes();
+      final img2 = await widget.initialImages![1].readAsBytes();
+
+      setState(() {
+        _imageBytesList[0] = img1;
+        _imageBytesList[1] = img2;
+      });
+    } catch (e) {
+      debugPrint("Gagal memuat foto: $e");
+    }
+  }
 
   Future<void> _pickImage(int index) async {
     try {
