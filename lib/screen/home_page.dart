@@ -597,7 +597,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: const Text('Photo Booth App'),
         backgroundColor: Colors.yellow[700],
-        foregroundColor: Colors.white,
+        foregroundColor: Colors.black,
         elevation: 0,
         actions: [
           IconButton(
