@@ -13,7 +13,8 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await dotenv.load(fileName: ".env");
   await SupabaseService.init();
-  runApp(MyApp());
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
