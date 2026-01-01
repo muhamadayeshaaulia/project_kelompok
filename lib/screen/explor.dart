@@ -86,5 +86,61 @@ Widget _buildPopularGrid() {
       },
     );
   }
+Widget _buildPopularCard(String postId, Map<String, dynamic> data) {
+    return GestureDetector(
+      onTap: () => _openDetail(postId, data),
+      child: Container(
+        width: 150,
+        margin: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          image: DecorationImage(
+            image: NetworkImage(data['post_image']),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            gradient: LinearGradient(
+              begin: Alignment.bottomCenter,
+              colors: [Colors.black.withOpacity(0.8), Colors.transparent],
+            ),
+          ),
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                data['nama'] ?? 'User',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.remove_red_eye,
+                    color: Colors.white70,
+                    size: 12,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    "${data['views'] ?? 0}",
+                    style: const TextStyle(color: Colors.white70, fontSize: 10),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   }
 
