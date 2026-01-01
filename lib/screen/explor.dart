@@ -46,7 +46,7 @@ class _ExplorPageState extends State<ExplorPage> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.people, color: Colors.black),
+            icon: const Icon(Icons.person_search_outlined, color: Colors.black),
             onPressed: () {
               Navigator.pushReplacement(
                 context,

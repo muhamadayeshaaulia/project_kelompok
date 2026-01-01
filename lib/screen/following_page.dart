@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:project_kelompok/screen/explor.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 
 class FollowingPage extends StatefulWidget {
@@ -139,6 +140,13 @@ class _FollowingPageState extends State<FollowingPage> {
             ),
           ),
         ),
+        actions: [IconButton(
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const ExplorPage()),
+            );
+        }, icon: const Icon(Icons.explore_outlined))],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(70),
           child: Padding(
