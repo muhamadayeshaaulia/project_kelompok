@@ -96,7 +96,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Hapus Postingan"),
-        content: const Text("Yakin ingin menghapus postingan ini beserta komentar dan like?"),
+        content: const Text(
+            "Postingan ini akan dihapus dari publik beserta like dan komentarnya.\n\nFoto akan TETAP ADA di menu 'Karya Saya'."),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -122,7 +123,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
       }
 
       WriteBatch batch = FirebaseFirestore.instance.batch();
-      DocumentReference postRef = FirebaseFirestore.instance.collection('posts').doc(widget.postId);
+      DocumentReference postRef =
+          FirebaseFirestore.instance.collection('posts').doc(widget.postId);
 
       var likesSnapshot = await postRef.collection('likes').get();
       for (var doc in likesSnapshot.docs) {
@@ -139,10 +141,13 @@ class _PostDetailPageState extends State<PostDetailPage> {
       await batch.commit();
 
       if (mounted) {
-        Navigator.pop(context); 
-        Navigator.pop(context); 
+        Navigator.pop(context);
+        Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Postingan berhasil dihapus")),
+          const SnackBar(
+            content: Text("Postingan dihapus dari publik. Foto aman di Karya Saya."),
+            backgroundColor: Colors.green,
+          ),
         );
       }
     } catch (e) {
