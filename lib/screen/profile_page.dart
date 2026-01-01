@@ -403,6 +403,41 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  Widget _buildEmailField(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(color: Colors.grey)),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: TextEditingController(text: value),
+                  enabled: false,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                height: 56,
+                width: 56,
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.teal)),
+                child: const Icon(Icons.verified, color: Colors.teal),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildGenderDropdown() {
   return Padding(
     padding: const EdgeInsets.only(bottom: 14),
@@ -447,3 +482,5 @@ class _ProfilePageState extends State<ProfilePage> {
     ),
   );
 }
+}
+
