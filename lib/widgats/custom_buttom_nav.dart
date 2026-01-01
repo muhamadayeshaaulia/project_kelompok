@@ -94,7 +94,7 @@ class CustomButtomNav extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildNavItem(context, Icons.home, 'Home', 0),
-            _buildNavItem(context, Icons.people, 'People', 1),
+            _buildNavItem(context, Icons.explore_outlined, 'Explore', 1),
             
             GestureDetector(
               onTap: () {
