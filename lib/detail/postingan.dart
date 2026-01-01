@@ -91,6 +91,68 @@ class _PostDetailPageState extends State<PostDetailPage> {
     setState(() => isLiked = !isLiked);
   }
 
+  Future<void> _deletePost() async {
+    bool? confirm = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Hapus Postingan"),
+        content: const Text("Yakin ingin menghapus postingan ini beserta komentar dan like?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Batal"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text("Hapus", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (c) => const Center(child: CircularProgressIndicator()),
+        );
+      }
+
+      WriteBatch batch = FirebaseFirestore.instance.batch();
+      DocumentReference postRef = FirebaseFirestore.instance.collection('posts').doc(widget.postId);
+
+      var likesSnapshot = await postRef.collection('likes').get();
+      for (var doc in likesSnapshot.docs) {
+        batch.delete(doc.reference);
+      }
+
+      var commentsSnapshot = await postRef.collection('comments').get();
+      for (var doc in commentsSnapshot.docs) {
+        batch.delete(doc.reference);
+      }
+
+      batch.delete(postRef);
+
+      await batch.commit();
+
+      if (mounted) {
+        Navigator.pop(context); 
+        Navigator.pop(context); 
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Postingan berhasil dihapus")),
+        );
+      }
+    } catch (e) {
+      if (mounted) Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Gagal menghapus: $e")),
+      );
+    }
+  }
+
   void _addComment() async {
     String commentText = _commentController.text.trim();
     if (commentText.isEmpty || currentUser == null) return;
@@ -198,12 +260,21 @@ class _PostDetailPageState extends State<PostDetailPage> {
     String templateLabel = detectedTemplate == 'classic_4'
         ? 'Classic 4'
         : 'Classic 2';
+    
+    bool isOwner = currentUser?.uid == widget.postData['uid'];
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Postingan"),
         backgroundColor: Colors.yellow[700],
         foregroundColor: Colors.white,
+        actions: [
+          if (isOwner)
+            IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: _deletePost,
+            ),
+        ],
       ),
       body: Column(
         children: [
