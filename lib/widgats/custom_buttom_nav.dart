@@ -3,13 +3,12 @@ import 'package:project_kelompok/screen/following_page.dart';
 import 'package:project_kelompok/screen/home_page.dart';
 import 'package:project_kelompok/screen/info_page.dart';
 import 'package:project_kelompok/screen/profile_page.dart';
-import 'package:project_kelompok/screen/camera_page.dart'; // Pastikan import ini ada
+import 'package:project_kelompok/screen/camera_page.dart';
 
 class CustomButtomNav extends StatelessWidget {
   final int currentIndex;
   const CustomButtomNav({super.key, required this.currentIndex});
 
-  // --- LOGIKA BUKA KAMERA & POPUP ---
   void _showCameraOptions(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -31,11 +30,10 @@ class CustomButtomNav extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                // Pilihan 2 Frame
                 GestureDetector(
                   onTap: () {
-                    Navigator.pop(context); // Tutup popup
-                    _openCamera(context, 2); // Buka kamera 2 frame
+                    Navigator.pop(context);
+                    _openCamera(context, 2);
                   },
                   child: Column(
                     children: [
@@ -45,15 +43,14 @@ class CustomButtomNav extends StatelessWidget {
                         child: const Icon(Icons.filter_2, color: Colors.blue, size: 30),
                       ),
                       const SizedBox(height: 8),
-                      const Text("2 Frame", style: TextStyle(fontWeight: FontWeight.bold)),
+                      const Text("Classic 2", style: TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),
-                // Pilihan 4 Frame
                 GestureDetector(
                   onTap: () {
-                    Navigator.pop(context); // Tutup popup
-                    _openCamera(context, 4); // Buka kamera 4 frame
+                    Navigator.pop(context);
+                    _openCamera(context, 4);
                   },
                   child: Column(
                     children: [
@@ -63,7 +60,7 @@ class CustomButtomNav extends StatelessWidget {
                         child: const Icon(Icons.filter_4, color: Colors.purple, size: 30),
                       ),
                       const SizedBox(height: 8),
-                      const Text("4 Frame", style: TextStyle(fontWeight: FontWeight.bold)),
+                      const Text("Classic 4", style: TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),
@@ -76,7 +73,6 @@ class CustomButtomNav extends StatelessWidget {
     );
   }
 
-  // Helper untuk Navigasi ke CameraPage
   void _openCamera(BuildContext context, int count) {
     Navigator.push(
       context,
@@ -98,10 +94,8 @@ class CustomButtomNav extends StatelessWidget {
             _buildNavItem(context, Icons.home, 'Home', 0),
             _buildNavItem(context, Icons.people, 'People', 1),
             
-            // --- TOMBOL KAMERA TENGAH ---
             GestureDetector(
               onTap: () {
-                // PANGGIL FUNGSI POPUP DI SINI
                 _showCameraOptions(context);
               },
               child: Column(
@@ -115,7 +109,6 @@ class CustomButtomNav extends StatelessWidget {
                 ],
               ),
             ),
-            // ---------------------------
 
             _buildNavItem(context, Icons.info, 'Info', 2),
             _buildNavItem(context, Icons.person, 'Profile', 3),

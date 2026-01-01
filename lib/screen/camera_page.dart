@@ -2,17 +2,15 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-// Import KEDUA halaman editor kamu
-import 'package:project_kelompok/template/photoboothpage2.dart'; // Yg 2 Foto
-import 'package:project_kelompok/template/photoboothpage.dart';  // Yg 4 Foto (Pastikan nama filenya benar)
+import 'package:project_kelompok/template/photoboothpage2.dart';
+import 'package:project_kelompok/template/photoboothpage.dart';
 
 class CameraPage extends StatefulWidget {
-  final int photoCount; // Bisa 2, bisa 4
+  final int photoCount;
 
   const CameraPage({
     super.key, 
-    required this.photoCount // Wajib diisi saat dipanggil
+    required this.photoCount
   });
 
   @override
@@ -67,7 +65,6 @@ class _CameraPageState extends State<CameraPage> {
         isTakingPicture = false;
       });
 
-      // LOGIKA UTAMA: Cek apakah jumlah foto sudah sesuai target (2 atau 4)
       if (capturedImages.length < widget.photoCount) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -87,7 +84,6 @@ class _CameraPageState extends State<CameraPage> {
   }
 
   void _finishAndNavigate() {
-    // ROUTING: Tentukan mau dibawa ke halaman mana
     if (widget.photoCount == 2) {
       // Ke Template 2 Foto
       Navigator.pushReplacement(
@@ -97,7 +93,6 @@ class _CameraPageState extends State<CameraPage> {
         ),
       );
     } else {
-      // Ke Template 4 Foto (PhotoBoothPage)
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -118,14 +113,10 @@ class _CameraPageState extends State<CameraPage> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // 1. Preview Kamera
           CameraPreview(controller!),
 
-          // 2. Overlay Grid Dinamis
-          // Membuat kotak-kotak sesuai jumlah foto (2 atau 4)
           Column(
             children: List.generate(widget.photoCount, (index) {
-              // Cek apakah slot ini sedang aktif atau sudah difoto
               bool isTaken = index < capturedImages.length;
               bool isCurrent = index == capturedImages.length;
 
@@ -134,12 +125,10 @@ class _CameraPageState extends State<CameraPage> {
                   width: double.infinity,
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: isCurrent ? Colors.yellow : Colors.white24, // Kuning jika giliran sekarang
-                      width: isCurrent ? 4 : 1,
+                      color: isCurrent ? Colors.yellow : Colors.white24,
                     ),
                   ),
                   child: isTaken
-                      // Tampilkan hasil foto kecil jika sudah diambil
                       ? Image.file(capturedImages[index], fit: BoxFit.cover, color: Colors.black45, colorBlendMode: BlendMode.darken)
                       : null,
                 ),
@@ -147,7 +136,6 @@ class _CameraPageState extends State<CameraPage> {
             }),
           ),
 
-          // 3. Info Teks
           Positioned(
             top: 40, left: 0, right: 0,
             child: Text(
@@ -160,7 +148,6 @@ class _CameraPageState extends State<CameraPage> {
             ),
           ),
 
-          // 4. Tombol Shutter
           Positioned(
             bottom: 30, left: 0, right: 0,
             child: Center(
