@@ -40,6 +40,32 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
   final GlobalKey _boundaryKey = GlobalKey();
   bool _isLoading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialImages != null && widget.initialImages!.length == 4) {
+      _loadCameraImages();
+    }
+  }
+
+  Future<void> _loadCameraImages() async {
+    try {
+      final img1 = await widget.initialImages![0].readAsBytes();
+      final img2 = await widget.initialImages![1].readAsBytes();
+      final img3 = await widget.initialImages![2].readAsBytes();
+      final img4 = await widget.initialImages![3].readAsBytes();
+
+      setState(() {
+        _imageBytesList[0] = img1;
+        _imageBytesList[1] = img2;
+        _imageBytesList[2] = img3;
+        _imageBytesList[3] = img4;
+      });
+    } catch (e) {
+      debugPrint("Error loading images: $e");
+    }
+  }
+
   Future<void> _pickImage(int index) async {
     try {
       final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
