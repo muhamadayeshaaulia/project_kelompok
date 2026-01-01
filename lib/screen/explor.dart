@@ -55,6 +55,36 @@ class _ExplorPageState extends State<ExplorPage> {
       ),
     );
   }
+Widget _buildPopularGrid() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('posts')
+          .orderBy('views', descending: true)
+          .limit(6)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const SizedBox(
+            height: 200,
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
 
+        return SizedBox(
+          height: 220,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index) {
+              var post = snapshot.data!.docs[index];
+              var data = post.data() as Map<String, dynamic>;
+              return _buildPopularCard(post.id, data);
+            },
+          ),
+        );
+      },
+    );
+  }
   }
 
