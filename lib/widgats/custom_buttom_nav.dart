@@ -5,6 +5,7 @@ import 'package:project_kelompok/screen/info_page.dart';
 import 'package:project_kelompok/screen/profile_page.dart';
 import 'package:project_kelompok/screen/camera_page.dart';
 
+
 class CustomButtomNav extends StatelessWidget {
   final int currentIndex;
   const CustomButtomNav({super.key, required this.currentIndex});
@@ -147,7 +148,7 @@ class CustomButtomNav extends StatelessWidget {
         } else if (index == 1) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const FollowingPage()),
+            MaterialPageRoute(builder: (context) => const ExplorPage()),
           );
         }
       },

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:intl/intl.dart';
 
 class PostDetailPage extends StatefulWidget {
   final String postId;
@@ -31,6 +32,19 @@ class _PostDetailPageState extends State<PostDetailPage> {
     super.initState();
     _checkIfLiked();
     _fetchMyName();
+  }
+
+  String formatPostTime(Timestamp? timestamp) {
+    if (timestamp == null) return "...";
+    DateTime postDate = timestamp.toDate();
+    DateTime now = DateTime.now();
+    Duration difference = now.difference(postDate);
+
+    if (difference.inHours < 24) {
+      return DateFormat('HH:mm').format(postDate);
+    } else {
+      return DateFormat('d MMM yyyy').format(postDate);
+    }
   }
 
   Future<void> _fetchMyName() async {
@@ -76,18 +90,15 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }
 
   void _addComment() async {
-    if (_commentController.text.trim().isEmpty || currentUser == null) return;
-    if (_commentController.text.trim().isEmpty || 
-      currentUser == null || 
-      _myUserName == "Loading...") {
-  
+    String commentText = _commentController.text.trim();
+    if (commentText.isEmpty || currentUser == null) return;
+
     if (_myUserName == "Loading...") {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Mohon tunggu, sedang memuat profil..."))
+        const SnackBar(content: Text("Mohon tunggu, sedang memuat profil...")),
       );
+      return;
     }
-    return;
-  }
 
     await FirebaseFirestore.instance
         .collection('posts')
@@ -97,7 +108,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
           'uid': currentUser!.uid,
           'nama': _myUserName,
           'photo_url': _myProfilePic,
-          'komentar': _commentController.text.trim(),
+          'komentar': commentText,
           'parent_id': replyingToId,
           'reply_to_name': replyingToName,
           'timestamp': FieldValue.serverTimestamp(),
@@ -105,21 +116,22 @@ class _PostDetailPageState extends State<PostDetailPage> {
         });
 
     if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Komentar berhasil dikirim! 💬"),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-      
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Komentar berhasil dikirim! 💬"),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+
     setState(() {
       _commentController.clear();
       replyingToId = null;
       replyingToName = null;
     });
+    FocusScope.of(context).unfocus();
   }
 
   void _deleteComment(String commentId) async {
@@ -143,14 +155,13 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     .collection('comments')
                     .doc(commentId)
                     .delete();
-
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("Komentar berhasil dihapus")),
                 );
               } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Gagal menghapus komentar: $e")),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text("Gagal menghapus: $e")));
               }
             },
             child: const Text("Hapus", style: TextStyle(color: Colors.red)),
@@ -207,6 +218,11 @@ class _PostDetailPageState extends State<PostDetailPage> {
                       widget.postData['nama'] ?? "User",
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
+                    subtitle: Text(
+                      formatPostTime(
+                        widget.postData['timestamp'] as Timestamp?,
+                      ),
+                    ),
                   ),
                   Image.network(
                     widget.postData['post_image'],
@@ -224,6 +240,24 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           ),
                           onPressed: _toggleLike,
                         ),
+                        StreamBuilder<QuerySnapshot>(
+                          stream: FirebaseFirestore.instance
+                              .collection('posts')
+                              .doc(widget.postId)
+                              .collection('likes')
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            int count = snapshot.hasData
+                                ? snapshot.data!.docs.length
+                                : 0;
+                            return Text(
+                              "$count ",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          },
+                        ),
                         const Text("Suka"),
                         const SizedBox(width: 15),
                         const Icon(Icons.mode_comment_outlined),
@@ -233,20 +267,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
                         IconButton(
                           icon: const Icon(Icons.share_outlined),
                           onPressed: () async {
-                            try {
-                              await Share.share(
-                                "Lihat karya keren ini: ${widget.postData['post_image']}\nDiposting oleh: ${widget.postData['nama']}",
-                                subject: "Karya Fotografi",
-                              );
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    "Tidak dapat membuka menu berbagi: $e",
-                                  ),
-                                ),
-                              );
-                            }
+                            await Share.share(
+                              "Karya dari ${widget.postData['nama']}: ${widget.postData['post_image']}",
+                            );
                           },
                         ),
                       ],
@@ -273,15 +296,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
           .orderBy('timestamp', descending: false)
           .snapshots(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(20),
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
-
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
           return Center(
             child: Padding(
@@ -307,9 +321,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
             ),
           );
         }
-
-        var allComments = snapshot.data!.docs;
-        var mainComments = allComments
+        var allDocs = snapshot.data!.docs;
+        var mainComments = allDocs
             .where((doc) => doc['parent_id'] == null)
             .toList();
 
@@ -318,22 +331,19 @@ class _PostDetailPageState extends State<PostDetailPage> {
           physics: const NeverScrollableScrollPhysics(),
           itemCount: mainComments.length,
           itemBuilder: (context, index) {
-            var commentDoc = mainComments[index];
-            var commentId = commentDoc.id;
-            var commentData = commentDoc.data() as Map<String, dynamic>;
-            var replies = allComments
-                .where((doc) => doc['parent_id'] == commentId)
+            var doc = mainComments[index];
+            var replies = allDocs
+                .where((d) => d['parent_id'] == doc.id)
                 .toList();
-
             return Column(
               children: [
-                _commentTile(commentId, commentData),
+                _commentTile(doc.id, doc.data() as Map<String, dynamic>),
                 ...replies.map(
-                  (reply) => Padding(
+                  (r) => Padding(
                     padding: const EdgeInsets.only(left: 45),
                     child: _commentTile(
-                      reply.id,
-                      reply.data() as Map<String, dynamic>,
+                      r.id,
+                      r.data() as Map<String, dynamic>,
                       isReply: true,
                     ),
                   ),
@@ -359,14 +369,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
       onLongPress: isMyComment ? () => _deleteComment(id) : null,
       dense: true,
       leading: CircleAvatar(
-      radius: isReply ? 12 : 15,
-      backgroundImage: data['photo_url'] != null 
-          ? NetworkImage(data['photo_url']) 
-          : null,
-      child: data['photo_url'] == null 
-          ? const Icon(Icons.person, size: 18) 
-          : null,
-    ),
+        radius: isReply ? 12 : 15,
+        backgroundImage: data['photo_url'] != null
+            ? NetworkImage(data['photo_url'])
+            : null,
+        child: data['photo_url'] == null
+            ? const Icon(Icons.person, size: 18)
+            : null,
+      ),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -378,9 +388,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
             GestureDetector(
               onTap: () => _deleteComment(id),
               child: const Icon(
-                Icons.delete_outline,
+                Icons.close_rounded,
                 size: 16,
-                color: Colors.red,
+                color: Colors.grey,
               ),
             ),
         ],
@@ -405,12 +415,10 @@ class _PostDetailPageState extends State<PostDetailPage> {
               ),
               const SizedBox(width: 20),
               GestureDetector(
-                onTap: () {
-                  setState(() {
-                    replyingToId = id;
-                    replyingToName = data['nama'];
-                  });
-                },
+                onTap: () => setState(() {
+                  replyingToId = id;
+                  replyingToName = data['nama'];
+                }),
                 child: Text(
                   "Balas",
                   style: TextStyle(
@@ -421,9 +429,13 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 ),
               ),
               const SizedBox(width: 15),
+              Text(
+                formatPostTime(data['timestamp'] as Timestamp?),
+                style: const TextStyle(fontSize: 10, color: Colors.grey),
+              ),
               if (likes.isNotEmpty)
                 Text(
-                  "${likes.length} ❤️",
+                  "  ${likes.length} ❤️",
                   style: const TextStyle(fontSize: 11),
                 ),
             ],
@@ -436,13 +448,13 @@ class _PostDetailPageState extends State<PostDetailPage> {
   Widget _buildInputBar() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
             color: Colors.black12,
             blurRadius: 4,
-            offset: const Offset(0, -2),
+            offset: Offset(0, -2),
           ),
         ],
       ),
@@ -451,12 +463,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (replyingToName != null)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
-                color: Colors.grey[100],
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
                 child: Row(
                   children: [
                     Text("Membalas ", style: const TextStyle(fontSize: 12)),
@@ -474,11 +482,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                         replyingToId = null;
                         replyingToName = null;
                       }),
-                      child: const Icon(
-                        Icons.close,
-                        size: 16,
-                        color: Colors.grey,
-                      ),
+                      child: const Icon(Icons.close, size: 16),
                     ),
                   ],
                 ),
@@ -489,9 +493,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   child: TextField(
                     controller: _commentController,
                     decoration: InputDecoration(
-                      hintText: replyingToName != null
-                          ? "Balas..."
-                          : "Tulis komentar...",
+                      hintText: "Tulis komentar...",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20),
                         borderSide: BorderSide.none,
@@ -505,13 +507,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 5),
-                CircleAvatar(
-                  backgroundColor: Colors.blue,
-                  child: IconButton(
-                    icon: const Icon(Icons.send, color: Colors.white, size: 20),
-                    onPressed: _addComment,
-                  ),
+                IconButton(
+                  icon: const Icon(Icons.send, color: Colors.blue),
+                  onPressed: _addComment,
                 ),
               ],
             ),
