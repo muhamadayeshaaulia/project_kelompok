@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_kelompok/detail/postingan.dart';
+import 'package:project_kelompok/screen/camera_page.dart';
 import 'package:project_kelompok/template/photoboothpage.dart';
 import 'package:project_kelompok/template/photoboothpage2.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
@@ -725,7 +726,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         final result = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const PhotoBoothPage2(),
+                            builder: (context) => const CameraPage(photoCount: 2),
                           ),
                         );
                         if (result == true) _loadPhotos();
@@ -739,7 +740,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         final result = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const PhotoBoothPage(),
+                            builder: (context) => const CameraPage(photoCount: 4),
                           ),
                         );
                         if (result == true) _loadPhotos();
