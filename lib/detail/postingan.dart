@@ -296,11 +296,31 @@ class _PostDetailPageState extends State<PostDetailPage> {
           .orderBy('timestamp', descending: false)
           .snapshots(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting)
-          return const Center(child: CircularProgressIndicator());
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty)
-          return const SizedBox();
-
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 40),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.chat_bubble_outline,
+                    color: Colors.grey[400],
+                    size: 50,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "Belum ada komentar.",
+                    style: TextStyle(color: Colors.grey[600]),
+                  ),
+                  const Text(
+                    "Jadilah yang pertama mengomentari!",
+                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
         var allDocs = snapshot.data!.docs;
         var mainComments = allDocs
             .where((doc) => doc['parent_id'] == null)
@@ -368,11 +388,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
             GestureDetector(
               onTap: () => _deleteComment(id),
               child: const Icon(
-                Icons
-                    .close_rounded,
+                Icons.close_rounded,
                 size: 16,
-                color: Colors
-                    .grey,
+                color: Colors.grey,
               ),
             ),
         ],
