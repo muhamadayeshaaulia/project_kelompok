@@ -17,10 +17,12 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final nameCtrl = TextEditingController();
-  final genderCtrl = TextEditingController();
+  final genderCtrl = TextEditingController ();
   final addressCtrl = TextEditingController();
   final descCtrl = TextEditingController();
   final socialMediaCtrl = TextEditingController();
+  String? selectedGender;
+
 
   final user = FirebaseAuth.instance.currentUser;
 
@@ -42,7 +44,9 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _loadUserData() async {
     if (user == null) return;
     
-    setState(() => isFetching = true);
+    setState(() => isFetching = true)
+    selectedGender = genderCtrl.text.isEmpty ? null : genderCtrl.text;
+;
 
     try {
       final doc = await FirebaseFirestore.instance
