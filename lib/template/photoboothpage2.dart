@@ -13,7 +13,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:project_kelompok/services/supabase_service.dart';
 
 class PhotoBoothPage2 extends StatefulWidget {
-  const PhotoBoothPage2({super.key});
+  final List<File>? initialImages; 
+
+  // Update constructor:
+  const PhotoBoothPage2({super.key, this.initialImages});
 
   @override
   State<PhotoBoothPage2> createState() => _PhotoBoothPageState();
