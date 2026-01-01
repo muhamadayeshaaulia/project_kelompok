@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_kelompok/detail/postingan.dart';
 import 'package:intl/intl.dart';
+import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 
 class ExplorPage extends StatefulWidget {
   const ExplorPage({super.key});
@@ -44,6 +45,7 @@ class _ExplorPageState extends State<ExplorPage> {
           _buildRecentList(),
         ],
       ),
+      bottomNavigationBar: const CustomButtomNav(currentIndex: 1),
     );
   }
 
