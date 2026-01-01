@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import 'package:project_kelompok/screen/home_page.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 import 'package:project_kelompok/services/supabase_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -16,7 +17,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  // Controller
+  // ================= CONTROLLER =================
   final nameCtrl = TextEditingController();
   final genderCtrl = TextEditingController();
   final addressCtrl = TextEditingController();
@@ -64,7 +65,7 @@ class _ProfilePageState extends State<ProfilePage> {
         _photoUrl = data['photo_url'];
       }
     } catch (e) {
-      debugPrint("Load Error: $e");
+      debugPrint("Load error: $e");
     } finally {
       setState(() => isFetching = false);
     }
@@ -95,13 +96,13 @@ class _ProfilePageState extends State<ProfilePage> {
     final path = 'profile/$fileName';
 
     await SupabaseService.client.storage.from('photos').uploadBinary(
-          path,
-          _imageBytes!,
-          fileOptions: FileOptions(
-            contentType: 'image/$safeExt',
-            upsert: true,
-          ),
-        );
+      path,
+      _imageBytes!,
+      fileOptions: FileOptions(
+        contentType: 'image/$safeExt',
+        upsert: true,
+      ),
+    );
 
     return SupabaseService.client.storage.from('photos').getPublicUrl(path);
   }
@@ -109,6 +110,7 @@ class _ProfilePageState extends State<ProfilePage> {
   // ================= SAVE PROFILE =================
   Future<void> _saveProfile() async {
     if (user == null) return;
+
     setState(() => isSaving = true);
 
     try {
@@ -150,6 +152,66 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  // ================= DELETE ACCOUNT =================
+  Future<void> _deleteAccount() async {
+    if (user == null) return;
+
+    try {
+      // Hapus Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .delete();
+
+      // Hapus akun Auth
+      await user!.delete();
+
+      // Redirect
+      if (mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const MyHomePage()),
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Gagal menghapus akun: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  // ================= CONFIRM DIALOG =================
+  void _showDeleteDialog() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Hapus Akun"),
+        content: const Text(
+          "Akun dan seluruh data Anda akan dihapus secara permanen. "
+          "Apakah Anda yakin?",
+        ),
+        actions: [
+          TextButton(
+            child: const Text("Batal"),
+            onPressed: () => Navigator.pop(context),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text("Hapus"),
+            onPressed: () {
+              Navigator.pop(context);
+              _deleteAccount();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   // ================= UI =================
   @override
   Widget build(BuildContext context) {
@@ -180,11 +242,15 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       body: isFetching
           ? const Center(child: CircularProgressIndicator())
-          : Stack(
-              children: [
-                _header(),
-                _content(),
-              ],
+          : SingleChildScrollView(
+              child: Column(
+                children: [
+                  _header(),
+                  _avatar(),
+                  _profileCard(),
+                  _accountControlCard(),
+                ],
+              ),
             ),
       bottomNavigationBar: const CustomButtomNav(currentIndex: 3),
     );
@@ -193,98 +259,96 @@ class _ProfilePageState extends State<ProfilePage> {
   // ================= HEADER =================
   Widget _header() {
     return Container(
-      height: 220,
+      height: 160,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [Color(0xFFFFC02D), Color(0xFFFFE082)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
         ),
-      ),
-    );
-  }
-
-  // ================= CONTENT =================
-  Widget _content() {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          const SizedBox(height: 120),
-          _avatar(),
-          const SizedBox(height: 16),
-          _card(),
-        ],
       ),
     );
   }
 
   // ================= AVATAR =================
   Widget _avatar() {
-    return GestureDetector(
-      onTap: _pickImage,
-      child: Stack(
-        alignment: Alignment.bottomRight,
-        children: [
-          CircleAvatar(
-            radius: 55,
-            backgroundColor: Colors.white,
-            child: CircleAvatar(
-              radius: 50,
-              backgroundImage: _imageBytes != null
-                  ? MemoryImage(_imageBytes!)
-                  : (_photoUrl != null ? NetworkImage(_photoUrl!) : null)
-                      as ImageProvider?,
-              child: _photoUrl == null && _imageBytes == null
-                  ? const Icon(Icons.person, size: 40)
-                  : null,
-            ),
+    return Transform.translate(
+      offset: const Offset(0, -50),
+      child: GestureDetector(
+        onTap: _pickImage,
+        child: CircleAvatar(
+          radius: 55,
+          backgroundColor: Colors.white,
+          child: CircleAvatar(
+            radius: 50,
+            backgroundImage: _imageBytes != null
+                ? MemoryImage(_imageBytes!)
+                : (_photoUrl != null ? NetworkImage(_photoUrl!) : null)
+                    as ImageProvider?,
+            child: _photoUrl == null && _imageBytes == null
+                ? const Icon(Icons.person, size: 40)
+                : null,
           ),
-          if (isEditing)
-            const CircleAvatar(
-              radius: 14,
-              backgroundColor: Color(0xFFFFC02D),
-              child: Icon(Icons.camera_alt, size: 16),
-            ),
-        ],
+        ),
       ),
     );
   }
 
-  // ================= CARD =================
-  Widget _card() {
+  // ================= PROFILE CARD =================
+  Widget _profileCard() {
+    return _card(
+      title: "Informasi Pribadi",
+      children: [
+        _field("Nama Lengkap", nameCtrl),
+        _genderDropdown(),
+        _readonly("Email", user?.email ?? "-"),
+        _field("Alamat", addressCtrl),
+        _field("Sosial Media", socialCtrl),
+        _field("Tentang Saya", descCtrl, maxLines: 3),
+        if (isEditing)
+          ElevatedButton(
+            onPressed: isSaving ? null : _saveProfile,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFFC02D),
+            ),
+            child: isSaving
+                ? const CircularProgressIndicator(color: Colors.white)
+                : const Text("Simpan Perubahan"),
+          ),
+      ],
+    );
+  }
+
+  // ================= ACCOUNT CONTROL =================
+  Widget _accountControlCard() {
+    return _card(
+      title: "Kontrol Akun",
+      children: [
+        ListTile(
+          leading: const Icon(Icons.delete, color: Colors.red),
+          title: const Text("Hapus Akun"),
+          subtitle: const Text("Hapus akun secara permanen"),
+          onTap: _showDeleteDialog,
+        ),
+      ],
+    );
+  }
+
+  // ================= WIDGET HELPER =================
+  Widget _card({required String title, required List<Widget> children}) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Card(
-        elevation: 6,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 5,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _field("Nama Lengkap", nameCtrl),
-              _genderDropdown(),
-              _readonly("Email", user?.email ?? "-"),
-              _field("Alamat", addressCtrl),
-              _field("Sosial Media", socialCtrl),
-              _field("Tentang Saya", descCtrl, maxLines: 3),
-              const SizedBox(height: 20),
-              if (isEditing)
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: isSaving ? null : _saveProfile,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFFC02D),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    child: isSaving
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            "Simpan Perubahan",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                  ),
-                ),
+              Text(title,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              ...children,
             ],
           ),
         ),
@@ -292,7 +356,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // ================= FORM =================
   Widget _field(String label, TextEditingController ctrl,
       {int maxLines = 1}) {
     return Padding(
