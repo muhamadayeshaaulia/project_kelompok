@@ -46,7 +46,8 @@ class _ExplorPageState extends State<ExplorPage> {
       ),
     );
   }
-    Widget _buildSectionTitle(String title) {
+
+  Widget _buildSectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Text(
@@ -55,7 +56,8 @@ class _ExplorPageState extends State<ExplorPage> {
       ),
     );
   }
-Widget _buildPopularGrid() {
+
+  Widget _buildPopularGrid() {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('posts')
@@ -86,7 +88,8 @@ Widget _buildPopularGrid() {
       },
     );
   }
-Widget _buildPopularCard(String postId, Map<String, dynamic> data) {
+
+  Widget _buildPopularCard(String postId, Map<String, dynamic> data) {
     return GestureDetector(
       onTap: () => _openDetail(postId, data),
       child: Container(
@@ -142,5 +145,134 @@ Widget _buildPopularCard(String postId, Map<String, dynamic> data) {
     );
   }
 
-  }
+  Widget _buildRecentList() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('posts')
+          .orderBy('timestamp', descending: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return const SizedBox();
 
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index) {
+            var post = snapshot.data!.docs[index];
+            var data = post.data() as Map<String, dynamic>;
+            String postId = post.id;
+
+            return Card(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: CircleAvatar(
+                      backgroundImage: NetworkImage(data['user_image'] ?? ''),
+                      backgroundColor: Colors.grey[200],
+                    ),
+                    title: Text(
+                      data['nama'] ?? 'User',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text(
+                      formatPostTime(data['timestamp'] as Timestamp?),
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => _openDetail(postId, data),
+                    child: Image.network(
+                      data['post_image'],
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: 300,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        StreamBuilder<QuerySnapshot>(
+                          stream: FirebaseFirestore.instance
+                              .collection('posts')
+                              .doc(postId)
+                              .collection('likes')
+                              .snapshots(),
+                          builder: (context, likeSnapshot) {
+                            int totalLikes = likeSnapshot.hasData
+                                ? likeSnapshot.data!.docs.length
+                                : 0;
+                            return Row(
+                              children: [
+                                Icon(
+                                  Icons.favorite,
+                                  color: totalLikes > 0
+                                      ? Colors.red
+                                      : Colors.grey,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  "$totalLikes",
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        const SizedBox(width: 15),
+                        StreamBuilder<QuerySnapshot>(
+                          stream: FirebaseFirestore.instance
+                              .collection('posts')
+                              .doc(postId)
+                              .collection('comments')
+                              .snapshots(),
+                          builder: (context, commentSnapshot) {
+                            int totalComments = commentSnapshot.hasData
+                                ? commentSnapshot.data!.docs.length
+                                : 0;
+                            return Row(
+                              children: [
+                                const Icon(
+                                  Icons.comment_outlined,
+                                  size: 20,
+                                  color: Colors.grey,
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  "$totalComments",
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        const Spacer(),
+                        Text(
+                          "${data['views'] ?? 0} tayangan",
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+}
