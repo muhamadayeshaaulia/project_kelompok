@@ -4,11 +4,13 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   app_links
+  camera_windows
   cloud_firestore
   file_selector_windows
   firebase_auth
   firebase_core
   gal
+  permission_handler_windows
   share_plus
   url_launcher_windows
 )

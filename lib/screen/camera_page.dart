@@ -1,166 +1,169 @@
 import 'dart:io';
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:project_kelompok/template/photoboothpage2.dart';
-import 'package:project_kelompok/template/photoboothpage.dart';
+
 
 class CameraPage extends StatefulWidget {
-  final int photoCount;
-
-  const CameraPage({
-    super.key, 
-    required this.photoCount
-  });
+  final int photoCount; // Masukkan angka 2 saat memanggil halaman ini
+  const CameraPage({super.key, required this.photoCount});
 
   @override
   State<CameraPage> createState() => _CameraPageState();
 }
 
 class _CameraPageState extends State<CameraPage> {
-  CameraController? controller;
-  List<File> capturedImages = [];
-  bool isTakingPicture = false;
+  final List<File> _capturedPhotos = []; // Keranjang penampung foto
+  final ImagePicker _picker = ImagePicker();
 
-  @override
-  void initState() {
-    super.initState();
-    _initializeCamera();
-  }
-
-  Future<void> _initializeCamera() async {
-    final cameras = await availableCameras();
-    final firstCamera = cameras.firstWhere(
-      (cam) => cam.lensDirection == CameraLensDirection.front,
-      orElse: () => cameras.first,
-    );
-
-    controller = CameraController(
-      firstCamera,
-      ResolutionPreset.high,
-      enableAudio: false,
-    );
-
-    await controller!.initialize();
-    if (mounted) setState(() {});
-  }
-
-  @override
-  void dispose() {
-    controller?.dispose();
-    super.dispose();
-  }
-
-  Future<void> _takePhoto() async {
-    if (controller == null || !controller!.value.isInitialized || isTakingPicture) return;
-
-    setState(() => isTakingPicture = true);
-    HapticFeedback.mediumImpact();
-
+  // Fungsi Buka Kamera Bawaan
+  Future<void> _takeNextPhoto() async {
     try {
-      final image = await controller!.takePicture();
-      
-      setState(() {
-        capturedImages.add(File(image.path));
-        isTakingPicture = false;
-      });
+      final XFile? photo = await _picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 100,
+        preferredCameraDevice: CameraDevice.front, // Kamera depan
+      );
 
-      if (capturedImages.length < widget.photoCount) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Lanjut gaya ke-${capturedImages.length + 1}!"), 
-              duration: const Duration(milliseconds: 500)
-            ),
-          );
-        }
-      } else {
-        _finishAndNavigate();
+      if (photo != null) {
+        setState(() {
+          _capturedPhotos.add(File(photo.path));
+        });
       }
     } catch (e) {
-      debugPrint("Error: $e");
-      setState(() => isTakingPicture = false);
+      debugPrint("Error ambil foto: $e");
     }
   }
 
-  void _finishAndNavigate() {
-    if (widget.photoCount == 2) {
-      // Ke Template 2 Foto
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => PhotoBoothPage2(initialImages: capturedImages),
+  // Fungsi Reset (Ulang Foto)
+  void _resetPhotos() {
+    setState(() {
+      _capturedPhotos.clear();
+    });
+  }
+
+  // Fungsi Pindah ke Halaman Edit (PhotoBoothPage2)
+  void _goToEditingPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PhotoBoothPage2(
+          initialImages: _capturedPhotos, // <-- KITA LEMPAR FOTO KE SINI
         ),
-      );
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => PhotoBoothPage(initialImages: capturedImages),
-        ),
-      );
-    }
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    if (controller == null || !controller!.value.isInitialized) {
-      return const Scaffold(backgroundColor: Colors.black, body: Center(child: CircularProgressIndicator()));
-    }
+    // Cek apakah jumlah foto sudah sesuai target (misal: 2)
+    bool isComplete = _capturedPhotos.length >= widget.photoCount;
 
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Stack(
-        fit: StackFit.expand,
+      appBar: AppBar(
+        title: Text("Ambil Foto (${_capturedPhotos.length}/${widget.photoCount})"),
+        backgroundColor: Colors.transparent,
+        foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            onPressed: _resetPhotos,
+            icon: const Icon(Icons.refresh),
+            tooltip: "Ulangi Foto",
+          )
+        ],
+      ),
+      body: Column(
         children: [
-          CameraPreview(controller!),
+          // --- BAGIAN 1: PREVIEW GRID SEDERHANA ---
+          // Ini cuma buat user liat dia udah foto apa aja sebelum masuk template asli
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: widget.photoCount == 2 ? 1 : 2, // 1 kolom kalau 2 foto
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 4/3,
+                ),
+                itemCount: widget.photoCount,
+                itemBuilder: (context, index) {
+                  if (index < _capturedPhotos.length) {
+                    // Tampilkan Foto yang sudah diambil
+                    return Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.white, width: 2),
+                        image: DecorationImage(
+                          image: FileImage(_capturedPhotos[index]),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    );
+                  } else {
+                    // Tampilkan Kotak Kosong (Placeholder)
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[800],
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(
+                        child: Text(
+                          "${index + 1}",
+                          style: const TextStyle(
+                            color: Colors.white54, 
+                            fontSize: 40, 
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+          ),
 
-          Column(
-            children: List.generate(widget.photoCount, (index) {
-              bool isTaken = index < capturedImages.length;
-              bool isCurrent = index == capturedImages.length;
-
-              return Expanded(
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: isCurrent ? Colors.yellow : Colors.white24,
+          // --- BAGIAN 2: TOMBOL KONTROL ---
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.grey[900],
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (!isComplete)
+                  // TOMBOL JEPRET (Muncul kalau foto belum lengkap)
+                  ElevatedButton.icon(
+                    onPressed: _takeNextPhoto,
+                    icon: const Icon(Icons.camera_alt),
+                    label: Text("Ambil Foto #${_capturedPhotos.length + 1}"),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      backgroundColor: Colors.yellow[700],
+                      foregroundColor: Colors.black,
+                      textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  )
+                else
+                  // TOMBOL LANJUT (Muncul kalau foto sudah lengkap)
+                  ElevatedButton.icon(
+                    onPressed: _goToEditingPage, // <-- PANGGIL FUNGSI PINDAH HALAMAN
+                    icon: const Icon(Icons.edit),
+                    label: const Text("Lanjut Edit Frame"),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      backgroundColor: Colors.green, // Warna hijau tanda siap
+                      foregroundColor: Colors.white,
+                      textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  child: isTaken
-                      ? Image.file(capturedImages[index], fit: BoxFit.cover, color: Colors.black45, colorBlendMode: BlendMode.darken)
-                      : null,
-                ),
-              );
-            }),
-          ),
-
-          Positioned(
-            top: 40, left: 0, right: 0,
-            child: Text(
-              "FOTO ${capturedImages.length + 1} DARI ${widget.photoCount}",
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold, 
-                shadows: [Shadow(blurRadius: 4, color: Colors.black)]
-              ),
+              ],
             ),
           ),
-
-          Positioned(
-            bottom: 30, left: 0, right: 0,
-            child: Center(
-              child: FloatingActionButton.large(
-                backgroundColor: Colors.white,
-                onPressed: _takePhoto,
-                child: const Icon(Icons.camera_alt, color: Colors.black),
-              ),
-            ),
-          ),
-          
-          if (isTakingPicture)
-             const Center(child: CircularProgressIndicator()),
         ],
       ),
     );
