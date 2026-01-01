@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_kelompok/detail/postingan.dart';
 import 'package:intl/intl.dart';
+import 'package:project_kelompok/screen/following_page.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 
 class ExplorPage extends StatefulWidget {
@@ -30,11 +31,32 @@ class _ExplorPageState extends State<ExplorPage> {
       appBar: AppBar(
         title: const Text(
           "Jelajahi Karya",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.black),
         ),
-        backgroundColor: Colors.yellow[700],
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color.fromRGBO(255, 192, 45, 1), Colors.white],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         elevation: 0,
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.people, color: Colors.black),
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                new MaterialPageRoute(
+                  builder: (context) => const FollowingPage(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: ListView(
         children: [
@@ -277,6 +299,7 @@ class _ExplorPageState extends State<ExplorPage> {
       },
     );
   }
+
   void _openDetail(String postId, Map<String, dynamic> data) {
     FirebaseFirestore.instance.collection('posts').doc(postId).update({
       'views': FieldValue.increment(1),
