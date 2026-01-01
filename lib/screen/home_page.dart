@@ -2,14 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_kelompok/detail/postingan.dart';
-import 'package:project_kelompok/screen/camera_page.dart';
 import 'package:project_kelompok/template/photoboothpage.dart';
 import 'package:project_kelompok/template/photoboothpage2.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 import 'package:project_kelompok/services/supabase_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'dart:io';
-import 'package:image_picker/image_picker.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -25,135 +22,6 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String> _photoUrls = [];
   bool _isLoading = true;
   int _selectedTab = 0;
-
-  // --- FUNGSI 1: BUKA GALERI (Untuk Template) ---
-  Future<void> _pickFromGallery(int count) async {
-    final ImagePicker picker = ImagePicker();
-    // Ambil banyak foto sekaligus
-    final List<XFile> images = await picker.pickMultiImage();
-
-    if (images.isNotEmpty) {
-      // Ubah jadi File
-      List<File> selectedFiles = images.map((e) => File(e.path)).toList();
-
-      // Kalau user pilih kebanyakan, potong sesuai template (misal cuma butuh 2)
-      if (selectedFiles.length > count) {
-        selectedFiles = selectedFiles.sublist(0, count);
-      }
-
-      if (mounted) {
-        // Arahkan ke halaman Edit (PhotoBoothPage)
-        if (count == 2) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  PhotoBoothPage2(initialImages: selectedFiles),
-            ),
-          );
-        } else {
-          // Asumsi Classic 4
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  PhotoBoothPage(initialImages: selectedFiles),
-            ),
-          );
-        }
-      }
-    }
-  }
-
-  // --- FUNGSI 2: POPUP KAMERA (Untuk Tombol Kamera Kuning) ---
-  void _showCameraOptions() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              "Mulai Memotret",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                // Pilihan 2 Frame
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context); // Tutup popup
-                    _openCamera(2); // Buka kamera 2
-                  },
-                  child: Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundColor: Colors.blue[100],
-                        child: const Icon(
-                          Icons.filter_2,
-                          color: Colors.blue,
-                          size: 30,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        "2 Frame",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-                // Pilihan 4 Frame
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context); // Tutup popup
-                    _openCamera(4); // Buka kamera 4
-                  },
-                  child: Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundColor: Colors.purple[100],
-                        child: const Icon(
-                          Icons.filter_4,
-                          color: Colors.purple,
-                          size: 30,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        "4 Frame",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Helper: Buka CameraPage
-  Future<void> _openCamera(int count) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => CameraPage(photoCount: count)),
-    );
-    if (result == true) _loadPhotos();
-  }
 
   @override
   void initState() {
@@ -317,9 +185,9 @@ class _MyHomePageState extends State<MyHomePage> {
         _isLoading = false;
       });
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Foto berhasil dihapus.")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Foto berhasil dihapus.")),
+      );
     } catch (e) {
       debugPrint("Error deleting photo: $e");
       setState(() => _isLoading = false);
@@ -725,19 +593,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-    floatingActionButton: SizedBox(
-      width: 70,
-      height: 70,
-      child: FloatingActionButton(
-        backgroundColor: Colors.yellow[700],
-        elevation: 0, // Set 0 agar menyatu jika navbarnya transparan, atau sesuaikan
-        onPressed: () {
-          _showCameraOptions(); // <--- Panggil Popup Pilihan Kamera
-        },
-        child: const Icon(Icons.camera_alt, size: 30, color: Colors.white),
-      ),
-    ),
       appBar: AppBar(
         title: const Text('Photo Booth App'),
         backgroundColor: Colors.yellow[700],
@@ -866,21 +721,28 @@ class _MyHomePageState extends State<MyHomePage> {
                       title: "Classic 2",
                       icon: Icons.filter_2,
                       color: Colors.blue[100]!,
-                      onTap: () {
-                        _pickFromGallery(
-                          2,
-                        ); // <--- UBAH JADI INI (Panggil Galeri)
+                      onTap: () async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const PhotoBoothPage2(),
+                          ),
+                        );
+                        if (result == true) _loadPhotos();
                       },
                     ),
-
                     _buildTemplateCard(
                       title: "Classic 4",
                       icon: Icons.filter_4,
                       color: Colors.purple[100]!,
-                      onTap: () {
-                        _pickFromGallery(
-                          4,
-                        ); // <--- UBAH JADI INI (Panggil Galeri)
+                      onTap: () async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const PhotoBoothPage(),
+                          ),
+                        );
+                        if (result == true) _loadPhotos();
                       },
                     ),
                     _buildTemplateCard(
