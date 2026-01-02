@@ -210,6 +210,12 @@ class _TemplateVintageState extends State<TemplateVintage> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDark = _frameColor.computeLuminance() < 0.5;
+    Color textColor = isDark
+        ? const Color(0xFFFDF5E6)
+        : const Color(0xFF2C2C2C);
+    Color borderColor = isDark ? Colors.white12 : Colors.black12;
+
     return Scaffold(
       appBar: AppBar(title: const Text("Dashboard"), actions: const []),
       body: SingleChildScrollView(
