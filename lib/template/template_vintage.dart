@@ -354,6 +354,55 @@ class _TemplateVintageState extends State<TemplateVintage> {
                 letterSpacing: 2,
               ),
             ),
+            const SizedBox(height: 15),
+            SizedBox(
+              height: 60,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                itemCount: _colorOptions.length,
+                itemBuilder: (context, index) {
+                  final color = _colorOptions[index];
+                  final isSelected = _frameColor == color;
+                  return GestureDetector(
+                    onTap: () => setState(() => _frameColor = color),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      margin: const EdgeInsets.symmetric(horizontal: 8),
+                      width: isSelected ? 50 : 40,
+                      height: isSelected ? 50 : 40,
+                      decoration: BoxDecoration(
+                        color: color,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isSelected
+                              ? const Color(0xFF5D4037)
+                              : Colors.grey[400]!,
+                          width: isSelected ? 3 : 1,
+                        ),
+                        boxShadow: [
+                          if (isSelected)
+                            BoxShadow(
+                              color: Colors.brown.withOpacity(0.4),
+                              blurRadius: 8,
+                              spreadRadius: 1,
+                            ),
+                        ],
+                      ),
+                      child: isSelected
+                          ? Icon(
+                              Icons.check,
+                              size: 20,
+                              color: color.computeLuminance() > 0.5
+                                  ? Colors.black
+                                  : Colors.white,
+                            )
+                          : null,
+                    ),
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
