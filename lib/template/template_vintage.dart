@@ -222,16 +222,50 @@ class _TemplateVintageState extends State<TemplateVintage> {
         title: const Text(
           "VINTAGE BOOTH",
           style: TextStyle(
-            fontFamily: 'monospace', // Gaya font mesin tik
+            fontFamily: 'monospace',
             fontWeight: FontWeight.bold,
             letterSpacing: 2,
             color: Colors.white,
           ),
         ),
         centerTitle: true,
-        backgroundColor: const Color(0xFF5D4037), // Coklat Tua
+        backgroundColor: const Color(0xFF5D4037),
         elevation: 4,
         iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(10.0),
+        child: Column(
+          children: [
+            SizedBox(height: 30),
+            Center(
+              child: RepaintBoundary(
+                key: _boundaryKey,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  width: 260,
+                  padding: const EdgeInsets.fromLTRB(20, 30, 20, 40),
+                  decoration: BoxDecoration(
+                    color: _frameColor,
+
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 10,
+                        offset: const Offset(5, 5),
+                      ),
+                    ],
+
+                    border: Border.all(
+                      color: Colors.grey.withOpacity(0.2),
+                      width: 1,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
