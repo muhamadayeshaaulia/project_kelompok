@@ -79,7 +79,7 @@ class _TemplateVintageState extends State<TemplateVintage> {
   }
 
   Future<void> _pickImage(int index) async {
-    try{
+    try {
       final XFile? pickedFile = await _picker.pickImage(
         source: ImageSource.gallery,
       );
@@ -106,6 +106,8 @@ class _TemplateVintageState extends State<TemplateVintage> {
           _imageBytesList[index] = bytes;
         });
       }
+    } catch (e) {
+      debugPrint("Error pick image: $e");
     }
   }
 
