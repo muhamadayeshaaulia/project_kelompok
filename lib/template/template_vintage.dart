@@ -56,6 +56,13 @@ class _TemplateVintageState extends State<TemplateVintage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.initialImages != null && widget.initialImages!.length == 2) {
+      _loadCameraImages();
+    }
+  }
+
   Future<void> _loadCameraImages() async {
     try {
       final img1 = await widget.initialImages![0].readAsBytes();
@@ -70,12 +77,7 @@ class _TemplateVintageState extends State<TemplateVintage> {
     }
   }
 
-  void initState() {
-    super.initState();
-    if (widget.initialImages != null && widget.initialImages!.length == 2) {
-      _loadCameraImages();
-    }
-  }
+  Future<void> _pickImage(int index) async {}
 
   @override
   Widget build(BuildContext context) {
