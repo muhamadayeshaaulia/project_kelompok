@@ -56,6 +56,21 @@ class _TemplateVintageState extends State<TemplateVintage> {
   ];
 
   @override
+  Future<void> _loadCameraImages() async {
+    try {
+      final img1 = await widget.initialImages![0].readAsBytes();
+      final img2 = await widget.initialImages![1].readAsBytes();
+
+      setState(() {
+        _imageBytesList[0] = img1;
+        _imageBytesList[1] = img2;
+      });
+    } catch (e) {
+      debugPrint("Gagal memuat foto: $e");
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Dashboard"), actions: const []),
