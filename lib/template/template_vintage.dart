@@ -32,6 +32,29 @@ class _TemplateVintageState extends State<TemplateVintage> {
   final GlobalKey _boundaryKey = GlobalKey();
   bool _isLoading = false;
 
+  static const List<double> _sepiaMatrix = [
+    0.393,
+    0.769,
+    0.189,
+    0,
+    0,
+    0.349,
+    0.686,
+    0.168,
+    0,
+    0,
+    0.272,
+    0.534,
+    0.131,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
