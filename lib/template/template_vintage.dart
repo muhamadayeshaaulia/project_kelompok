@@ -344,6 +344,16 @@ class _TemplateVintageState extends State<TemplateVintage> {
                 ),
               ),
             ),
+            SizedBox(height: 30),
+            Text(
+              "FRAME COLOR",
+              style: TextStyle(
+                fontFamily: 'monospace',
+                fontWeight: FontWeight.bold,
+                color: Colors.brown[800],
+                letterSpacing: 2,
+              ),
+            ),
           ],
         ),
       ),
