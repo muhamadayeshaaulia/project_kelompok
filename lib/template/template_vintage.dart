@@ -403,6 +403,37 @@ class _TemplateVintageState extends State<TemplateVintage> {
                 },
               ),
             ),
+            const SizedBox(height: 30),
+
+            ElevatedButton.icon(
+              onPressed: _isLoading ? null : _captureAndUpload,
+              icon: const Icon(
+                Icons.print,
+                color: Colors.white,
+              ), // Icon print lebih vintage
+              label: const Text(
+                "PRINT MEMORY",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'monospace',
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF5D4037), // Coklat Tua
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 50,
+                  vertical: 18,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(
+                    5,
+                  ), // Sudut tidak terlalu bulat
+                ),
+                elevation: 5,
+              ),
+            ),
           ],
         ),
       ),
