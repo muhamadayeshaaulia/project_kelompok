@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 class TemplateVintage extends StatefulWidget {
@@ -77,7 +78,36 @@ class _TemplateVintageState extends State<TemplateVintage> {
     }
   }
 
-  Future<void> _pickImage(int index) async {}
+  Future<void> _pickImage(int index) async {
+    try{
+      final XFile? pickedFile = await _picker.pickImage(
+        source: ImageSource.gallery,
+      );
+      if (pickedFile == null) return;
+
+      CroppedFile? croppedFile = await ImageCropper().cropImage(
+        sourcePath: pickedFile.path,
+        aspectRatio: const CropAspectRatio(ratioX: 4, ratioY: 3),
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Potong Foto Vintage',
+            toolbarColor: const Color(0xFF5D4037), // Coklat Tua
+            toolbarWidgetColor: Colors.white,
+            activeControlsWidgetColor: const Color(0xFFD7CCC8),
+            lockAspectRatio: true,
+          ),
+          IOSUiSettings(title: 'Potong Foto Vintage'),
+        ],
+      );
+
+      if (croppedFile != null) {
+        final bytes = await croppedFile.readAsBytes();
+        setState(() {
+          _imageBytesList[index] = bytes;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
