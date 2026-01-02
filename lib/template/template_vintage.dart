@@ -217,10 +217,21 @@ class _TemplateVintageState extends State<TemplateVintage> {
     Color borderColor = isDark ? Colors.white12 : Colors.black12;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Dashboard"), actions: const []),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(children: []),
+      backgroundColor: const Color(0xFFEEE0C9),
+      appBar: AppBar(
+        title: const Text(
+          "VINTAGE BOOTH",
+          style: TextStyle(
+            fontFamily: 'monospace', // Gaya font mesin tik
+            fontWeight: FontWeight.bold,
+            letterSpacing: 2,
+            color: Colors.white,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: const Color(0xFF5D4037), // Coklat Tua
+        elevation: 4,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
     );
   }
