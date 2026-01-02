@@ -1,13 +1,13 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import '../services/supabase_service.dart';
-import '../screen/home_page.dart';
-import '../widgats/custom_buttom_nav.dart';
+import 'package:project_kelompok/screen/home_page.dart';
+import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
+import 'package:project_kelompok/services/supabase_service.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -17,307 +17,356 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  // ================= USER =================
-  final user = FirebaseAuth.instance.currentUser;
-
-  // ================= CONTROLLER =================
   final nameCtrl = TextEditingController();
+  final genderCtrl = TextEditingController();
   final addressCtrl = TextEditingController();
   final descCtrl = TextEditingController();
+  final socialMediaCtrl = TextEditingController();
 
   String? selectedGender;
-  String? photoUrl;
 
-  Uint8List? imageBytes;
-  String? imageExt;
+  final user = FirebaseAuth.instance.currentUser;
 
   bool isEditing = false;
-  bool isLoading = true;
   bool isSaving = false;
+  bool isFetching = true;
 
-  // ================= INIT =================
+  Uint8List? _imageBytes;
+  String? _imageExtension;
+  String? _currentPhotoUrl;
+
   @override
   void initState() {
     super.initState();
-    _loadUser();
+    _loadUserData();
   }
 
-  // ================= LOAD DATA =================
-  Future<void> _loadUser() async {
+  Future<void> _loadUserData() async {
     if (user == null) return;
+    setState(() => isFetching = true);
 
     final doc = await FirebaseFirestore.instance
         .collection('users')
         .doc(user!.uid)
         .get();
 
-    if (doc.exists) {
-      final data = doc.data()!;
-      nameCtrl.text = data['nama'] ?? '';
-      addressCtrl.text = data['alamat'] ?? '';
-      descCtrl.text = data['keterangan'] ?? '';
-      selectedGender = data['jenis_kelamin'];
-      photoUrl = data['photo_url'];
+    if (doc.exists && mounted) {
+      final data = doc.data();
+      setState(() {
+        nameCtrl.text = data?['nama'] ?? '';
+        genderCtrl.text = data?['jenis_kelamin'] ?? '';
+        selectedGender =
+            ["Laki laki", "Perempuan"].contains(genderCtrl.text)
+                ? genderCtrl.text
+                : null;
+        addressCtrl.text = data?['alamat'] ?? '';
+        descCtrl.text = data?['keterangan'] ?? '';
+        socialMediaCtrl.text = data?['sosmed_link'] ?? '';
+        _currentPhotoUrl = data?['photo_url'];
+      });
     }
 
-    setState(() => isLoading = false);
+    if (mounted) setState(() => isFetching = false);
   }
 
-  // ================= PICK IMAGE =================
   Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final img = await picker.pickImage(source: ImageSource.gallery);
+    if (!isEditing) return;
 
-    if (img != null) {
-      imageBytes = await img.readAsBytes();
-      imageExt = img.name.split('.').last;
-      setState(() {});
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      final croppedFile = await ImageCropper().cropImage(
+        sourcePath: pickedFile.path,
+        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Atur Foto Profil',
+            toolbarColor: Colors.yellow,
+            toolbarWidgetColor: Colors.white,
+            lockAspectRatio: true,
+          ),
+        ],
+      );
+
+      if (croppedFile != null) {
+        final bytes = await croppedFile.readAsBytes();
+        final ext = croppedFile.path.split('.').last;
+        setState(() {
+          _imageBytes = bytes;
+          _imageExtension = ext;
+        });
+      }
     }
   }
 
-  // ================= UPLOAD IMAGE =================
-  Future<String?> _uploadImage() async {
-    if (imageBytes == null) return null;
+  Future<String?> _uploadImageToSupabase() async {
+    if (_imageBytes == null || user == null) return null;
 
-    final ext = imageExt ?? 'jpg';
-    final fileName = 'profile_${user!.uid}_${DateTime.now().millisecondsSinceEpoch}.$ext';
-
-    final path = 'profile/$fileName';
+    String ext = _imageExtension ?? 'jpg';
+    final fileName = '${DateTime.now().millisecondsSinceEpoch}.$ext';
+    final path = 'profile/${user!.uid}/$fileName';
 
     await SupabaseService.client.storage.from('photos').uploadBinary(
-      path,
-      imageBytes!,
-      fileOptions: FileOptions(
-        upsert: true,
-        contentType: 'image/$ext',
-      ),
-    );
+          path,
+          _imageBytes!,
+          fileOptions: FileOptions(
+            contentType: 'image/$ext',
+            upsert: true,
+          ),
+        );
 
     return SupabaseService.client.storage.from('photos').getPublicUrl(path);
   }
 
-  // ================= SAVE PROFILE =================
   Future<void> _saveProfile() async {
+    if (user == null) return;
     setState(() => isSaving = true);
 
-    try {
-      String? newPhoto;
+    String? newPhotoUrl;
 
-      if (imageBytes != null) {
-        newPhoto = await _uploadImage();
-      }
+    if (_imageBytes != null) {
+      newPhotoUrl = await _uploadImageToSupabase();
+    }
 
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user!.uid)
-          .set({
-        'nama': nameCtrl.text,
-        'alamat': addressCtrl.text,
-        'keterangan': descCtrl.text,
-        'jenis_kelamin': selectedGender,
-        'photo_url': newPhoto ?? photoUrl,
-        'updated_at': Timestamp.now(),
-      }, SetOptions(merge: true));
+    final updateData = {
+      'nama': nameCtrl.text,
+      'jenis_kelamin': genderCtrl.text,
+      'alamat': addressCtrl.text,
+      'keterangan': descCtrl.text,
+      'sosmed_link': socialMediaCtrl.text,
+      'email': user!.email,
+      'updated_at': DateTime.now(),
+    };
 
-      photoUrl = newPhoto ?? photoUrl;
-      imageBytes = null;
-      isEditing = false;
+    if (newPhotoUrl != null) {
+      updateData['photo_url'] = newPhotoUrl;
+      await user!.updatePhotoURL(newPhotoUrl);
+    }
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .set(updateData, SetOptions(merge: true));
+
+    if (mounted) {
+      setState(() {
+        _currentPhotoUrl = newPhotoUrl ?? _currentPhotoUrl;
+        _imageBytes = null;
+        isEditing = false;
+      });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Profil berhasil disimpan")),
+        const SnackBar(content: Text('Profil berhasil disimpan')),
       );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
+    }
+
+    setState(() => isSaving = false);
+  }
+
+  Future<void> _deleteAccount() async {
+    if (user == null) return;
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .delete();
+
+    await SupabaseService.client.storage
+        .from('photos')
+        .remove(['profile/${user!.uid}']);
+
+    await user!.delete();
+
+    if (mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const MyHomePage()),
+        (_) => false,
       );
-    } finally {
-      setState(() => isSaving = false);
     }
   }
 
-  // ================= REMOVE PHOTO =================
-  void _removePhoto() {
-    setState(() {
-      imageBytes = null;
-      photoUrl = null;
-    });
-  }
-
-  // ================= PHOTO ACTION =================
-  void _showPhotoAction() {
-    if (!isEditing) return;
-
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: const Icon(Icons.photo),
-            title: const Text("Ganti Foto"),
-            onTap: () {
-              Navigator.pop(context);
-              _pickImage();
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.delete, color: Colors.red),
-            title: const Text("Hapus Foto"),
-            onTap: () {
-              Navigator.pop(context);
-              _removePhoto();
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ================= UI =================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Profil"),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color.fromRGBO(255, 192, 45, 1), Colors.white],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const MyHomePage()),
+            );
+          },
+        ),
+        title: const Text("Profil", style: TextStyle(color: Colors.black)),
         actions: [
           TextButton(
             onPressed: () {
-              setState(() => isEditing = !isEditing);
+              setState(() {
+                isEditing = !isEditing;
+                if (!isEditing) _loadUserData();
+              });
             },
-            child: Text(isEditing ? "Batal" : "Edit"),
-          )
+            child: Text(
+              isEditing ? "Batal" : "Edit",
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ],
       ),
-      body: isLoading
+      body: isFetching
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-              child: Column(
-                children: [
-                  _header(),
-                  _avatar(),
-                  _profileForm(),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Pengaturan Personal",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 16),
+                    _buildField("Nama Lengkap", nameCtrl, enabled: isEditing),
+                    _buildGenderDropdown(),
+                    _buildEmailField("Email", user?.email ?? ""),
+                    _buildField("Alamat", addressCtrl, enabled: isEditing),
+                    _buildField("Sosial Media (Link)", socialMediaCtrl,
+                        enabled: isEditing),
+                    _buildField("Tentang saya", descCtrl,
+                        maxLines: 3, enabled: isEditing),
+                    const SizedBox(height: 32),
+                    const Text("Kontrol Akun",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          await FirebaseAuth.instance.signOut();
+                          if (mounted) {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const MyHomePage()),
+                              (_) => false,
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey[300],
+                        ),
+                        child: const Text("Keluar Akun",
+                            style: TextStyle(color: Colors.black)),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _deleteAccount,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                        ),
+                        child: const Text("Hapus Akun",
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
       bottomNavigationBar: const CustomButtomNav(currentIndex: 3),
     );
   }
 
-  // ================= HEADER =================
-  Widget _header() {
-    return Container(
-      height: 150,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFFFFC02D), Color(0xFFFFE082)],
-        ),
-      ),
-    );
-  }
-
-  // ================= AVATAR =================
-  Widget _avatar() {
-    ImageProvider? img;
-
-    if (imageBytes != null) {
-      img = MemoryImage(imageBytes!);
-    } else if (photoUrl != null) {
-      img = NetworkImage(photoUrl!);
+  Widget _buildProfileImage() {
+    if (_imageBytes != null) {
+      return Image.memory(_imageBytes!, fit: BoxFit.cover);
     }
-
-    return Transform.translate(
-      offset: const Offset(0, -40),
-      child: GestureDetector(
-        onTap: _showPhotoAction,
-        child: Stack(
-          children: [
-            CircleAvatar(
-              radius: 55,
-              backgroundColor: Colors.white,
-              child: CircleAvatar(
-                radius: 50,
-                backgroundImage: img,
-                child: img == null
-                    ? const Icon(Icons.person, size: 40)
-                    : null,
-              ),
-            ),
-            if (isEditing)
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: CircleAvatar(
-                  backgroundColor: Colors.black,
-                  radius: 16,
-                  child: const Icon(Icons.edit, size: 16, color: Colors.white),
-                ),
-              ),
-          ],
-        ),
-      ),
+    if (_currentPhotoUrl != null && _currentPhotoUrl!.isNotEmpty) {
+      return Image.network(_currentPhotoUrl!, fit: BoxFit.cover);
+    }
+    return Container(
+      color: Colors.grey[200],
+      child: const Icon(Icons.person, size: 50, color: Colors.grey),
     );
   }
 
-  // ================= FORM =================
-  Widget _profileForm() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              _field("Nama Lengkap", nameCtrl),
-              _gender(),
-              _field("Alamat", addressCtrl),
-              _field("Tentang Saya", descCtrl, maxLines: 3),
-              const SizedBox(height: 12),
-              if (isEditing)
-                ElevatedButton(
-                  onPressed: isSaving ? null : _saveProfile,
-                  child: isSaving
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text("Simpan"),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _field(String label, TextEditingController ctrl,
-      {int maxLines = 1}) {
+  Widget _buildField(String label, TextEditingController controller,
+      {int maxLines = 1, bool enabled = true}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: TextField(
-        controller: ctrl,
-        enabled: isEditing,
+        controller: controller,
         maxLines: maxLines,
+        enabled: enabled,
         decoration: InputDecoration(
           labelText: label,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          filled: !enabled,
+          fillColor: Colors.grey[100],
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         ),
       ),
     );
   }
 
-  Widget _gender() {
-    return DropdownButtonFormField<String>(
-      value: ["Laki laki", "Perempuan"].contains(selectedGender)
-          ? selectedGender
-          : null,
-      items: const [
-        DropdownMenuItem(value: "Laki laki", child: Text("Laki laki")),
-        DropdownMenuItem(value: "Perempuan", child: Text("Perempuan")),
-      ],
-      onChanged: isEditing ? (v) => setState(() => selectedGender = v) : null,
-      decoration: const InputDecoration(labelText: "Jenis Kelamin"),
+  Widget _buildEmailField(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: TextField(
+        enabled: false,
+        controller: TextEditingController(text: value),
+        decoration: InputDecoration(
+          labelText: label,
+          filled: true,
+          fillColor: Colors.grey[100],
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGenderDropdown() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: DropdownButtonFormField<String>(
+        value: selectedGender,
+        items: const [
+          DropdownMenuItem(value: "Laki laki", child: Text("Laki laki")),
+          DropdownMenuItem(value: "Perempuan", child: Text("Perempuan")),
+        ],
+        onChanged: isEditing
+            ? (value) {
+                setState(() {
+                  selectedGender = value;
+                  genderCtrl.text = value ?? '';
+                });
+              }
+            : null,
+        decoration: InputDecoration(
+          labelText: "Jenis Kelamin",
+          filled: !isEditing,
+          fillColor: Colors.grey[100],
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      ),
     );
   }
 }
