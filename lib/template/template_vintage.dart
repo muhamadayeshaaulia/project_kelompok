@@ -140,12 +140,15 @@ class _TemplateVintageState extends State<TemplateVintage> {
     try {
       await Future.delayed(const Duration(milliseconds: 200));
       RenderRepaintBoundary? boundary =
-          _boundaryKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
-      
+          _boundaryKey.currentContext?.findRenderObject()
+              as RenderRepaintBoundary?;
+
       if (boundary == null) throw "Gagal render widget.";
 
       ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-      ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      ByteData? byteData = await image.toByteData(
+        format: ui.ImageByteFormat.png,
+      );
       final fullImageBytes = byteData?.buffer.asUint8List();
 
       if (fullImageBytes == null) throw "Gambar kosong.";
@@ -164,17 +167,18 @@ class _TemplateVintageState extends State<TemplateVintage> {
         }
       }
 
-      final fileName = 'vintage_strip_${DateTime.now().millisecondsSinceEpoch}.png';
+      final fileName =
+          'vintage_strip_${DateTime.now().millisecondsSinceEpoch}.png';
       final filePath = 'uploads/${user.uid}/$fileName';
-      
+
       await SupabaseService.client.storage
           .from('photos')
           .uploadBinary(
             filePath,
             fullImageBytes,
             fileOptions: const FileOptions(
-              contentType: 'image/png', 
-              upsert: true
+              contentType: 'image/png',
+              upsert: true,
             ),
           );
 
@@ -188,7 +192,7 @@ class _TemplateVintageState extends State<TemplateVintage> {
 
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const MyHomePage()), 
+          MaterialPageRoute(builder: (context) => const MyHomePage()),
           (route) => false,
         );
       }
@@ -199,6 +203,9 @@ class _TemplateVintageState extends State<TemplateVintage> {
           SnackBar(content: Text("Gagal: $e"), backgroundColor: Colors.red),
         );
       }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
