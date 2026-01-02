@@ -192,8 +192,13 @@ class _TemplateVintageState extends State<TemplateVintage> {
           (route) => false,
         );
       }
-
-    }
+    } catch (e) {
+      debugPrint("Error: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Gagal: $e"), backgroundColor: Colors.red),
+        );
+      }
   }
 
   @override
