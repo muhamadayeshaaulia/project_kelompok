@@ -261,6 +261,56 @@ class _TemplateVintageState extends State<TemplateVintage> {
                       width: 1,
                     ),
                   ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      ...List.generate(2, (index) {
+                        return GestureDetector(
+                          onTap: () => _pickImage(index),
+                          child: Container(
+                            height: 160,
+                            width: double.infinity,
+                            margin: const EdgeInsets.only(bottom: 15),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFD7CCC8),
+                              border: Border.all(color: borderColor, width: 1),
+                            ),
+                            child: _imageBytesList[index] == null
+                                ? Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.camera_alt,
+                                        color: Colors.grey[600],
+                                        size: 30,
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        "TAP TO ADD",
+                                        style: TextStyle(
+                                          fontFamily: 'monospace',
+                                          fontSize: 10,
+                                          color: Colors.grey[700],
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                // Terapkan Filter Sepia pada Gambar
+                                : ColorFiltered(
+                                    colorFilter: const ColorFilter.matrix(
+                                      _sepiaMatrix,
+                                    ),
+                                    child: Image.memory(
+                                      _imageBytesList[index]!,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                          ),
+                        );
+                      }),
+                    ],
+                  ),
                 ),
               ),
             ),
