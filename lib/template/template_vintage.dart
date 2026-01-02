@@ -309,6 +309,36 @@ class _TemplateVintageState extends State<TemplateVintage> {
                           ),
                         );
                       }),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15),
+                        child: Column(
+                          children: [
+                            Text(
+                              "MEMORIES",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontFamily: 'monospace', // Font mesin tik
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 5,
+                                fontSize: 14,
+                                color: textColor,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              // Menampilkan tanggal hari ini
+                              "${DateTime.now().day} . ${DateTime.now().month} . ${DateTime.now().year}",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontFamily: 'monospace',
+                                fontSize: 10,
+                                letterSpacing: 2,
+                                color: textColor.withOpacity(0.7),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
