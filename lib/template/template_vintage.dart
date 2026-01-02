@@ -111,6 +111,8 @@ class _TemplateVintageState extends State<TemplateVintage> {
     }
   }
 
+  Future<void> _captureAndUpload() async {}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
