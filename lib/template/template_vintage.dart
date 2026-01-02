@@ -12,6 +12,8 @@ class TemplateVintage extends StatefulWidget {
 }
 
 class _TemplateVintageState extends State<TemplateVintage> {
+  Color _frameColor = const Color(0xFFFDF5E6);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
