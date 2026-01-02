@@ -70,6 +70,13 @@ class _TemplateVintageState extends State<TemplateVintage> {
     }
   }
 
+  void initState() {
+    super.initState();
+    if (widget.initialImages != null && widget.initialImages!.length == 2) {
+      _loadCameraImages();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
