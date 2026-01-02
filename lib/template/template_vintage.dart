@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -111,7 +112,24 @@ class _TemplateVintageState extends State<TemplateVintage> {
     }
   }
 
-  Future<void> _captureAndUpload() async {}
+  Future<void> _captureAndUpload() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Kamu belum login.")));
+      return;
+    }
+
+    if (_imageBytesList.contains(null)) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Isi semua foto dulu ya!")));
+      return;
+    }
+
+    setState(() => _isLoading = true);
+  }
 
   @override
   Widget build(BuildContext context) {
