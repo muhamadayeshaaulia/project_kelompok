@@ -6,7 +6,7 @@ import 'package:project_kelompok/template/photoboothpage2.dart';
 
 
 class CameraPage extends StatefulWidget {
-  final int photoCount; // Masukkan angka 2 saat memanggil halaman ini
+  final int photoCount;
   const CameraPage({super.key, required this.photoCount});
 
   @override
@@ -14,16 +14,15 @@ class CameraPage extends StatefulWidget {
 }
 
 class _CameraPageState extends State<CameraPage> {
-  final List<File> _capturedPhotos = []; // Keranjang penampung foto
+  final List<File> _capturedPhotos = [];
   final ImagePicker _picker = ImagePicker();
 
-  // Fungsi Buka Kamera Bawaan
   Future<void> _takeNextPhoto() async {
     try {
       final XFile? photo = await _picker.pickImage(
         source: ImageSource.camera,
         imageQuality: 100,
-        preferredCameraDevice: CameraDevice.front, // Kamera depan
+        preferredCameraDevice: CameraDevice.front,
       );
 
       if (photo != null) {
@@ -36,7 +35,6 @@ class _CameraPageState extends State<CameraPage> {
     }
   }
 
-  // Fungsi Reset (Ulang Foto)
   void _resetPhotos() {
     setState(() {
       _capturedPhotos.clear();
@@ -71,7 +69,6 @@ class _CameraPageState extends State<CameraPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Cek apakah jumlah foto sudah sesuai target (misal: 2)
     bool isComplete = _capturedPhotos.length >= widget.photoCount;
 
     return Scaffold(
@@ -90,14 +87,12 @@ class _CameraPageState extends State<CameraPage> {
       ),
       body: Column(
         children: [
-          // --- BAGIAN 1: PREVIEW GRID SEDERHANA ---
-          // Ini cuma buat user liat dia udah foto apa aja sebelum masuk template asli
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: GridView.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: widget.photoCount == 2 ? 1 : 2, // 1 kolom kalau 2 foto
+                  crossAxisCount: widget.photoCount == 2 ? 1 : 2,
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
                   childAspectRatio: 4/3,
@@ -105,7 +100,6 @@ class _CameraPageState extends State<CameraPage> {
                 itemCount: widget.photoCount,
                 itemBuilder: (context, index) {
                   if (index < _capturedPhotos.length) {
-                    // Tampilkan Foto yang sudah diambil
                     return Container(
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.white, width: 2),
@@ -116,7 +110,6 @@ class _CameraPageState extends State<CameraPage> {
                       ),
                     );
                   } else {
-                    // Tampilkan Kotak Kosong (Placeholder)
                     return Container(
                       decoration: BoxDecoration(
                         color: Colors.grey[800],
@@ -140,7 +133,6 @@ class _CameraPageState extends State<CameraPage> {
             ),
           ),
 
-          // --- BAGIAN 2: TOMBOL KONTROL ---
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -151,7 +143,6 @@ class _CameraPageState extends State<CameraPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (!isComplete)
-                  // TOMBOL JEPRET (Muncul kalau foto belum lengkap)
                   ElevatedButton.icon(
                     onPressed: _takeNextPhoto,
                     icon: const Icon(Icons.camera_alt),
@@ -164,14 +155,13 @@ class _CameraPageState extends State<CameraPage> {
                     ),
                   )
                 else
-                  // TOMBOL LANJUT (Muncul kalau foto sudah lengkap)
                   ElevatedButton.icon(
-                    onPressed: _goToEditingPage, // <-- PANGGIL FUNGSI PINDAH HALAMAN
+                    onPressed: _goToEditingPage,
                     icon: const Icon(Icons.edit),
                     label: const Text("Lanjut Edit Frame"),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                      backgroundColor: Colors.green, // Warna hijau tanda siap
+                      backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
                       textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),

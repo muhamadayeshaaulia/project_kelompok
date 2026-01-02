@@ -779,7 +779,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     _buildTabButton(0, "Karya Saya"),
                     const SizedBox(width: 25),
-                    _buildTabButton(1, "Postingan"),
+                    _buildTabButton(1, "Postingan Saya"),
                   ],
                 ),
               ),
