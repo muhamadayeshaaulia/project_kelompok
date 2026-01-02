@@ -1,10 +1,17 @@
 import 'dart:io';
 import 'dart:typed_data';
-
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:ui' as ui;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:image_cropper/image_cropper.dart';
+import 'package:flutter/rendering.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:gal/gal.dart';
+import 'package:project_kelompok/screen/home_page.dart'; // Pastikan import ini sesuai
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:project_kelompok/services/supabase_service.dart'; // Pastikan import ini sesuai
 
 class TemplateVintage extends StatefulWidget {
   final List<File>? initialImages;
@@ -129,6 +136,64 @@ class _TemplateVintageState extends State<TemplateVintage> {
     }
 
     setState(() => _isLoading = true);
+
+    try {
+      await Future.delayed(const Duration(milliseconds: 200));
+      RenderRepaintBoundary? boundary =
+          _boundaryKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      
+      if (boundary == null) throw "Gagal render widget.";
+
+      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      final fullImageBytes = byteData?.buffer.asUint8List();
+
+      if (fullImageBytes == null) throw "Gambar kosong.";
+
+      if (!kIsWeb) {
+        try {
+          await Gal.requestAccess();
+          final tempDir = await getTemporaryDirectory();
+          final file = await File(
+            '${tempDir.path}/vintage_strip_${DateTime.now().millisecondsSinceEpoch}.png',
+          ).create();
+          await file.writeAsBytes(fullImageBytes);
+          await Gal.putImage(file.path, album: 'VintageBooth');
+        } catch (e) {
+          debugPrint("Skip galeri: $e");
+        }
+      }
+
+      final fileName = 'vintage_strip_${DateTime.now().millisecondsSinceEpoch}.png';
+      final filePath = 'uploads/${user.uid}/$fileName';
+      
+      await SupabaseService.client.storage
+          .from('photos')
+          .uploadBinary(
+            filePath,
+            fullImageBytes,
+            fileOptions: const FileOptions(
+              contentType: 'image/png', 
+              upsert: true
+            ),
+          );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Tersimpan dalam kenangan!"),
+            backgroundColor: Color(0xFF5D4037),
+          ),
+        );
+
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const MyHomePage()), 
+          (route) => false,
+        );
+      }
+
+    }
   }
 
   @override
