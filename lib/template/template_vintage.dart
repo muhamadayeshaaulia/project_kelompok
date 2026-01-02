@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class TemplateVintage extends StatefulWidget {
   final List<File>? initialImages;
@@ -24,6 +26,11 @@ class _TemplateVintageState extends State<TemplateVintage> {
     const Color(0xFFBC8F8F), // Rosy Brown
     const Color(0xFFA9A9A9), // Dark Gray
   ];
+
+  final List<Uint8List?> _imageBytesList = List.filled(2, null);
+  final ImagePicker _picker = ImagePicker();
+  final GlobalKey _boundaryKey = GlobalKey();
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
