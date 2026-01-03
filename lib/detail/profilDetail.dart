@@ -121,21 +121,7 @@ class _OtherUserProfilePageState extends State<Profildetail> {
                             },
                           ),
                           Container(height: 30, width: 1, color: Colors.grey[300]),
-                          StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('users')
-                                .doc(widget.uid)
-                                .collection('followers')
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              int followerCount = snapshot.hasData
-                                  ? snapshot.data!.docs.length
-                                  : 0;
-                              return _buildStatColumn("Followers", followerCount, () {
-                                debugPrint("Tombol Followers Ditekan");
-                              });
-                            },
-                          ),
+                          
                           Container(height: 30, width: 1, color: Colors.grey[300]),
                           StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
