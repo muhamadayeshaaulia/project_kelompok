@@ -15,7 +15,6 @@ class Profildetail extends StatefulWidget {
 
 class _ProfildetailState extends State<Profildetail> {
   
-  // Widget Helper untuk Statistik (Post/Follower/Following)
   Widget _buildStatColumn(String label, int count, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
@@ -49,10 +48,8 @@ class _ProfildetailState extends State<Profildetail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // --- PERUBAHAN UTAMA: Menggunakan CustomScrollView ---
       body: CustomScrollView(
         slivers: [
-          // 1. APP BAR (Pinned = True agar menempel saat scroll)
           SliverAppBar(
             pinned: true, 
             expandedHeight: 50.0,
@@ -62,8 +59,6 @@ class _ProfildetailState extends State<Profildetail> {
             foregroundColor: Colors.white,
           ),
 
-          // 2. HEADER PROFIL (Foto, Nama, Bio, Statistik)
-          // Kita bungkus FutureBuilder lama kamu ke dalam SliverToBoxAdapter
           SliverToBoxAdapter(
             child: FutureBuilder<DocumentSnapshot>(
               future: FirebaseFirestore.instance
@@ -85,7 +80,6 @@ class _ProfildetailState extends State<Profildetail> {
                   padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
                   child: Column(
                     children: [
-                      // Foto Profil
                       Center(
                         child: CircleAvatar(
                           radius: 50,
