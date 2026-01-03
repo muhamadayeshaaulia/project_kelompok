@@ -248,7 +248,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ListTile(
-                    leading: GestureDetector( // <-- BUNGKUS DENGAN GESTURE DETECTOR
+                    leading: GestureDetector(
                       onTap: () => _navigateToProfile(widget.postData['uid']),
                       child: CircleAvatar(
                         backgroundImage: widget.postData['user_image'] != null
