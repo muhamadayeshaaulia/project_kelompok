@@ -42,6 +42,7 @@ class _ProfilePageState extends State<ProfilePage> {
     _loadUserData();
   }
 
+  // --- LOGIKA SOSIAL MEDIA ---
   Widget _getSocialIcon(String url) {
     String lowerUrl = url.toLowerCase();
     if (lowerUrl.contains("github.com"))
@@ -105,6 +106,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ).showSnackBar(const SnackBar(content: Text("Gagal membuka link")));
     }
   }
+
   Future<void> _loadUserData() async {
     if (user == null) return;
     setState(() => isFetching = true);
@@ -129,46 +131,26 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Future<bool> _reauthenticateUser() async {
-    final passwordCtrl = TextEditingController();
-    bool success = false;
-    await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text("Konfirmasi Kata Sandi"),
-        content: TextField(
-          controller: passwordCtrl,
-          obscureText: true,
-          decoration: const InputDecoration(labelText: "Kata Sandi"),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Batal"),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              try {
-                AuthCredential cred = EmailAuthProvider.credential(
-                  email: user!.email!,
-                  password: passwordCtrl.text.trim(),
-                );
-                await user!.reauthenticateWithCredential(cred);
-                success = true;
-                if (mounted) Navigator.pop(context);
-              } catch (e) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text("Salah!")));
-              }
-            },
-            child: const Text("OK"),
-          ),
-        ],
-      ),
-    );
-    return success;
+  Future<void> _saveProfile() async {
+    setState(() => isSaving = true);
+    try {
+      String? newUrl;
+      if (_imageBytes != null) newUrl = await _uploadImageToSupabase();
+      await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
+        'nama': nameCtrl.text,
+        'jenis_kelamin': genderCtrl.text,
+        'alamat': addressCtrl.text,
+        'sosmed_link': socialMediaCtrl.text,
+        'keterangan': descCtrl.text,
+        if (newUrl != null) 'photo_url': newUrl,
+      }, SetOptions(merge: true));
+      setState(() {
+        isEditing = false;
+        if (newUrl != null) _currentPhotoUrl = newUrl;
+      });
+    } finally {
+      setState(() => isSaving = false);
+    }
   }
 
   Future<void> _deleteAccount() async {
@@ -177,9 +159,7 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Hapus Akun?"),
-        content: const Text(
-          "Semua folder data, postingan, dan like akan hilang.",
-        ),
+        content: const Text("Semua data Anda akan dihapus permanen."),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -195,43 +175,13 @@ class _ProfilePageState extends State<ProfilePage> {
     );
     if (confirm != true) return;
     setState(() => isSaving = true);
-
     try {
       final uid = user!.uid;
       final firestore = FirebaseFirestore.instance;
-      final comments = await firestore
-          .collectionGroup('comments')
-          .where('uid', isEqualTo: uid)
-          .get();
-      for (var doc in comments.docs) {
-        await doc.reference.delete();
-      }
-      final posts = await firestore.collection('posts').get();
-      for (var pDoc in posts.docs) {
-        await pDoc.reference.collection('likes').doc(uid).delete();
-      }
-      final allUsers = await firestore.collection('users').get();
-      for (var uDoc in allUsers.docs) {
-        await uDoc.reference.collection('followers').doc(uid).delete();
-        await uDoc.reference.collection('following').doc(uid).delete();
-      }
       await firestore.collection('users').doc(uid).delete();
       await firestore.terminate();
       await firestore.clearPersistence();
-
-      try {
-        await user!.delete();
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'requires-recent-login') {
-          setState(() => isSaving = false);
-          if (await _reauthenticateUser()) {
-            setState(() => isSaving = true);
-            await user!.delete();
-          } else {
-            return;
-          }
-        }
-      }
+      await user!.delete();
       if (mounted)
         Navigator.of(
           context,
@@ -242,6 +192,7 @@ class _ProfilePageState extends State<ProfilePage> {
       if (mounted) setState(() => isSaving = false);
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -280,215 +231,276 @@ class _ProfilePageState extends State<ProfilePage> {
                 SingleChildScrollView(
                   child: Column(
                     children: [
-                      Container(
-                        height: 200,
-                        width: double.infinity,
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Color.fromRGBO(255, 192, 45, 1),
-                              Colors.white,
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            GestureDetector(
-                              onTap: _pickImage,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 3,
-                                  ),
-                                ),
-                                child: ClipOval(
-                                  child: SizedBox(
-                                    width: 100,
-                                    height: 100,
-                                    child: _buildProfileImage(),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              nameCtrl.text,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      _buildHeader(),
                       Padding(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildField("Nama", nameCtrl, enabled: isEditing),
-                            const Text(
-                              "Jenis Kelamin",
-                              style: TextStyle(color: Colors.grey),
+                            _buildSectionTitle("Informasi Personal"),
+                            _buildInfoField(
+                              "Nama Lengkap",
+                              nameCtrl,
+                              isEditing,
                             ),
-                            const SizedBox(height: 8),
-                            isEditing
-                                ? _buildGenderSelection()
-                                : _buildGenderDisplay(),
-                            const SizedBox(height: 14),
-                            _buildField(
-                              "Alamat",
-                              addressCtrl,
-                              enabled: isEditing,
-                            ),
-                            const Text(
-                              "Sosial Media (Pisahkan dengan koma)",
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                            const SizedBox(height: 8),
-                            isEditing
-                                ? TextField(
-                                    controller: socialMediaCtrl,
-                                    maxLines: null,
-                                    decoration: InputDecoration(
-                                      hintText: "Link GitHub, IG, dll",
-                                      filled: true,
-                                      fillColor: Colors.grey[100],
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                    ),
-                                  )
-                                : _buildSocialMediaDisplay(),
-                            const SizedBox(height: 14),
-                            _buildField(
+                            _buildGenderSection(),
+                            _buildInfoField("Alamat", addressCtrl, isEditing),
+                            _buildSocialSection(),
+                            _buildInfoField(
                               "Tentang Saya",
                               descCtrl,
+                              isEditing,
                               maxLines: 3,
-                              enabled: isEditing,
                             ),
-                            if (isEditing)
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: isSaving ? null : _saveProfile,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.yellow[800],
-                                  ),
-                                  child: const Text(
-                                    "Simpan",
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                              ),
-                            const SizedBox(height: 8),
-                            Center(
-                              child: TextButton(
-                                onPressed: _deleteAccount,
-                                child: const Text(
-                                  "Hapus Akun",
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              ),
-                            ),
+                            const SizedBox(height: 30),
+                            if (isEditing) _buildSaveButton(),
+                            if (!isEditing) _buildDeleteButton(),
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-                if (isSaving)
-                  Container(
-                    color: Colors.black.withOpacity(0.5),
-                    child: const Center(
-                      child: CircularProgressIndicator(color: Colors.yellow),
-                    ),
-                  ),
+                if (isSaving) _buildSavingOverlay(),
               ],
             ),
       bottomNavigationBar: const CustomButtomNav(currentIndex: 3),
     );
   }
 
-  Widget _buildGenderSelection() {
-    return Row(
-      children: [
-        Expanded(child: _genderBtn("Laki-laki", Icons.male, Colors.blue)),
-        const SizedBox(width: 12),
-        Expanded(child: _genderBtn("Perempuan", Icons.female, Colors.pink)),
-      ],
-    );
-  }
-
-  Widget _genderBtn(String val, IconData icon, Color color) {
-    bool isSel = genderCtrl.text == val;
-    return GestureDetector(
-      onTap: () => setState(() => genderCtrl.text = val),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: isSel ? color.withOpacity(0.1) : Colors.grey[100],
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: isSel ? color : Colors.transparent),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: isSel ? color : Colors.grey),
-            const SizedBox(width: 8),
-            Text(val),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGenderDisplay() {
-    bool isM = genderCtrl.text == "Laki-laki";
+  Widget _buildHeader() {
     return Container(
+      height: 200,
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(10),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color.fromRGBO(255, 192, 45, 1), Colors.white],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
       ),
-      child: Row(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            isM ? Icons.male : Icons.female,
-            color: isM ? Colors.blue : Colors.pink,
+          GestureDetector(
+            onTap: isEditing ? _pickImage : null,
+            child: Stack(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.grey[200],
+                    backgroundImage: _getProfileImage(),
+                  ),
+                ),
+                if (isEditing)
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.orange,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.camera_alt,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
-          const SizedBox(width: 10),
-          Text(genderCtrl.text),
+          const SizedBox(height: 12),
+          Text(
+            nameCtrl.text,
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSocialMediaDisplay() {
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.orange,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoField(
+    String label,
+    TextEditingController ctrl,
+    bool editing, {
+    int maxLines = 1,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+          const SizedBox(height: 8),
+          editing
+              ? TextField(
+                  controller: ctrl,
+                  maxLines: maxLines,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.grey[50],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                  ),
+                )
+              : Text(
+                  ctrl.text.isEmpty ? "-" : ctrl.text,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGenderSection() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Jenis Kelamin",
+            style: TextStyle(fontSize: 14, color: Colors.grey),
+          ),
+          const SizedBox(height: 8),
+          isEditing
+              ? Row(
+                  children: [
+                    _genderOption("Laki-laki", Icons.male, Colors.blue),
+                    const SizedBox(width: 15),
+                    _genderOption("Perempuan", Icons.female, Colors.pink),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Icon(
+                      genderCtrl.text == "Laki-laki"
+                          ? Icons.male
+                          : Icons.female,
+                      color: genderCtrl.text == "Laki-laki"
+                          ? Colors.blue
+                          : Colors.pink,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      genderCtrl.text.isEmpty ? "-" : genderCtrl.text,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+        ],
+      ),
+    );
+  }
+
+  Widget _genderOption(String val, IconData icon, Color color) {
+    bool isSelected = genderCtrl.text == val;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => genderCtrl.text = val),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color: isSelected ? color.withOpacity(0.1) : Colors.grey[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: isSelected ? color : Colors.grey[300]!),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: isSelected ? color : Colors.grey),
+              const SizedBox(width: 8),
+              Text(
+                val,
+                style: TextStyle(color: isSelected ? color : Colors.black54),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSocialSection() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Sosial Media",
+            style: TextStyle(fontSize: 14, color: Colors.grey),
+          ),
+          const SizedBox(height: 8),
+          isEditing
+              ? TextField(
+                  controller: socialMediaCtrl,
+                  decoration: InputDecoration(
+                    hintText: "Pisahkan dengan koma (github.com/user, ...)",
+                    filled: true,
+                    fillColor: Colors.grey[50],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                  ),
+                )
+              : _buildSocialIcons(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSocialIcons() {
     List<String> links = socialMediaCtrl.text
         .split(',')
         .map((s) => s.trim())
         .where((s) => s.isNotEmpty)
         .toList();
+    if (links.isEmpty) return const Text("-");
     return Wrap(
       spacing: 12,
-      runSpacing: 12,
       children: links
           .map(
             (url) => GestureDetector(
               onTap: () => _launchURL(url),
               child: Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Colors.grey[100],
                   shape: BoxShape.circle,
-                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
                 ),
                 child: _getSocialIcon(url),
               ),
@@ -498,63 +510,48 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildField(
-    String label,
-    TextEditingController controller, {
-    int maxLines = 1,
-    bool enabled = true,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: const TextStyle(color: Colors.grey)),
-          const SizedBox(height: 6),
-          TextField(
-            controller: controller,
-            maxLines: maxLines,
-            enabled: enabled,
-            decoration: InputDecoration(
-              filled: !enabled,
-              fillColor: Colors.grey[100],
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
+  Widget _buildSaveButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: isSaving ? null : _saveProfile,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.yellow[800],
+          padding: const EdgeInsets.symmetric(vertical: 15),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-        ],
+        ),
+        child: const Text(
+          "SIMPAN PERUBAHAN",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }
 
-  Widget _buildProfileImage() {
-    if (_imageBytes != null)
-      return Image.memory(_imageBytes!, fit: BoxFit.cover);
-    if (_currentPhotoUrl != null)
-      return Image.network(_currentPhotoUrl!, fit: BoxFit.cover);
-    return const Icon(Icons.person, size: 50);
+  Widget _buildDeleteButton() {
+    return Center(
+      child: TextButton(
+        onPressed: _deleteAccount,
+        child: const Text("Hapus Akun", style: TextStyle(color: Colors.red)),
+      ),
+    );
   }
-  Future<void> _saveProfile() async {
-    setState(() => isSaving = true);
-    try {
-      String? newUrl;
-      if (_imageBytes != null) newUrl = await _uploadImageToSupabase();
-      await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
-        'nama': nameCtrl.text,
-        'jenis_kelamin': genderCtrl.text,
-        'alamat': addressCtrl.text,
-        'sosmed_link': socialMediaCtrl.text,
-        'keterangan': descCtrl.text,
-        if (newUrl != null) 'photo_url': newUrl,
-      }, SetOptions(merge: true));
-      setState(() {
-        isEditing = false;
-        if (newUrl != null) _currentPhotoUrl = newUrl;
-      });
-    } finally {
-      setState(() => isSaving = false);
-    }
+
+  Widget _buildSavingOverlay() {
+    return Container(
+      color: Colors.black26,
+      child: const Center(
+        child: CircularProgressIndicator(color: Colors.yellow),
+      ),
+    );
+  }
+
+  dynamic _getProfileImage() {
+    if (_imageBytes != null) return MemoryImage(_imageBytes!);
+    if (_currentPhotoUrl != null) return NetworkImage(_currentPhotoUrl!);
+    return null;
   }
 
   Future<String?> _uploadImageToSupabase() async {
