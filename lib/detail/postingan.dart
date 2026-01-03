@@ -31,7 +31,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
   String _myUserName = "Loading...";
   String? _myProfilePic;
 
-  
+  void _navigateToProfile(String uid) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Profildetail(uid: uid),
+      ),
+    );
+  }
 
   @override
   void initState() {
