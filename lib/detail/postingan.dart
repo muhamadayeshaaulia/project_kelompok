@@ -267,13 +267,22 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Postingan"),
-        backgroundColor: Colors.yellow[700],
+        title: const Text("Postingan", style: TextStyle(color: Colors.black)),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color.fromRGBO(255, 192, 45, 1), Colors.white],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         foregroundColor: Colors.white,
         actions: [
           if (isOwner)
             IconButton(
               icon: const Icon(Icons.delete_outline),
+              color: Colors.black,
               onPressed: _deletePost,
             ),
         ],
