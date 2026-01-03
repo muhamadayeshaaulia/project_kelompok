@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_kelompok/detail/postingan.dart';
 import 'package:intl/intl.dart';
+import 'package:project_kelompok/detail/profilDetail.dart';
 import 'package:project_kelompok/screen/following_page.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 
@@ -185,6 +186,9 @@ class _ExplorPageState extends State<ExplorPage> {
             var post = snapshot.data!.docs[index];
             var data = post.data() as Map<String, dynamic>;
             String postId = post.id;
+            
+            // 1. AMBIL UID PEMILIK POSTINGAN
+            String ownerUid = data['uid']; 
 
             return Card(
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -194,6 +198,14 @@ class _ExplorPageState extends State<ExplorPage> {
               child: Column(
                 children: [
                   ListTile(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Profildetail(uid: ownerUid),
+                        ),
+                      );
+                    },
                     leading: CircleAvatar(
                       backgroundImage: NetworkImage(data['user_image'] ?? ''),
                       backgroundColor: Colors.grey[200],
@@ -206,7 +218,9 @@ class _ExplorPageState extends State<ExplorPage> {
                       formatPostTime(data['timestamp'] as Timestamp?),
                       style: const TextStyle(fontSize: 12, color: Colors.grey),
                     ),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
                   ),
+                  
                   GestureDetector(
                     onTap: () => _openDetail(postId, data),
                     child: Image.network(
@@ -214,8 +228,11 @@ class _ExplorPageState extends State<ExplorPage> {
                       fit: BoxFit.cover,
                       width: double.infinity,
                       height: 300,
+                      errorBuilder: (context, error, stackTrace) => 
+                          Container(height: 300, color: Colors.grey[300], child: Icon(Icons.error)),
                     ),
                   ),
+
                   Padding(
                     padding: const EdgeInsets.all(12),
                     child: Row(
