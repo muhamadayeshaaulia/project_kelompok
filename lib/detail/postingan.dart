@@ -456,21 +456,27 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
     return ListTile(
       dense: true,
-      leading: CircleAvatar(
-        radius: isReply ? 12 : 15,
-        backgroundImage: data['photo_url'] != null
-            ? NetworkImage(data['photo_url'])
-            : null,
-        child: data['photo_url'] == null
-            ? const Icon(Icons.person, size: 18)
-            : null,
+      leading: GestureDetector(
+        onTap: () => _navigateToProfile(data['uid']),
+        child: CircleAvatar(
+          radius: isReply ? 12 : 15,
+          backgroundImage: data['photo_url'] != null
+              ? NetworkImage(data['photo_url'])
+              : null,
+          child: data['photo_url'] == null
+              ? const Icon(Icons.person, size: 18)
+              : null,
+        ),
       ),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            data['nama'] ?? "User",
-            style: const TextStyle(fontWeight: FontWeight.bold),
+          GestureDetector(
+            onTap: () => _navigateToProfile(data['uid']),
+            child: Text(
+              data['nama'] ?? "User",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
           if (isMyComment)
             GestureDetector(
@@ -479,6 +485,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
             ),
         ],
       ),
+
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
