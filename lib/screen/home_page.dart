@@ -374,14 +374,20 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _showPostConfirmation(String imageUrl) {
-    String detectedTemplate = 'classic_2';
+    String detectedTemplate = 'classic_2'; // Default
+
+    // --- LOGIKA DETEKSI YANG BARU ---
     if (imageUrl.contains('C4_')) {
       detectedTemplate = 'classic_4';
+    } else if (imageUrl.contains('V1_')) {
+      // Ini tambahannya!
+      detectedTemplate = 'vintage';
     } else if (imageUrl.contains('C2_')) {
       detectedTemplate = 'classic_2';
     } else if (imageUrl.contains('vintage_')) {
       detectedTemplate = 'vintage';
     }
+    // --------------------------------
 
     showDialog(
       context: context,
@@ -782,7 +788,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     _buildTabButton(0, "Karya Saya"),
                     const SizedBox(width: 25),
-                    _buildTabButton(1, "Postingan"),
+                    _buildTabButton(1, "Postingan Saya"),
                   ],
                 ),
               ),

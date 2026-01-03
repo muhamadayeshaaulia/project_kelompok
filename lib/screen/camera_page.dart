@@ -30,6 +30,13 @@ class _CameraPageState extends State<CameraPage> {
     _capturedPhotos = List<File?>.filled(widget.photoCount, null);
   }
 
+  void _takeNextPhoto() {
+    final nextIndex = _capturedPhotos.indexWhere((photo) => photo == null);
+    if (nextIndex != -1) {
+      _showImageOptions(nextIndex);
+    }
+  }
+
   Future<void> _takePhoto(int index) async {
     final XFile? photo = await _picker.pickImage(
       source: ImageSource.camera,
@@ -164,9 +171,7 @@ class _CameraPageState extends State<CameraPage> {
                 itemBuilder: (context, index) {
                   final photo = _capturedPhotos[index];
                   return GestureDetector(
-                    onTap: () => _showImageOptions(
-                      index,
-                    ),
+                    onTap: () => _showImageOptions(index),
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.grey[850],
@@ -218,19 +223,38 @@ class _CameraPageState extends State<CameraPage> {
           ),
           Container(
             padding: const EdgeInsets.all(20),
-            child: ElevatedButton(
-              onPressed: isComplete ? _goToEditingPage : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: isComplete ? Colors.green : Colors.grey,
-                minimumSize: const Size(double.infinity, 50),
-              ),
-              child: Text(
-                isComplete ? "LANJUT KE EDIT FRAME" : "LENGKAPI SEMUA FOTO",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (!isComplete)
+                  ElevatedButton.icon(
+                    onPressed: _takeNextPhoto,
+                    icon: const Icon(Icons.camera_alt),
+                    label: Text("Ambil Foto"),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 15,
+                      ),
+                      backgroundColor: Colors.yellow[700],
+                      foregroundColor: Colors.black,
+                    ),
+                  )
+                else
+                  ElevatedButton.icon(
+                    onPressed: _goToEditingPage,
+                    icon: const Icon(Icons.edit),
+                    label: const Text("Lanjut Edit Frame"),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 15,
+                      ),
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+              ],
             ),
           ),
         ],

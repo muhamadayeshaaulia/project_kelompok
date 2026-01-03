@@ -114,7 +114,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
     );
 
     if (confirm != true) return;
-
     try {
       showDialog(
         context: context,
@@ -267,6 +266,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     padding: const EdgeInsets.all(12.0),
                     child: ElevatedButton.icon(
                       onPressed: () {
+                        // Logika Navigasi Template
                         if (detectedTemplate == 'classic_4') {
                           Navigator.push(
                             context,
