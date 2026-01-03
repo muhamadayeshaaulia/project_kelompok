@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:project_kelompok/detail/profilDetail.dart';
 
 class UserListPage extends StatelessWidget {
   final String title;     // Judul: "Pengikut" atau "Mengikuti"
@@ -80,7 +81,7 @@ class UserListPage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => OtherUserProfilePage(uid: targetUserId),
+                          builder: (context) => Profildetail(uid: targetUserId),
                         ),
                       );
                     },
