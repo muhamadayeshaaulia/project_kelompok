@@ -1,14 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:project_kelompok/template/photoboothpage.dart';
-import 'package:project_kelompok/template/photoboothpage2.dart';
-import 'package:project_kelompok/template/template_vintage.dart';
 
-
-class Profildetail extends StatelessWidget {
+class OtherUserProfilePage extends StatefulWidget {
   final String uid;
 
-  const Profildetail({super.key, required this.uid});
+  const OtherUserProfilePage({super.key, required this.uid});
+
+  @override
+  State<OtherUserProfilePage> createState() => _OtherUserProfilePageState();
+}
+
+class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
+  Widget _buildStatColumn(String label, int count) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          count.toString(),
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.grey,
+            fontSize: 14,
+          ),
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +46,10 @@ class Profildetail extends StatelessWidget {
         child: Column(
           children: [
             FutureBuilder<DocumentSnapshot>(
-              future: FirebaseFirestore.instance.collection('users').doc(uid).get(),
+              future: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(widget.uid)
+                  .get(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const Padding(
@@ -31,11 +58,11 @@ class Profildetail extends StatelessWidget {
                   );
                 }
                 var userData = snapshot.data!.data() as Map<String, dynamic>?;
-                
+
                 if (userData == null) return const Text("User tidak ditemukan");
 
                 return Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
                       CircleAvatar(
@@ -51,34 +78,78 @@ class Profildetail extends StatelessWidget {
                       Text(
                         userData['nama'] ?? "Tanpa Nama",
                         style: const TextStyle(
-                          fontSize: 20, 
-                          fontWeight: FontWeight.bold
-                        ),
+                            fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       Text(
                         userData['email'] ?? "-",
                         style: const TextStyle(color: Colors.grey),
                       ),
-                      const SizedBox(height: 20),
-                      const Divider(),
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('posts')
+                                .where('uid', isEqualTo: widget.uid)
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              int postCount = snapshot.hasData
+                                  ? snapshot.data!.docs.length
+                                  : 0;
+                              return _buildStatColumn("Post", postCount);
+                            },
+                          ),
+                          StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(widget.uid)
+                                .collection('followers')
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              int followerCount = snapshot.hasData
+                                  ? snapshot.data!.docs.length
+                                  : 0;
+                              return _buildStatColumn(
+                                  "Followers", followerCount);
+                            },
+                          ),
+                          StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(widget.uid)
+                                .collection('following')
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              int followingCount = snapshot.hasData
+                                  ? snapshot.data!.docs.length
+                                  : 0;
+                              return _buildStatColumn(
+                                  "Following", followingCount);
+                            },
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 );
               },
             ),
-
+            const Divider(thickness: 1),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: const Align(
                 alignment: Alignment.centerLeft,
-                child: Text("Karya Pengguna Ini", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                child: Text(
+                  "Karya Pengguna Ini",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
               ),
             ),
-            const SizedBox(height: 10),
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('posts')
-                  .where('uid', isEqualTo: uid)
+                  .where('uid', isEqualTo: widget.uid)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -87,7 +158,9 @@ class Profildetail extends StatelessWidget {
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return const Padding(
                     padding: EdgeInsets.all(20.0),
-                    child: Text("Belum ada postingan."),
+                    child: Center(
+                      child: Text("Belum ada postingan."),
+                    ),
                   );
                 }
 
@@ -102,25 +175,9 @@ class Profildetail extends StatelessWidget {
                   itemCount: snapshot.data!.docs.length,
                   itemBuilder: (context, index) {
                     var post = snapshot.data!.docs[index];
-                    return GestureDetector(
-                      onTap: () {
-                        // Opsional: Jika diklik masuk ke detail post lagi
-                        /*
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PostDetailPage(
-                              postId: post.id,
-                              postData: post.data() as Map<String, dynamic>,
-                            ),
-                          ),
-                        );
-                        */
-                      },
-                      child: Image.network(
-                        post['post_image'],
-                        fit: BoxFit.cover,
-                      ),
+                    return Image.network(
+                      post['post_image'],
+                      fit: BoxFit.cover,
                     );
                   },
                 );
