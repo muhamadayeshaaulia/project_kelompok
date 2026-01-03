@@ -93,7 +93,6 @@ class _ProfildetailState extends State<Profildetail> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      // Nama
                       Center(
                         child: Text(
                           userData['nama'] ?? "Tanpa Nama",
@@ -102,7 +101,6 @@ class _ProfildetailState extends State<Profildetail> {
                           textAlign: TextAlign.center,
                         ),
                       ),
-                      // Email
                       Center(
                         child: Text(
                           userData['email'] ?? "-",
@@ -112,11 +110,9 @@ class _ProfildetailState extends State<Profildetail> {
                       ),
                       const SizedBox(height: 24),
                       
-                      // Statistik Row
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          // Post Count
                           StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('posts')
@@ -129,7 +125,6 @@ class _ProfildetailState extends State<Profildetail> {
                           ),
                           Container(height: 30, width: 1, color: Colors.grey[300]),
                           
-                          // Followers Count
                           StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('users')
@@ -154,7 +149,6 @@ class _ProfildetailState extends State<Profildetail> {
                           ),
                           Container(height: 30, width: 1, color: Colors.grey[300]),
 
-                          // Following Count
                           StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('users')
@@ -197,7 +191,6 @@ class _ProfildetailState extends State<Profildetail> {
             ),
           ),
 
-          // 3. GRID POSTINGAN (Menggunakan SliverGrid)
           StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('posts')
@@ -216,7 +209,6 @@ class _ProfildetailState extends State<Profildetail> {
                 );
               }
 
-              // --- BAGIAN INI MEMBUAT GRID BISA DI-SCROLL MENYATU DENGAN HEADER ---
               return SliverGrid(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
@@ -228,11 +220,8 @@ class _ProfildetailState extends State<Profildetail> {
                     var post = snapshot.data!.docs[index];
                     var postData = post.data() as Map<String, dynamic>;
                     String postId = post.id;
-
-                    // --- BAGIAN INI MEMBUAT GAMBAR BISA DIKLIK ---
                     return InkWell(
                       onTap: () {
-                        // Navigasi ke Halaman Detail Postingan
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -260,7 +249,6 @@ class _ProfildetailState extends State<Profildetail> {
             },
           ),
           
-          // Spacer bawah
           const SliverToBoxAdapter(child: SizedBox(height: 40)),
         ],
       ),
