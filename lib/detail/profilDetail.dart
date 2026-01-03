@@ -12,7 +12,6 @@ class Profildetail extends StatefulWidget {
 
 class _OtherUserProfilePageState extends State<Profildetail> {
   
-  // Widget Helper untuk Statistik (Sekarang bisa diklik)
   Widget _buildStatColumn(String label, int count, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
@@ -105,7 +104,6 @@ class _OtherUserProfilePageState extends State<Profildetail> {
                       ),
                       const SizedBox(height: 24),
                       
-                      // Bagian Statistik
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -118,12 +116,11 @@ class _OtherUserProfilePageState extends State<Profildetail> {
                               int postCount = snapshot.hasData
                                   ? snapshot.data!.docs.length
                                   : 0;
-                              return _buildStatColumn("Post", postCount, () {
-                                // Aksi jika Post diklik (Opsional)
+                              return _buildStatColumn("Postingan", postCount, () {
                               });
                             },
                           ),
-                          Container(height: 30, width: 1, color: Colors.grey[300]), // Pemisah Vertical
+                          Container(height: 30, width: 1, color: Colors.grey[300]),
                           StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('users')
@@ -135,12 +132,11 @@ class _OtherUserProfilePageState extends State<Profildetail> {
                                   ? snapshot.data!.docs.length
                                   : 0;
                               return _buildStatColumn("Followers", followerCount, () {
-                                // TAMBAHKAN KODE NAVIGASI KE LIST FOLLOWER DISINI
                                 debugPrint("Tombol Followers Ditekan");
                               });
                             },
                           ),
-                          Container(height: 30, width: 1, color: Colors.grey[300]), // Pemisah Vertical
+                          Container(height: 30, width: 1, color: Colors.grey[300]),
                           StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('users')
