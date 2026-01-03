@@ -14,7 +14,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:project_kelompok/services/supabase_service.dart';
 
 class PhotoBoothPage2 extends StatefulWidget {
-  final List<File>? initialImages; 
+  final List<File>? initialImages;
 
   const PhotoBoothPage2({super.key, this.initialImages});
 
@@ -99,16 +99,16 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
   Future<void> _captureAndUpload() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Kamu belum login.")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Kamu belum login.")));
       return;
     }
 
     if (_imageBytesList.contains(null)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Isi semua foto dulu ya!")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Isi semua foto dulu ya!")));
       return;
     }
 
@@ -117,12 +117,15 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
     try {
       await Future.delayed(const Duration(milliseconds: 200));
       RenderRepaintBoundary? boundary =
-          _boundaryKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
-      
+          _boundaryKey.currentContext?.findRenderObject()
+              as RenderRepaintBoundary?;
+
       if (boundary == null) throw "Gagal render widget.";
 
       ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-      ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      ByteData? byteData = await image.toByteData(
+        format: ui.ImageByteFormat.png,
+      );
       final fullImageBytes = byteData?.buffer.asUint8List();
 
       if (fullImageBytes == null) throw "Gambar kosong.";
@@ -142,16 +145,16 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
       }
 
       final fileName = 'C2_strip_${DateTime.now().millisecondsSinceEpoch}.png';
-      final filePath = 'uploads/${user.uid}/$fileName'; 
-      
+      final filePath = 'uploads/${user.uid}/$fileName';
+
       await SupabaseService.client.storage
           .from('photos')
           .uploadBinary(
             filePath,
             fullImageBytes,
             fileOptions: const FileOptions(
-              contentType: 'image/png', 
-              upsert: true
+              contentType: 'image/png',
+              upsert: true,
             ),
           );
 
@@ -165,11 +168,10 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
 
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const MyHomePage()), 
+          MaterialPageRoute(builder: (context) => const MyHomePage()),
           (route) => false,
         );
       }
-
     } catch (e) {
       debugPrint("Error: $e");
       if (mounted) {
@@ -189,8 +191,10 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
     Color borderColor = isDark ? Colors.white24 : Colors.grey[300]!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Custom Photostrip"),
-      backgroundColor: Colors.yellow[700]),
+      appBar: AppBar(
+        title: const Text("Custom Photostrip"),
+        backgroundColor: Colors.yellow[700],
+      ),
       body: Stack(
         children: [
           SingleChildScrollView(
