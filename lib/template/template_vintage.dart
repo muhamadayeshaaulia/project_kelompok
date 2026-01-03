@@ -189,7 +189,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Tersimpan dalam kenangan!"),
-            backgroundColor: Color(0xFF5D4037),
+            backgroundColor: Colors.green,
           ),
         );
 
@@ -432,11 +432,11 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
                 ElevatedButton.icon(
                   onPressed: _isLoading ? null : _captureAndUpload,
                   icon: const Icon(
-                    Icons.print,
+                    Icons.save_alt,
                     color: Colors.white,
-                  ), // Icon print lebih vintage
+                  ),
                   label: const Text(
-                    "PRINT MEMORY",
+                    "Simpan Photostrip",
                     style: TextStyle(
                       color: Colors.white,
                       fontFamily: 'monospace',
@@ -445,15 +445,15 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF5D4037), // Coklat Tua
+                    backgroundColor: Colors.yellow[700],
                     padding: const EdgeInsets.symmetric(
                       horizontal: 50,
                       vertical: 18,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
-                        5,
-                      ), // Sudut tidak terlalu bulat
+                        30,
+                      ),
                     ),
                     elevation: 5,
                   ),
@@ -464,20 +464,12 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
 
           if (_isLoading)
             Container(
-              color: const Color(0xFF5D4037).withOpacity(0.8), // Overlay coklat
+              color: Colors.black.withOpacity(0.8),
               child: const Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     CircularProgressIndicator(color: Color(0xFFFDF5E6)),
-                    SizedBox(height: 10),
-                    Text(
-                      "DEVELOPING PHOTO...",
-                      style: TextStyle(
-                        color: Color(0xFFFDF5E6),
-                        fontFamily: 'monospace',
-                      ),
-                    ),
                   ],
                 ),
               ),
