@@ -8,34 +8,32 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:gal/gal.dart';
-import 'package:project_kelompok/screen/home_page.dart'; // Pastikan import ini sesuai
+import 'package:project_kelompok/screen/home_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:project_kelompok/services/supabase_service.dart'; // Pastikan import ini sesuai
+import 'package:project_kelompok/services/supabase_service.dart';
 
-class PhotoBoothPage2 extends StatefulWidget {
+class TemplateVintage extends StatefulWidget {
   final List<File>? initialImages;
 
-  const PhotoBoothPage2({super.key, this.initialImages});
+  const TemplateVintage({super.key, this.initialImages});
 
   @override
-  State<PhotoBoothPage2> createState() => _PhotoBoothPageState();
+  State<TemplateVintage> createState() => _PhotoBoothPageState();
 }
 
-class _PhotoBoothPageState extends State<PhotoBoothPage2> {
-  // Default warna frame jadi Krem Vintage
+class _PhotoBoothPageState extends State<TemplateVintage> {
   Color _frameColor = const Color(0xFFFDF5E6);
 
-  // Pilihan Warna Tema Vintage (Earth Tones)
   final List<Color> _colorOptions = [
-    const Color(0xFFFDF5E6), // Old Lace (Krem)
-    const Color(0xFF2C2C2C), // Charcoal (Hitam Pudar)
-    const Color(0xFF8D6E63), // Antique Bronze
-    const Color(0xFF556B2F), // Dark Olive
-    const Color(0xFF8FBC8F), // Dark Sea Green
-    const Color(0xFFD2B48C), // Tan
-    const Color(0xFFBC8F8F), // Rosy Brown
-    const Color(0xFFA9A9A9), // Dark Gray
+    const Color(0xFFFDF5E6),
+    const Color(0xFF2C2C2C),
+    const Color(0xFF8D6E63),
+    const Color(0xFF556B2F),
+    const Color(0xFF8FBC8F),
+    const Color(0xFFD2B48C),
+    const Color(0xFFBC8F8F),
+    const Color(0xFFA9A9A9),
   ];
 
   final List<Uint8List?> _imageBytesList = List.filled(2, null);
@@ -43,7 +41,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
   final GlobalKey _boundaryKey = GlobalKey();
   bool _isLoading = false;
 
-  // Matrix untuk efek Sepia (Kecoklatan jadul)
   static const List<double> _sepiaMatrix = [
     0.393,
     0.769,
@@ -102,7 +99,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: 'Potong Foto Vintage',
-            toolbarColor: const Color(0xFF5D4037), // Coklat Tua
+            toolbarColor: const Color(0xFF5D4037),
             toolbarWidgetColor: Colors.white,
             activeControlsWidgetColor: const Color(0xFFD7CCC8),
             lockAspectRatio: true,
@@ -160,8 +157,9 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
         try {
           await Gal.requestAccess();
           final tempDir = await getTemporaryDirectory();
+          // Diubah menjadi V1_strip
           final file = await File(
-            '${tempDir.path}/vintage_strip_${DateTime.now().millisecondsSinceEpoch}.png',
+            '${tempDir.path}/V1_strip_${DateTime.now().millisecondsSinceEpoch}.png',
           ).create();
           await file.writeAsBytes(fullImageBytes);
           await Gal.putImage(file.path, album: 'VintageBooth');
@@ -170,8 +168,8 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
         }
       }
 
-      final fileName =
-          'vintage_strip_${DateTime.now().millisecondsSinceEpoch}.png';
+      // Diubah menjadi V1_strip
+      final fileName = 'V1_strip_${DateTime.now().millisecondsSinceEpoch}.png';
       final filePath = 'uploads/${user.uid}/$fileName';
 
       await SupabaseService.client.storage
@@ -213,7 +211,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
 
   @override
   Widget build(BuildContext context) {
-    // Logika warna text berdasarkan gelap/terang background frame
     bool isDark = _frameColor.computeLuminance() < 0.5;
     Color textColor = isDark
         ? const Color(0xFFFDF5E6)
@@ -221,20 +218,19 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
     Color borderColor = isDark ? Colors.white12 : Colors.black12;
 
     return Scaffold(
-      // Background App Vintage (Krem agak gelap)
       backgroundColor: const Color(0xFFEEE0C9),
       appBar: AppBar(
         title: const Text(
           "VINTAGE BOOTH",
           style: TextStyle(
-            fontFamily: 'monospace', // Gaya font mesin tik
+            fontFamily: 'monospace',
             fontWeight: FontWeight.bold,
             letterSpacing: 2,
             color: Colors.white,
           ),
         ),
         centerTitle: true,
-        backgroundColor: const Color(0xFF5D4037), // Coklat Tua
+        backgroundColor: const Color(0xFF5D4037),
         elevation: 4,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -250,16 +246,10 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
                     key: _boundaryKey,
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
-                      width: 260, // Sedikit lebih lebar
-                      padding: const EdgeInsets.fromLTRB(
-                        20,
-                        30,
-                        20,
-                        40,
-                      ), // Padding bawah lebih besar untuk text
+                      width: 260,
+                      padding: const EdgeInsets.fromLTRB(20, 30, 20, 40),
                       decoration: BoxDecoration(
                         color: _frameColor,
-                        // Efek kertas fisik dengan shadow halus
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.3),
@@ -267,7 +257,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
                             offset: const Offset(5, 5),
                           ),
                         ],
-                        // Border tipis agar terlihat seperti kertas foto
                         border: Border.all(
                           color: Colors.grey.withOpacity(0.2),
                           width: 1,
@@ -285,9 +274,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
                                 width: double.infinity,
                                 margin: const EdgeInsets.only(bottom: 15),
                                 decoration: BoxDecoration(
-                                  color: const Color(
-                                    0xFFD7CCC8,
-                                  ), // Placeholder coklat muda
+                                  color: const Color(0xFFD7CCC8),
                                   border: Border.all(
                                     color: borderColor,
                                     width: 1,
@@ -314,7 +301,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
                                           ),
                                         ],
                                       )
-                                    // Terapkan Filter Sepia pada Gambar
                                     : ColorFiltered(
                                         colorFilter: const ColorFilter.matrix(
                                           _sepiaMatrix,
@@ -328,7 +314,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
                             );
                           }),
 
-                          // Footer Text Vintage
                           Padding(
                             padding: const EdgeInsets.only(top: 15),
                             child: Column(
@@ -337,7 +322,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
                                   "MEMORIES",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    fontFamily: 'monospace', // Font mesin tik
+                                    fontFamily: 'monospace',
                                     fontWeight: FontWeight.w900,
                                     letterSpacing: 5,
                                     fontSize: 14,
@@ -346,7 +331,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  // Menampilkan tanggal hari ini
                                   "${DateTime.now().day} . ${DateTime.now().month} . ${DateTime.now().year}",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
@@ -367,7 +351,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
 
                 const SizedBox(height: 40),
 
-                // Pemilih Warna Frame
                 Text(
                   "FRAME COLOR",
                   style: TextStyle(
@@ -392,7 +375,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
                           margin: const EdgeInsets.symmetric(horizontal: 8),
-                          width: isSelected ? 50 : 40, // Animasi ukuran
+                          width: isSelected ? 50 : 40,
                           height: isSelected ? 50 : 40,
                           decoration: BoxDecoration(
                             color: color,
@@ -429,13 +412,9 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
 
                 const SizedBox(height: 40),
 
-                // Tombol Simpan
                 ElevatedButton.icon(
                   onPressed: _isLoading ? null : _captureAndUpload,
-                  icon: const Icon(
-                    Icons.print,
-                    color: Colors.white,
-                  ), // Icon print lebih vintage
+                  icon: const Icon(Icons.print, color: Colors.white),
                   label: const Text(
                     "PRINT MEMORY",
                     style: TextStyle(
@@ -446,15 +425,13 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF5D4037), // Coklat Tua
+                    backgroundColor: const Color(0xFF5D4037),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 50,
                       vertical: 18,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        5,
-                      ), // Sudut tidak terlalu bulat
+                      borderRadius: BorderRadius.circular(5),
                     ),
                     elevation: 5,
                   ),
@@ -465,7 +442,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
 
           if (_isLoading)
             Container(
-              color: const Color(0xFF5D4037).withOpacity(0.8), // Overlay coklat
+              color: const Color(0xFF5D4037).withOpacity(0.8),
               child: const Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
