@@ -97,7 +97,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
       builder: (context) => AlertDialog(
         title: const Text("Hapus Postingan"),
         content: const Text(
-            "Postingan ini akan dihapus dari publik beserta like dan komentarnya.\n\nFoto akan TETAP ADA di menu 'Karya Saya'."),
+          "Postingan ini akan dihapus dari publik beserta like dan komentarnya.\n\nFoto akan TETAP ADA di menu 'Karya Saya'.",
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -123,8 +124,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
       }
 
       WriteBatch batch = FirebaseFirestore.instance.batch();
-      DocumentReference postRef =
-          FirebaseFirestore.instance.collection('posts').doc(widget.postId);
+      DocumentReference postRef = FirebaseFirestore.instance
+          .collection('posts')
+          .doc(widget.postId);
 
       var likesSnapshot = await postRef.collection('likes').get();
       for (var doc in likesSnapshot.docs) {
@@ -145,16 +147,18 @@ class _PostDetailPageState extends State<PostDetailPage> {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Postingan dihapus dari publik. Foto aman di Karya Saya."),
+            content: Text(
+              "Postingan dihapus dari publik. Foto aman di Karya Saya.",
+            ),
             backgroundColor: Colors.green,
           ),
         );
       }
     } catch (e) {
       if (mounted) Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Gagal menghapus: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Gagal menghapus: $e")));
     }
   }
 
@@ -265,7 +269,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     String templateLabel = detectedTemplate == 'classic_4'
         ? 'Classic 4'
         : 'Classic 2';
-    
+
     bool isOwner = currentUser?.uid == widget.postData['uid'];
 
     return Scaffold(
@@ -275,10 +279,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
         foregroundColor: Colors.white,
         actions: [
           if (isOwner)
-            IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: _deletePost,
-            ),
+            IconButton(icon: const Icon(Icons.delete), onPressed: _deletePost),
         ],
       ),
       body: Column(
