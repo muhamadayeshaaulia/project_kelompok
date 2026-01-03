@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:project_kelompok/detail/user_list_page.dart';
 
 class Profildetail extends StatefulWidget {
   final String uid;
@@ -122,6 +123,32 @@ class _OtherUserProfilePageState extends State<Profildetail> {
                           ),
                           Container(height: 30, width: 1, color: Colors.grey[300]),
                           
+                          StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(widget.uid)
+                                .collection('followers')
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              int followerCount = snapshot.hasData
+                                  ? snapshot.data!.docs.length
+                                  : 0;
+                              
+                              return _buildStatColumn("Followers", followerCount, () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => UserListPage(
+                                      title: "Pengikut",
+                                      uid: widget.uid,
+                                      collectionName: 'followers',
+                                    ),
+                                  ),
+                                );
+                              });
+                            },
+                          ),
+
                           Container(height: 30, width: 1, color: Colors.grey[300]),
                           StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
