@@ -102,9 +102,9 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
   Future<void> _captureAndUpload() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Kamu belum login.")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Kamu belum login.")));
       return;
     }
 
@@ -120,12 +120,15 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
     try {
       await Future.delayed(const Duration(milliseconds: 200));
       RenderRepaintBoundary? boundary =
-          _boundaryKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+          _boundaryKey.currentContext?.findRenderObject()
+              as RenderRepaintBoundary?;
 
       if (boundary == null) throw "Gagal render widget.";
 
       ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-      ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      ByteData? byteData = await image.toByteData(
+        format: ui.ImageByteFormat.png,
+      );
       final fullImageBytes = byteData?.buffer.asUint8List();
 
       if (fullImageBytes == null) throw "Gambar kosong.";
@@ -138,7 +141,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
             '${tempDir.path}/photostrip_${DateTime.now().millisecondsSinceEpoch}.png',
           ).create();
           await file.writeAsBytes(fullImageBytes);
-          await Gal.putImage(file.path, album: 'PhotoBooth');
+          await Gal.putImage(file.path, album: 'Booth-Art');
         } catch (e) {
           debugPrint("Error: $e");
         }
@@ -192,7 +195,16 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Custom Photostrip"),
+        title: const Text(
+          "Classic 4",
+          style: TextStyle(
+            fontFamily: 'monospace',
+            fontWeight: FontWeight.bold,
+            letterSpacing: 2,
+            color: Colors.black,
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.yellow[700],
       ),
       body: Stack(
@@ -268,7 +280,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage> {
                               fontSize: 10,
                               color: textColor.withOpacity(0.7),
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),

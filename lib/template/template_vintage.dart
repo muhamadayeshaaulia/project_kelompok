@@ -102,7 +102,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: 'Potong Foto Vintage',
-            toolbarColor: const Color(0xFF5D4037), // Coklat Tua
+            toolbarColor: Colors.yellow[700],
             toolbarWidgetColor: Colors.white,
             activeControlsWidgetColor: const Color(0xFFD7CCC8),
             lockAspectRatio: true,
@@ -227,15 +227,15 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
         title: const Text(
           "VINTAGE BOOTH",
           style: TextStyle(
-            fontFamily: 'monospace', // Gaya font mesin tik
+            fontFamily: 'monospace',
             fontWeight: FontWeight.bold,
             letterSpacing: 2,
-            color: Colors.white,
+            color: Colors.black,
           ),
         ),
         centerTitle: true,
-        backgroundColor: const Color(0xFF5D4037), // Coklat Tua
-        elevation: 4,
+        backgroundColor: Colors.yellow[700],
+        elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Stack(
@@ -346,8 +346,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  // Menampilkan tanggal hari ini
-                                  "${DateTime.now().day} . ${DateTime.now().month} . ${DateTime.now().year}",
+                                  "${DateTime.now().year}",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontFamily: 'monospace',
@@ -399,14 +398,14 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
                             shape: BoxShape.circle,
                             border: Border.all(
                               color: isSelected
-                                  ? const Color(0xFF5D4037)
-                                  : Colors.grey[400]!,
+                                  ? Colors.blue
+                                  : Colors.grey[300]!,
                               width: isSelected ? 3 : 1,
                             ),
                             boxShadow: [
                               if (isSelected)
                                 BoxShadow(
-                                  color: Colors.brown.withOpacity(0.4),
+                                  color: Colors.blue.withOpacity(0.4),
                                   blurRadius: 8,
                                   spreadRadius: 1,
                                 ),
