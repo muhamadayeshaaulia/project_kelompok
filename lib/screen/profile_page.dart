@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:project_kelompok/screen/home_page.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 import 'package:project_kelompok/services/supabase_service.dart';
@@ -44,31 +45,66 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _getSocialIcon(String url) {
     String lowerUrl = url.toLowerCase();
     if (lowerUrl.contains("github.com"))
-      return const Icon(Icons.code, color: Colors.black);
-    if (lowerUrl.contains("facebook.com"))
-      return const Icon(Icons.facebook, color: Colors.blue);
+      return const FaIcon(
+        FontAwesomeIcons.github,
+        color: Color(0xFF181717),
+        size: 22,
+      );
     if (lowerUrl.contains("instagram.com"))
-      return const Icon(Icons.camera_alt, color: Colors.purple);
+      return const FaIcon(
+        FontAwesomeIcons.instagram,
+        color: Color(0xFFE4405F),
+        size: 22,
+      );
+    if (lowerUrl.contains("facebook.com"))
+      return const FaIcon(
+        FontAwesomeIcons.facebook,
+        color: Color(0xFF1877F2),
+        size: 22,
+      );
     if (lowerUrl.contains("twitter.com") || lowerUrl.contains("x.com"))
-      return const Icon(Icons.close, color: Colors.black);
+      return const FaIcon(
+        FontAwesomeIcons.xTwitter,
+        color: Colors.black,
+        size: 22,
+      );
     if (lowerUrl.contains("linkedin.com"))
-      return const Icon(Icons.business, color: Colors.blueAccent);
-    return const Icon(Icons.link, color: Colors.grey);
+      return const FaIcon(
+        FontAwesomeIcons.linkedin,
+        color: Color(0xFF0077B5),
+        size: 22,
+      );
+    if (lowerUrl.contains("youtube.com"))
+      return const FaIcon(
+        FontAwesomeIcons.youtube,
+        color: Color(0xFFFF0000),
+        size: 22,
+      );
+    if (lowerUrl.contains("tiktok.com"))
+      return const FaIcon(
+        FontAwesomeIcons.tiktok,
+        color: Colors.black,
+        size: 22,
+      );
+    return const FaIcon(FontAwesomeIcons.link, color: Colors.grey, size: 20);
   }
 
   Future<void> _launchURL(String url) async {
+    final cleanUrl = url.trim();
+    if (cleanUrl.isEmpty) return;
     final Uri uri = Uri.parse(
-      url.trim().startsWith('http') ? url.trim() : 'https://${url.trim()}',
+      cleanUrl.startsWith('http') ? cleanUrl : 'https://$cleanUrl',
     );
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Tidak bisa membuka link")),
-        );
-      }
+    try {
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication))
+        throw 'Error';
+    } catch (e) {
+      if (mounted)
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Gagal membuka link")));
     }
   }
-
   Future<void> _loadUserData() async {
     if (user == null) return;
     setState(() => isFetching = true);
@@ -88,8 +124,6 @@ class _ProfilePageState extends State<ProfilePage> {
           _currentPhotoUrl = data?['photo_url'];
         });
       }
-    } catch (e) {
-      debugPrint("Error loading data: $e");
     } finally {
       if (mounted) setState(() => isFetching = false);
     }
@@ -103,16 +137,10 @@ class _ProfilePageState extends State<ProfilePage> {
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: const Text("Konfirmasi Kata Sandi"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text("Sesi habis. Masukkan kata sandi untuk menghapus akun."),
-            TextField(
-              controller: passwordCtrl,
-              obscureText: true,
-              decoration: const InputDecoration(labelText: "Kata Sandi"),
-            ),
-          ],
+        content: TextField(
+          controller: passwordCtrl,
+          obscureText: true,
+          decoration: const InputDecoration(labelText: "Kata Sandi"),
         ),
         actions: [
           TextButton(
@@ -130,12 +158,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 success = true;
                 if (mounted) Navigator.pop(context);
               } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Kata sandi salah.")),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text("Salah!")));
               }
             },
-            child: const Text("Konfirmasi"),
+            child: const Text("OK"),
           ),
         ],
       ),
@@ -148,9 +176,9 @@ class _ProfilePageState extends State<ProfilePage> {
     bool confirm = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Hapus Akun & Semua Data?"),
+        title: const Text("Hapus Akun?"),
         content: const Text(
-          "Tindakan ini permanen. Semua data Anda akan dihapus.",
+          "Semua folder data, postingan, dan like akan hilang.",
         ),
         actions: [
           TextButton(
@@ -167,31 +195,10 @@ class _ProfilePageState extends State<ProfilePage> {
     );
     if (confirm != true) return;
     setState(() => isSaving = true);
+
     try {
-      final String uid = user!.uid;
+      final uid = user!.uid;
       final firestore = FirebaseFirestore.instance;
-      try {
-        final List<FileObject> profileFiles = await SupabaseService
-            .client
-            .storage
-            .from('photos')
-            .list(path: 'profile/$uid');
-        final List<FileObject> postFiles = await SupabaseService.client.storage
-            .from('photos')
-            .list(path: 'uploads/$uid');
-        if (profileFiles.isNotEmpty)
-          await SupabaseService.client.storage
-              .from('photos')
-              .remove(
-                profileFiles.map((e) => 'profile/$uid/${e.name}').toList(),
-              );
-        if (postFiles.isNotEmpty)
-          await SupabaseService.client.storage
-              .from('photos')
-              .remove(postFiles.map((e) => 'uploads/$uid/${e.name}').toList());
-      } catch (e) {
-        debugPrint("Storage Skip: $e");
-      }
       final comments = await firestore
           .collectionGroup('comments')
           .where('uid', isEqualTo: uid)
@@ -208,25 +215,10 @@ class _ProfilePageState extends State<ProfilePage> {
         await uDoc.reference.collection('followers').doc(uid).delete();
         await uDoc.reference.collection('following').doc(uid).delete();
       }
-      final myPosts = await firestore
-          .collection('posts')
-          .where('uid', isEqualTo: uid)
-          .get();
-      for (var doc in myPosts.docs) {
-        final subC = await doc.reference.collection('comments').get();
-        for (var c in subC.docs) await c.reference.delete();
-        final subL = await doc.reference.collection('likes').get();
-        for (var l in subL.docs) await l.reference.delete();
-        await doc.reference.delete();
-      }
-      final userRef = firestore.collection('users').doc(uid);
-      final intFol = await userRef.collection('followers').get();
-      for (var doc in intFol.docs) await doc.reference.delete();
-      final intFoll = await userRef.collection('following').get();
-      for (var doc in intFoll.docs) await doc.reference.delete();
-      await userRef.delete();
+      await firestore.collection('users').doc(uid).delete();
       await firestore.terminate();
       await firestore.clearPersistence();
+
       try {
         await user!.delete();
       } on FirebaseAuthException catch (e) {
@@ -240,89 +232,16 @@ class _ProfilePageState extends State<ProfilePage> {
           }
         }
       }
-      if (mounted) {
+      if (mounted)
         Navigator.of(
           context,
         ).pushNamedAndRemoveUntil('/login', (route) => false);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Akun Berhasil Dihapus.')));
-      }
     } catch (e) {
       debugPrint("Error: $e");
     } finally {
       if (mounted) setState(() => isSaving = false);
     }
   }
-
-  Future<void> _saveProfile() async {
-    if (user == null) return;
-    setState(() => isSaving = true);
-    try {
-      String? newPhotoUrl;
-      if (_imageBytes != null) newPhotoUrl = await _uploadImageToSupabase();
-      Map<String, dynamic> updateData = {
-        'nama': nameCtrl.text,
-        'jenis_kelamin': genderCtrl.text,
-        'alamat': addressCtrl.text,
-        'keterangan': descCtrl.text,
-        'sosmed_link': socialMediaCtrl.text,
-        'updated_at': DateTime.now(),
-      };
-      if (newPhotoUrl != null) updateData['photo_url'] = newPhotoUrl;
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user!.uid)
-          .set(updateData, SetOptions(merge: true));
-      if (mounted) {
-        setState(() {
-          if (newPhotoUrl != null) _currentPhotoUrl = newPhotoUrl;
-          isEditing = false;
-        });
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Profil disimpan!')));
-      }
-    } finally {
-      if (mounted) setState(() => isSaving = false);
-    }
-  }
-
-  Future<String?> _uploadImageToSupabase() async {
-    if (_imageBytes == null || user == null) return null;
-    String safeExt = _imageExtension ?? "jpg";
-    final path =
-        'profile/${user!.uid}/${DateTime.now().millisecondsSinceEpoch}.$safeExt';
-    await SupabaseService.client.storage
-        .from('photos')
-        .uploadBinary(
-          path,
-          _imageBytes!,
-          fileOptions: FileOptions(contentType: 'image/$safeExt', upsert: true),
-        );
-    return SupabaseService.client.storage.from('photos').getPublicUrl(path);
-  }
-
-  Future<void> _pickImage() async {
-    if (!isEditing) return;
-    final pickedFile = await ImagePicker().pickImage(
-      source: ImageSource.gallery,
-    );
-    if (pickedFile != null) {
-      CroppedFile? croppedFile = await ImageCropper().cropImage(
-        sourcePath: pickedFile.path,
-        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
-      );
-      if (croppedFile != null) {
-        final bytes = await croppedFile.readAsBytes();
-        setState(() {
-          _imageBytes = bytes;
-          _imageExtension = croppedFile.path.split('.').last;
-        });
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -335,14 +254,6 @@ class _ProfilePageState extends State<ProfilePage> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-          ),
-        ),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const MyHomePage()),
           ),
         ),
         title: const Text("Profil", style: TextStyle(color: Colors.black)),
@@ -406,9 +317,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              nameCtrl.text.isEmpty
-                                  ? "Fotografer"
-                                  : nameCtrl.text,
+                              nameCtrl.text,
                               style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -422,46 +331,32 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              "Pengaturan Personal",
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            _buildField(
-                              "Nama Lengkap",
-                              nameCtrl,
-                              enabled: isEditing,
-                            ),
-
+                            _buildField("Nama", nameCtrl, enabled: isEditing),
                             const Text(
                               "Jenis Kelamin",
                               style: TextStyle(color: Colors.grey),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 8),
                             isEditing
                                 ? _buildGenderSelection()
                                 : _buildGenderDisplay(),
                             const SizedBox(height: 14),
-
                             _buildField(
                               "Alamat",
                               addressCtrl,
                               enabled: isEditing,
                             ),
                             const Text(
-                              "Sosial Media",
+                              "Sosial Media (Pisahkan dengan koma)",
                               style: TextStyle(color: Colors.grey),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 8),
                             isEditing
                                 ? TextField(
                                     controller: socialMediaCtrl,
+                                    maxLines: null,
                                     decoration: InputDecoration(
-                                      hintText:
-                                          "Contoh: https://github.com/user, link_ig",
+                                      hintText: "Link GitHub, IG, dll",
                                       filled: true,
                                       fillColor: Colors.grey[100],
                                       border: OutlineInputBorder(
@@ -471,14 +366,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                   )
                                 : _buildSocialMediaDisplay(),
                             const SizedBox(height: 14),
-
                             _buildField(
-                              "Tentang saya",
+                              "Tentang Saya",
                               descCtrl,
                               maxLines: 3,
                               enabled: isEditing,
                             ),
-                            const SizedBox(height: 24),
                             if (isEditing)
                               SizedBox(
                                 width: double.infinity,
@@ -488,7 +381,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     backgroundColor: Colors.yellow[800],
                                   ),
                                   child: const Text(
-                                    "Simpan Perubahan",
+                                    "Simpan",
                                     style: TextStyle(color: Colors.white),
                                   ),
                                 ),
@@ -496,9 +389,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             const SizedBox(height: 8),
                             Center(
                               child: TextButton(
-                                onPressed: isSaving ? null : _deleteAccount,
+                                onPressed: _deleteAccount,
                                 child: const Text(
-                                  "Hapus Profil",
+                                  "Hapus Akun",
                                   style: TextStyle(color: Colors.red),
                                 ),
                               ),
@@ -525,81 +418,41 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildGenderSelection() {
     return Row(
       children: [
-        Expanded(
-          child: GestureDetector(
-            onTap: () => setState(() => genderCtrl.text = "Laki-laki"),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: genderCtrl.text == "Laki-laki"
-                    ? Colors.blue[50]
-                    : Colors.grey[100],
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: genderCtrl.text == "Laki-laki"
-                      ? Colors.blue
-                      : Colors.transparent,
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.male,
-                    color: genderCtrl.text == "Laki-laki"
-                        ? Colors.blue
-                        : Colors.grey,
-                  ),
-                  const SizedBox(width: 8),
-                  const Text("Laki-laki"),
-                ],
-              ),
-            ),
-          ),
-        ),
+        Expanded(child: _genderBtn("Laki-laki", Icons.male, Colors.blue)),
         const SizedBox(width: 12),
-        Expanded(
-          child: GestureDetector(
-            onTap: () => setState(() => genderCtrl.text = "Perempuan"),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: genderCtrl.text == "Perempuan"
-                    ? Colors.pink[50]
-                    : Colors.grey[100],
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: genderCtrl.text == "Perempuan"
-                      ? Colors.pink
-                      : Colors.transparent,
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.female,
-                    color: genderCtrl.text == "Perempuan"
-                        ? Colors.pink
-                        : Colors.grey,
-                  ),
-                  const SizedBox(width: 8),
-                  const Text("Perempuan"),
-                ],
-              ),
-            ),
-          ),
-        ),
+        Expanded(child: _genderBtn("Perempuan", Icons.female, Colors.pink)),
       ],
     );
   }
 
+  Widget _genderBtn(String val, IconData icon, Color color) {
+    bool isSel = genderCtrl.text == val;
+    return GestureDetector(
+      onTap: () => setState(() => genderCtrl.text = val),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: isSel ? color.withOpacity(0.1) : Colors.grey[100],
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: isSel ? color : Colors.transparent),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: isSel ? color : Colors.grey),
+            const SizedBox(width: 8),
+            Text(val),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildGenderDisplay() {
-    bool isMale = genderCtrl.text == "Laki-laki";
-    bool isFemale = genderCtrl.text == "Perempuan";
+    bool isM = genderCtrl.text == "Laki-laki";
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.grey[100],
         borderRadius: BorderRadius.circular(10),
@@ -607,16 +460,11 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Row(
         children: [
           Icon(
-            isMale
-                ? Icons.male
-                : (isFemale ? Icons.female : Icons.help_outline),
-            color: isMale
-                ? Colors.blue
-                : (isFemale ? Colors.pink : Colors.grey),
-            size: 20,
+            isM ? Icons.male : Icons.female,
+            color: isM ? Colors.blue : Colors.pink,
           ),
           const SizedBox(width: 10),
-          Text(genderCtrl.text.isEmpty ? "Belum diatur" : genderCtrl.text),
+          Text(genderCtrl.text),
         ],
       ),
     );
@@ -625,37 +473,29 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildSocialMediaDisplay() {
     List<String> links = socialMediaCtrl.text
         .split(',')
-        .where((s) => s.trim().isNotEmpty)
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
         .toList();
-    if (links.isEmpty)
-      return const Text(
-        "Belum ada sosial media",
-        style: TextStyle(color: Colors.grey),
-      );
     return Wrap(
       spacing: 12,
-      children: links.map((url) {
-        return GestureDetector(
-          onTap: () => _launchURL(url),
-          child: Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              shape: BoxShape.circle,
+      runSpacing: 12,
+      children: links
+          .map(
+            (url) => GestureDetector(
+              onTap: () => _launchURL(url),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+                ),
+                child: _getSocialIcon(url),
+              ),
             ),
-            child: _getSocialIcon(url),
-          ),
-        );
-      }).toList(),
+          )
+          .toList(),
     );
-  }
-
-  Widget _buildProfileImage() {
-    if (_imageBytes != null)
-      return Image.memory(_imageBytes!, fit: BoxFit.cover);
-    if (_currentPhotoUrl != null && _currentPhotoUrl!.isNotEmpty)
-      return Image.network(_currentPhotoUrl!, fit: BoxFit.cover);
-    return const Icon(Icons.person, size: 50, color: Colors.grey);
   }
 
   Widget _buildField(
@@ -686,5 +526,60 @@ class _ProfilePageState extends State<ProfilePage> {
         ],
       ),
     );
+  }
+
+  Widget _buildProfileImage() {
+    if (_imageBytes != null)
+      return Image.memory(_imageBytes!, fit: BoxFit.cover);
+    if (_currentPhotoUrl != null)
+      return Image.network(_currentPhotoUrl!, fit: BoxFit.cover);
+    return const Icon(Icons.person, size: 50);
+  }
+  Future<void> _saveProfile() async {
+    setState(() => isSaving = true);
+    try {
+      String? newUrl;
+      if (_imageBytes != null) newUrl = await _uploadImageToSupabase();
+      await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
+        'nama': nameCtrl.text,
+        'jenis_kelamin': genderCtrl.text,
+        'alamat': addressCtrl.text,
+        'sosmed_link': socialMediaCtrl.text,
+        'keterangan': descCtrl.text,
+        if (newUrl != null) 'photo_url': newUrl,
+      }, SetOptions(merge: true));
+      setState(() {
+        isEditing = false;
+        if (newUrl != null) _currentPhotoUrl = newUrl;
+      });
+    } finally {
+      setState(() => isSaving = false);
+    }
+  }
+
+  Future<String?> _uploadImageToSupabase() async {
+    final path =
+        'profile/${user!.uid}/${DateTime.now().millisecondsSinceEpoch}.${_imageExtension ?? 'jpg'}';
+    await SupabaseService.client.storage
+        .from('photos')
+        .uploadBinary(path, _imageBytes!);
+    return SupabaseService.client.storage.from('photos').getPublicUrl(path);
+  }
+
+  Future<void> _pickImage() async {
+    final file = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (file != null) {
+      final cropped = await ImageCropper().cropImage(
+        sourcePath: file.path,
+        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+      );
+      if (cropped != null) {
+        final bytes = await cropped.readAsBytes();
+        setState(() {
+          _imageBytes = bytes;
+          _imageExtension = cropped.path.split('.').last;
+        });
+      }
+    }
   }
 }
