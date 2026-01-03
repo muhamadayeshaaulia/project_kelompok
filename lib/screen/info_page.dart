@@ -9,6 +9,15 @@ import 'package:url_launcher/url_launcher.dart';
 class InfoAplikasiPage extends StatelessWidget {
   const InfoAplikasiPage({super.key});
 
+  Future<void> _launchEmail() async {
+    final Uri emailLaunchUri = Uri(
+      scheme: 'mailto',
+      path: 'developer@gmail.com',
+      queryParameters: {
+        'subject': 'Tanya Seputar Aplikasi',
+      },
+    );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
