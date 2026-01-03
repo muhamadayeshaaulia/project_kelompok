@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:project_kelompok/screen/home_page.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 import 'package:project_kelompok/services/supabase_service.dart';
@@ -38,6 +39,34 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _loadUserData();
+  }
+
+  Widget _getSocialIcon(String url) {
+    String lowerUrl = url.toLowerCase();
+    if (lowerUrl.contains("github.com"))
+      return const Icon(Icons.code, color: Colors.black);
+    if (lowerUrl.contains("facebook.com"))
+      return const Icon(Icons.facebook, color: Colors.blue);
+    if (lowerUrl.contains("instagram.com"))
+      return const Icon(Icons.camera_alt, color: Colors.purple);
+    if (lowerUrl.contains("twitter.com") || lowerUrl.contains("x.com"))
+      return const Icon(Icons.close, color: Colors.black);
+    if (lowerUrl.contains("linkedin.com"))
+      return const Icon(Icons.business, color: Colors.blueAccent);
+    return const Icon(Icons.link, color: Colors.grey);
+  }
+
+  Future<void> _launchURL(String url) async {
+    final Uri uri = Uri.parse(
+      url.trim().startsWith('http') ? url.trim() : 'https://${url.trim()}',
+    );
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Tidak bisa membuka link")),
+        );
+      }
+    }
   }
 
   Future<void> _loadUserData() async {
@@ -150,18 +179,16 @@ class _ProfilePageState extends State<ProfilePage> {
         final List<FileObject> postFiles = await SupabaseService.client.storage
             .from('photos')
             .list(path: 'uploads/$uid');
-        if (profileFiles.isNotEmpty) {
+        if (profileFiles.isNotEmpty)
           await SupabaseService.client.storage
               .from('photos')
               .remove(
                 profileFiles.map((e) => 'profile/$uid/${e.name}').toList(),
               );
-        }
-        if (postFiles.isNotEmpty) {
+        if (postFiles.isNotEmpty)
           await SupabaseService.client.storage
               .from('photos')
               .remove(postFiles.map((e) => 'uploads/$uid/${e.name}').toList());
-        }
       } catch (e) {
         debugPrint("Storage Skip: $e");
       }
@@ -187,24 +214,16 @@ class _ProfilePageState extends State<ProfilePage> {
           .get();
       for (var doc in myPosts.docs) {
         final subC = await doc.reference.collection('comments').get();
-        for (var c in subC.docs) {
-          await c.reference.delete();
-        }
+        for (var c in subC.docs) await c.reference.delete();
         final subL = await doc.reference.collection('likes').get();
-        for (var l in subL.docs) {
-          await l.reference.delete();
-        }
+        for (var l in subL.docs) await l.reference.delete();
         await doc.reference.delete();
       }
       final userRef = firestore.collection('users').doc(uid);
-      final myFollowers = await userRef.collection('followers').get();
-      for (var doc in myFollowers.docs) {
-        await doc.reference.delete();
-      }
-      final myFollowing = await userRef.collection('following').get();
-      for (var doc in myFollowing.docs) {
-        await doc.reference.delete();
-      }
+      final intFol = await userRef.collection('followers').get();
+      for (var doc in intFol.docs) await doc.reference.delete();
+      final intFoll = await userRef.collection('following').get();
+      for (var doc in intFoll.docs) await doc.reference.delete();
       await userRef.delete();
       await firestore.terminate();
       await firestore.clearPersistence();
@@ -230,7 +249,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ).showSnackBar(const SnackBar(content: Text('Akun Berhasil Dihapus.')));
       }
     } catch (e) {
-      debugPrint("Error Total: $e");
+      debugPrint("Error: $e");
     } finally {
       if (mounted) setState(() => isSaving = false);
     }
@@ -416,6 +435,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               nameCtrl,
                               enabled: isEditing,
                             ),
+
                             const Text(
                               "Jenis Kelamin",
                               style: TextStyle(color: Colors.grey),
@@ -431,11 +451,27 @@ class _ProfilePageState extends State<ProfilePage> {
                               addressCtrl,
                               enabled: isEditing,
                             ),
-                            _buildField(
+                            const Text(
                               "Sosial Media",
-                              socialMediaCtrl,
-                              enabled: isEditing,
+                              style: TextStyle(color: Colors.grey),
                             ),
+                            const SizedBox(height: 6),
+                            isEditing
+                                ? TextField(
+                                    controller: socialMediaCtrl,
+                                    decoration: InputDecoration(
+                                      hintText:
+                                          "Contoh: https://github.com/user, link_ig",
+                                      filled: true,
+                                      fillColor: Colors.grey[100],
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  )
+                                : _buildSocialMediaDisplay(),
+                            const SizedBox(height: 14),
+
                             _buildField(
                               "Tentang saya",
                               descCtrl,
@@ -485,6 +521,7 @@ class _ProfilePageState extends State<ProfilePage> {
       bottomNavigationBar: const CustomButtomNav(currentIndex: 3),
     );
   }
+
   Widget _buildGenderSelection() {
     return Row(
       children: [
@@ -514,14 +551,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         : Colors.grey,
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    "Laki-laki",
-                    style: TextStyle(
-                      color: genderCtrl.text == "Laki-laki"
-                          ? Colors.blue
-                          : Colors.black,
-                    ),
-                  ),
+                  const Text("Laki-laki"),
                 ],
               ),
             ),
@@ -554,14 +584,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         : Colors.grey,
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    "Perempuan",
-                    style: TextStyle(
-                      color: genderCtrl.text == "Perempuan"
-                          ? Colors.pink
-                          : Colors.black,
-                    ),
-                  ),
+                  const Text("Perempuan"),
                 ],
               ),
             ),
@@ -574,7 +597,6 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildGenderDisplay() {
     bool isMale = genderCtrl.text == "Laki-laki";
     bool isFemale = genderCtrl.text == "Perempuan";
-
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
@@ -594,12 +616,37 @@ class _ProfilePageState extends State<ProfilePage> {
             size: 20,
           ),
           const SizedBox(width: 10),
-          Text(
-            genderCtrl.text.isEmpty ? "Belum diatur" : genderCtrl.text,
-            style: const TextStyle(fontSize: 16),
-          ),
+          Text(genderCtrl.text.isEmpty ? "Belum diatur" : genderCtrl.text),
         ],
       ),
+    );
+  }
+
+  Widget _buildSocialMediaDisplay() {
+    List<String> links = socialMediaCtrl.text
+        .split(',')
+        .where((s) => s.trim().isNotEmpty)
+        .toList();
+    if (links.isEmpty)
+      return const Text(
+        "Belum ada sosial media",
+        style: TextStyle(color: Colors.grey),
+      );
+    return Wrap(
+      spacing: 12,
+      children: links.map((url) {
+        return GestureDetector(
+          onTap: () => _launchURL(url),
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              shape: BoxShape.circle,
+            ),
+            child: _getSocialIcon(url),
+          ),
+        );
+      }).toList(),
     );
   }
 
