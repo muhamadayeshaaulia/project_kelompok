@@ -5,10 +5,10 @@ import 'package:project_kelompok/template/photoboothpage2.dart';
 import 'package:project_kelompok/template/template_vintage.dart';
 
 
-class OtherUserProfilePage extends StatelessWidget {
+class Profildetail extends StatelessWidget {
   final String uid;
 
-  const OtherUserProfilePage({super.key, required this.uid});
+  const Profildetail({super.key, required this.uid});
 
   @override
   Widget build(BuildContext context) {
