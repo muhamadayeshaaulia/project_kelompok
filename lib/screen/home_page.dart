@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_kelompok/detail/postingan.dart';
 import 'package:project_kelompok/template/photoboothpage.dart';
 import 'package:project_kelompok/template/photoboothpage2.dart';
+import 'package:project_kelompok/template/template_vintage.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 import 'package:project_kelompok/services/supabase_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -403,7 +404,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             onPressed: () {
               Navigator.pop(context);
-              // 3. Panggil fungsi postImage dengan dua parameter
               _postImage(imageUrl, detectedTemplate);
             },
             child: const Text(
@@ -759,14 +759,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       title: "Vintage",
                       icon: Icons.camera_roll,
                       color: Colors.green[100]!,
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Fitur Vintage segera hadir!"),
-                            backgroundColor: Colors.orange,
-                            duration: Duration(seconds: 2),
+                      onTap: () async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const PhotoBoothPage3(),
                           ),
                         );
+                        if (result == true) _loadPhotos();
                       },
                     ),
                   ],
