@@ -148,7 +148,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
 
       if (boundary == null) throw "Gagal render widget.";
 
-      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      ui.Image image = await boundary.toImage(pixelRatio: 1.5);
       ByteData? byteData = await image.toByteData(
         format: ui.ImageByteFormat.png,
       );

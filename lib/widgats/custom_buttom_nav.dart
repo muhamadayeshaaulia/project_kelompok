@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:project_kelompok/screen/explor.dart';
-import 'package:project_kelompok/screen/following_page.dart';
 import 'package:project_kelompok/screen/home_page.dart';
 import 'package:project_kelompok/screen/info_page.dart';
 import 'package:project_kelompok/screen/profile_page.dart';
 import 'package:project_kelompok/screen/camera_page.dart';
-
 
 class CustomButtomNav extends StatelessWidget {
   final int currentIndex;
@@ -32,39 +30,26 @@ class CustomButtomNav extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                    _openCamera(context, 2);
-                  },
-                  child: Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundColor: Colors.blue[100],
-                        child: const Icon(Icons.filter_2, color: Colors.blue, size: 30),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text("Classic 2", style: TextStyle(fontWeight: FontWeight.bold)),
-                    ],
-                  ),
+                _buildCameraOption(
+                  context,
+                  icon: Icons.filter_2,
+                  label: "Classic 2",
+                  color: Colors.blue,
+                  onTap: () => _openCamera(context, 2, 'classic'),
                 ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                    _openCamera(context, 4);
-                  },
-                  child: Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundColor: Colors.purple[100],
-                        child: const Icon(Icons.filter_4, color: Colors.purple, size: 30),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text("Classic 4", style: TextStyle(fontWeight: FontWeight.bold)),
-                    ],
-                  ),
+                _buildCameraOption(
+                  context,
+                  icon: Icons.filter_4,
+                  label: "Classic 4",
+                  color: Colors.purple,
+                  onTap: () => _openCamera(context, 4, 'classic'),
+                ),
+                _buildCameraOption(
+                  context,
+                  icon: Icons.camera_roll,
+                  label: "Vintage",
+                  color: Colors.green,
+                  onTap: () => _openCamera(context, 2, 'vintage'),
                 ),
               ],
             ),
@@ -75,10 +60,41 @@ class CustomButtomNav extends StatelessWidget {
     );
   }
 
-  void _openCamera(BuildContext context, int count) {
+  Widget _buildCameraOption(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pop(context);
+        onTap();
+      },
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 30,
+            backgroundColor: color.withOpacity(0.1),
+            child: Icon(icon, color: color, size: 30),
+          ),
+          const SizedBox(height: 8),
+          Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
+  void _openCamera(BuildContext context, int count, String type) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => CameraPage(photoCount: count)),
+      MaterialPageRoute(
+        builder: (context) => CameraPage(
+          photoCount: count,
+          templateType: type,
+        ),
+      ),
     );
   }
 
@@ -95,23 +111,23 @@ class CustomButtomNav extends StatelessWidget {
           children: [
             _buildNavItem(context, Icons.home, 'Home', 0),
             _buildNavItem(context, Icons.explore_outlined, 'Explore', 1),
-            
             GestureDetector(
-              onTap: () {
-                _showCameraOptions(context);
-              },
+              onTap: () => _showCameraOptions(context),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   CircleAvatar(
                     radius: 25,
                     backgroundColor: Colors.yellow[700],
-                    child: const Icon(Icons.camera_alt, color: Colors.white, size: 25),
-                  )
+                    child: const Icon(
+                      Icons.camera_alt,
+                      color: Colors.white,
+                      size: 25,
+                    ),
+                  ),
                 ],
               ),
             ),
-
             _buildNavItem(context, Icons.info, 'Info', 2),
             _buildNavItem(context, Icons.person, 'Profile', 3),
           ],
@@ -131,27 +147,27 @@ class CustomButtomNav extends StatelessWidget {
       minWidth: 40,
       onPressed: () {
         if (isActive) return;
-        if (index == 0) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const MyHomePage()),
-          );
-        } else if (index == 3) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const ProfilePage()),
-          );
-        } else if (index == 2) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const InfoAplikasiPage()),
-          );
-        } else if (index == 1) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const ExplorPage()),
-          );
+        Widget page;
+        switch (index) {
+          case 0:
+            page = const MyHomePage();
+            break;
+          case 1:
+            page = const ExplorPage();
+            break;
+          case 2:
+            page = const InfoAplikasiPage();
+            break;
+          case 3:
+            page = const ProfilePage();
+            break;
+          default:
+            page = const MyHomePage();
         }
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => page),
+        );
       },
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
