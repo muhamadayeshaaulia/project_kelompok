@@ -374,20 +374,17 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _showPostConfirmation(String imageUrl) {
-    String detectedTemplate = 'classic_2'; // Default
+    String detectedTemplate = 'classic_2';
 
-    // --- LOGIKA DETEKSI YANG BARU ---
     if (imageUrl.contains('C4_')) {
       detectedTemplate = 'classic_4';
     } else if (imageUrl.contains('V1_')) {
-      // Ini tambahannya!
       detectedTemplate = 'vintage';
     } else if (imageUrl.contains('C2_')) {
       detectedTemplate = 'classic_2';
     } else if (imageUrl.contains('vintage_')) {
       detectedTemplate = 'vintage';
     }
-    // --------------------------------
 
     showDialog(
       context: context,
@@ -395,7 +392,11 @@ class _MyHomePageState extends State<MyHomePage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         title: const Text("Posting ke Explore?"),
         content: Text(
-          "Sistem mendeteksi ini adalah ${detectedTemplate == 'classic_4' ? 'Classic 4' : detectedTemplate == 'vintage' ? 'Vintage' : 'Classic 2'}. "
+          "Sistem mendeteksi ini adalah ${detectedTemplate == 'classic_4'
+              ? 'Classic 4'
+              : detectedTemplate == 'vintage'
+              ? 'Vintage'
+              : 'Classic 2'}. "
           "Karya kamu akan muncul di halaman publik.",
         ),
         actions: [
