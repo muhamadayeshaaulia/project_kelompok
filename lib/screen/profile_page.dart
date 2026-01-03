@@ -655,6 +655,12 @@ class _ProfilePageState extends State<ProfilePage> {
         isEditing = false;
         if (newUrl != null) _currentPhotoUrl = newUrl;
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Profil berhasil diperbarui!"),
+          backgroundColor: Colors.green,
+        ),
+      );
       _loadUserData();
     } finally {
       setState(() => isSaving = false);

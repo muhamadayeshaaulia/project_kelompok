@@ -17,7 +17,7 @@ class _MySplashScreenState extends State<MySplashScreen> {
   }
 
   _navigateToHome() async {
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 1));
     if (mounted) {
       Navigator.pushReplacementNamed(context, widget.nextRoute);
     }
