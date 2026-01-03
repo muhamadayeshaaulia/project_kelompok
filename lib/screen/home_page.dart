@@ -374,12 +374,18 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _showPostConfirmation(String imageUrl) {
-    String detectedTemplate = 'classic_2';
+    String detectedTemplate = 'classic_2'; // Default
+
+    // --- LOGIKA DETEKSI YANG BARU ---
     if (imageUrl.contains('C4_')) {
       detectedTemplate = 'classic_4';
+    } else if (imageUrl.contains('V1_')) {
+      // Ini tambahannya!
+      detectedTemplate = 'vintage';
     } else if (imageUrl.contains('C2_')) {
       detectedTemplate = 'classic_2';
     }
+    // --------------------------------
 
     showDialog(
       context: context,
@@ -387,7 +393,8 @@ class _MyHomePageState extends State<MyHomePage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         title: const Text("Posting ke Explore?"),
         content: Text(
-          "Sistem mendeteksi ini adalah ${detectedTemplate == 'classic_4' ? 'Classic 4' : 'Classic 2'}. "
+          // Update text dialognya biar dinamis
+          "Sistem mendeteksi ini adalah ${detectedTemplate == 'vintage' ? 'Vintage' : (detectedTemplate == 'classic_4' ? 'Classic 4' : 'Classic 2')}. "
           "Karya kamu akan muncul di halaman publik.",
         ),
         actions: [
@@ -404,7 +411,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             onPressed: () {
               Navigator.pop(context);
-              // 3. Panggil fungsi postImage dengan dua parameter
+              // Kirim detectedTemplate yang sudah benar ke database
               _postImage(imageUrl, detectedTemplate);
             },
             child: const Text(
