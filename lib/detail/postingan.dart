@@ -247,6 +247,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  
                   ListTile(
                     leading: GestureDetector(
                       onTap: () => _navigateToProfile(widget.postData['uid']),
@@ -259,7 +260,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                             : null,
                       ),
                     ),
-                    title: GestureDetector( // <-- BUNGKUS DENGAN GESTURE DETECTOR
+                    title: GestureDetector(
                       onTap: () => _navigateToProfile(widget.postData['uid']),
                       child: Text(
                         widget.postData['nama'] ?? "User",
@@ -272,6 +273,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                       ),
                     ),
                   ),
+
                   Image.network(
                     widget.postData['post_image'],
                     width: double.infinity,
@@ -282,7 +284,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     padding: const EdgeInsets.all(12.0),
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        // Logika Navigasi Template
                         if (detectedTemplate == 'classic_4') {
                           Navigator.push(
                             context,
