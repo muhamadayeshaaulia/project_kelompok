@@ -348,13 +348,34 @@ class _ProfilePageState extends State<ProfilePage> {
         children: [
           GestureDetector(
             onTap: isEditing ? _pickImage : null,
-            child: CircleAvatar(
-              radius: 50,
-              backgroundColor: Colors.white,
-              child: CircleAvatar(
-                radius: 47,
-                backgroundImage: _getProfileImage(),
-              ),
+            child: Stack(
+              children: [
+                CircleAvatar(
+                  radius: 50,
+                  backgroundColor: Colors.white,
+                  child: CircleAvatar(
+                    radius: 47,
+                    backgroundImage: _getProfileImage(),
+                  ),
+                ),
+                if (isEditing)
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.blue,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.camera_alt,
+                        color: Colors.black,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
           const SizedBox(height: 12),
@@ -670,6 +691,17 @@ class _ProfilePageState extends State<ProfilePage> {
       final cropped = await ImageCropper().cropImage(
         sourcePath: file.path,
         aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Potong Foto',
+            toolbarColor: Colors.yellow[700],
+            toolbarWidgetColor: Colors.white,
+            activeControlsWidgetColor: Colors.yellow[700],
+            initAspectRatio: CropAspectRatioPreset.square,
+            lockAspectRatio: true,
+          ),
+          IOSUiSettings(title: 'Potong Foto'),
+        ],
       );
       if (cropped != null) {
         final bytes = await cropped.readAsBytes();

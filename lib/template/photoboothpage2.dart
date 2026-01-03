@@ -202,6 +202,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
           ),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: Colors.yellow[700],
       ),
       body: Stack(
         children: [

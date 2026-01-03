@@ -457,7 +457,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    CircularProgressIndicator(color: Color(0xFFFDF5E6)),
+                    CircularProgressIndicator(color: Colors.white),
 
                   ],
                 ),

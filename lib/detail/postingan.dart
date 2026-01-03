@@ -197,6 +197,26 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }
 
   void _deleteComment(String commentId) async {
+    bool? confirm = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Hapus Komentar"),
+        content: const Text("Apakah Anda yakin ingin menghapus komentar ini?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Batal"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text("Hapus", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
     try {
       await FirebaseFirestore.instance
           .collection('posts')
@@ -209,7 +229,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Komentar berhasil dihapus"),
-            backgroundColor: Colors.grey,
+            backgroundColor: Colors.green,
             duration: Duration(seconds: 2),
           ),
         );
@@ -403,11 +423,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
               padding: EdgeInsets.symmetric(vertical: 40),
               child: Column(
                 children: [
-                  Icon(Icons.chat_bubble_outline, color: Colors.grey, size: 50),
+                  Icon(Icons.chat_bubble_outline, color: Colors.grey, size: 40),
                   SizedBox(height: 10),
                   Text(
                     "Belum ada komentar.",
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   Text(
                     "Jadilah yang pertama mengomentari!",
@@ -418,10 +441,12 @@ class _PostDetailPageState extends State<PostDetailPage> {
             ),
           );
         }
+
         var allDocs = snapshot.data!.docs;
-        var mainComments = allDocs
-            .where((doc) => doc['parent_id'] == null)
-            .toList();
+        var mainComments = allDocs.where((doc) {
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          return data['parent_id'] == null;
+        }).toList();
 
         return ListView.builder(
           shrinkWrap: true,
@@ -429,9 +454,11 @@ class _PostDetailPageState extends State<PostDetailPage> {
           itemCount: mainComments.length,
           itemBuilder: (context, index) {
             var doc = mainComments[index];
-            var replies = allDocs
-                .where((d) => d['parent_id'] == doc.id)
-                .toList();
+            var replies = allDocs.where((d) {
+              Map<String, dynamic> data = d.data() as Map<String, dynamic>;
+              return data['parent_id'] == doc.id;
+            }).toList();
+
             return Column(
               children: [
                 _commentTile(doc.id, doc.data() as Map<String, dynamic>),
