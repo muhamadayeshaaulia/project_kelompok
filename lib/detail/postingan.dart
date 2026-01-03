@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:project_kelompok/detail/profilDetail.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:project_kelompok/template/photoboothpage.dart';
@@ -29,6 +30,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
   String? replyingToName;
   String _myUserName = "Loading...";
   String? _myProfilePic;
+
+  
 
   @override
   void initState() {
