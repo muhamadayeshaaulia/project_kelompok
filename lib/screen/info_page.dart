@@ -99,10 +99,16 @@ class InfoAplikasiPage extends StatelessWidget {
               );
             },
           ),
-          const ListTile(
-            leading: Icon(Icons.email),
-            title: Text("Email"),
-            subtitle: Text("developer@gmail.com"),
+          ListTile(
+            leading: const Icon(Icons.email),
+            title: const Text("Email"),
+            subtitle: const Text("developer@gmail.com"),
+            trailing: const Icon(
+              Icons.arrow_forward_ios, 
+              size: 16, 
+              color: Colors.grey
+            ), // Tambahkan panah agar user tau ini bisa dipencet
+            onTap: _launchEmail, // Panggil fungsi launch di sini
           ),
           ListTile(
             leading: const Icon(Icons.privacy_tip),
