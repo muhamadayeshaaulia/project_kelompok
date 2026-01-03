@@ -248,17 +248,23 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage: widget.postData['user_image'] != null
-                          ? NetworkImage(widget.postData['user_image'])
-                          : null,
-                      child: widget.postData['user_image'] == null
-                          ? const Icon(Icons.person)
-                          : null,
+                    leading: GestureDetector( // <-- BUNGKUS DENGAN GESTURE DETECTOR
+                      onTap: () => _navigateToProfile(widget.postData['uid']),
+                      child: CircleAvatar(
+                        backgroundImage: widget.postData['user_image'] != null
+                            ? NetworkImage(widget.postData['user_image'])
+                            : null,
+                        child: widget.postData['user_image'] == null
+                            ? const Icon(Icons.person)
+                            : null,
+                      ),
                     ),
-                    title: Text(
-                      widget.postData['nama'] ?? "User",
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    title: GestureDetector( // <-- BUNGKUS DENGAN GESTURE DETECTOR
+                      onTap: () => _navigateToProfile(widget.postData['uid']),
+                      child: Text(
+                        widget.postData['nama'] ?? "User",
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                     subtitle: Text(
                       formatPostTime(
