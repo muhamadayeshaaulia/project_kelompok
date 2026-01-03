@@ -65,6 +65,7 @@ class _ProfilePageState extends State<ProfilePage> {
       if (mounted) setState(() => isFetching = false);
     }
   }
+
   Future<bool> _reauthenticateUser() async {
     final passwordCtrl = TextEditingController();
     bool success = false;
@@ -112,15 +113,15 @@ class _ProfilePageState extends State<ProfilePage> {
     );
     return success;
   }
+
   Future<void> _deleteAccount() async {
     if (user == null) return;
-
     bool confirm = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Hapus Akun & Semua Data?"),
         content: const Text(
-          "Tindakan ini permanen. Semua postingan, komentar, dan like Anda akan dihapus.",
+          "Tindakan ini permanen. Semua data Anda akan dihapus.",
         ),
         actions: [
           TextButton(
@@ -135,10 +136,8 @@ class _ProfilePageState extends State<ProfilePage> {
         ],
       ),
     );
-
     if (confirm != true) return;
     setState(() => isSaving = true);
-
     try {
       final String uid = user!.uid;
       final firestore = FirebaseFirestore.instance;
@@ -222,7 +221,6 @@ class _ProfilePageState extends State<ProfilePage> {
           }
         }
       }
-
       if (mounted) {
         Navigator.of(
           context,
@@ -233,16 +231,11 @@ class _ProfilePageState extends State<ProfilePage> {
       }
     } catch (e) {
       debugPrint("Error Total: $e");
-      if (mounted)
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red),
-        );
     } finally {
       if (mounted) setState(() => isSaving = false);
     }
   }
 
-  // --- SAVE & PICK IMAGE ---
   Future<void> _saveProfile() async {
     if (user == null) return;
     setState(() => isSaving = true);
@@ -423,11 +416,16 @@ class _ProfilePageState extends State<ProfilePage> {
                               nameCtrl,
                               enabled: isEditing,
                             ),
-                            _buildField(
+                            const Text(
                               "Jenis Kelamin",
-                              genderCtrl,
-                              enabled: isEditing,
+                              style: TextStyle(color: Colors.grey),
                             ),
+                            const SizedBox(height: 6),
+                            isEditing
+                                ? _buildGenderSelection()
+                                : _buildGenderDisplay(),
+                            const SizedBox(height: 14),
+
                             _buildField(
                               "Alamat",
                               addressCtrl,
@@ -485,6 +483,123 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
             ),
       bottomNavigationBar: const CustomButtomNav(currentIndex: 3),
+    );
+  }
+  Widget _buildGenderSelection() {
+    return Row(
+      children: [
+        Expanded(
+          child: GestureDetector(
+            onTap: () => setState(() => genderCtrl.text = "Laki-laki"),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: genderCtrl.text == "Laki-laki"
+                    ? Colors.blue[50]
+                    : Colors.grey[100],
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: genderCtrl.text == "Laki-laki"
+                      ? Colors.blue
+                      : Colors.transparent,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.male,
+                    color: genderCtrl.text == "Laki-laki"
+                        ? Colors.blue
+                        : Colors.grey,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    "Laki-laki",
+                    style: TextStyle(
+                      color: genderCtrl.text == "Laki-laki"
+                          ? Colors.blue
+                          : Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: GestureDetector(
+            onTap: () => setState(() => genderCtrl.text = "Perempuan"),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: genderCtrl.text == "Perempuan"
+                    ? Colors.pink[50]
+                    : Colors.grey[100],
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: genderCtrl.text == "Perempuan"
+                      ? Colors.pink
+                      : Colors.transparent,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.female,
+                    color: genderCtrl.text == "Perempuan"
+                        ? Colors.pink
+                        : Colors.grey,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    "Perempuan",
+                    style: TextStyle(
+                      color: genderCtrl.text == "Perempuan"
+                          ? Colors.pink
+                          : Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGenderDisplay() {
+    bool isMale = genderCtrl.text == "Laki-laki";
+    bool isFemale = genderCtrl.text == "Perempuan";
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            isMale
+                ? Icons.male
+                : (isFemale ? Icons.female : Icons.help_outline),
+            color: isMale
+                ? Colors.blue
+                : (isFemale ? Colors.pink : Colors.grey),
+            size: 20,
+          ),
+          const SizedBox(width: 10),
+          Text(
+            genderCtrl.text.isEmpty ? "Belum diatur" : genderCtrl.text,
+            style: const TextStyle(fontSize: 16),
+          ),
+        ],
+      ),
     );
   }
 
