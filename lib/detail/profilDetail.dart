@@ -151,8 +151,32 @@ class _OtherUserProfilePageState extends State<Profildetail> {
 
                           Container(height: 30, width: 1, color: Colors.grey[300]),
 
-                          
-                          
+                          StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(widget.uid)
+                                .collection('following')
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              int followingCount = snapshot.hasData
+                                  ? snapshot.data!.docs.length
+                                  : 0;
+                              
+                              return _buildStatColumn("Following", followingCount, () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => UserListPage(
+                                      title: "Mengikuti",
+                                      uid: widget.uid,
+                                      collectionName: 'following',
+                                    ),
+                                  ),
+                                );
+                              });
+                            },
+                          ),
+
                         ],
                       ),
                     ],
