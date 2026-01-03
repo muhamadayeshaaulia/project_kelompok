@@ -4,6 +4,7 @@ import 'package:project_kelompok/screen/member_card.dart';
 import 'package:project_kelompok/screen/privacy_policy_page.dart';
 import 'package:project_kelompok/screen/terms_conditions_page.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class InfoAplikasiPage extends StatelessWidget {
   const InfoAplikasiPage({super.key});
