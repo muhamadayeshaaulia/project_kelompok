@@ -1,36 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class OtherUserProfilePage extends StatefulWidget {
+class Profildetail extends StatefulWidget {
   final String uid;
 
-  const OtherUserProfilePage({super.key, required this.uid});
+  const Profildetail({super.key, required this.uid});
 
   @override
-  State<OtherUserProfilePage> createState() => _OtherUserProfilePageState();
+  State<Profildetail> createState() => _OtherUserProfilePageState();
 }
 
-class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
-  Widget _buildStatColumn(String label, int count) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          count.toString(),
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+class _OtherUserProfilePageState extends State<Profildetail> {
+  
+  // Widget Helper untuk Statistik (Sekarang bisa diklik)
+  Widget _buildStatColumn(String label, int count, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              count.toString(),
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.grey,
+                fontSize: 14,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.grey,
-            fontSize: 14,
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -39,11 +48,13 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Profil Pengguna"),
+        centerTitle: true,
         backgroundColor: Colors.yellow[700],
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center, 
           children: [
             FutureBuilder<DocumentSnapshot>(
               future: FirebaseFirestore.instance
@@ -62,29 +73,39 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
                 if (userData == null) return const Text("User tidak ditemukan");
 
                 return Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
                   child: Column(
                     children: [
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundImage: userData['photo_url'] != null
-                            ? NetworkImage(userData['photo_url'])
-                            : null,
-                        child: userData['photo_url'] == null
-                            ? const Icon(Icons.person, size: 50)
-                            : null,
+                      Center(
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundImage: userData['photo_url'] != null
+                              ? NetworkImage(userData['photo_url'])
+                              : null,
+                          child: userData['photo_url'] == null
+                              ? const Icon(Icons.person, size: 50)
+                              : null,
+                        ),
                       ),
                       const SizedBox(height: 12),
-                      Text(
-                        userData['nama'] ?? "Tanpa Nama",
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                      Center(
+                        child: Text(
+                          userData['nama'] ?? "Tanpa Nama",
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                      Text(
-                        userData['email'] ?? "-",
-                        style: const TextStyle(color: Colors.grey),
+                      Center(
+                        child: Text(
+                          userData['email'] ?? "-",
+                          style: const TextStyle(color: Colors.grey),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                       const SizedBox(height: 24),
+                      
+                      // Bagian Statistik
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -97,9 +118,12 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
                               int postCount = snapshot.hasData
                                   ? snapshot.data!.docs.length
                                   : 0;
-                              return _buildStatColumn("Post", postCount);
+                              return _buildStatColumn("Post", postCount, () {
+                                // Aksi jika Post diklik (Opsional)
+                              });
                             },
                           ),
+                          Container(height: 30, width: 1, color: Colors.grey[300]), // Pemisah Vertical
                           StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('users')
@@ -110,10 +134,13 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
                               int followerCount = snapshot.hasData
                                   ? snapshot.data!.docs.length
                                   : 0;
-                              return _buildStatColumn(
-                                  "Followers", followerCount);
+                              return _buildStatColumn("Followers", followerCount, () {
+                                // TAMBAHKAN KODE NAVIGASI KE LIST FOLLOWER DISINI
+                                debugPrint("Tombol Followers Ditekan");
+                              });
                             },
                           ),
+                          Container(height: 30, width: 1, color: Colors.grey[300]), // Pemisah Vertical
                           StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('users')
@@ -124,8 +151,10 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
                               int followingCount = snapshot.hasData
                                   ? snapshot.data!.docs.length
                                   : 0;
-                              return _buildStatColumn(
-                                  "Following", followingCount);
+                              return _buildStatColumn("Following", followingCount, () {
+                                // TAMBAHKAN KODE NAVIGASI KE LIST FOLLOWING DISINI
+                                debugPrint("Tombol Following Ditekan");
+                              });
                             },
                           ),
                         ],
@@ -136,16 +165,18 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
               },
             ),
             const Divider(thickness: 1),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              child: const Align(
-                alignment: Alignment.centerLeft,
+            
+            // Judul Bagian Postingan (Dibuat Center)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 15),
+              child: Center(
                 child: Text(
                   "Karya Pengguna Ini",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),
             ),
+
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('posts')
@@ -164,25 +195,33 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
                   );
                 }
 
-                return GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 2,
-                    mainAxisSpacing: 2,
+                // Grid View dengan padding yang seimbang
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4.0), // Padding tipis kiri kanan
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 4, // Jarak antar foto horizontal
+                      mainAxisSpacing: 4,  // Jarak antar foto vertikal
+                    ),
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                      var post = snapshot.data!.docs[index];
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(4), // Sedikit rounded biar bagus
+                        child: Image.network(
+                          post['post_image'],
+                          fit: BoxFit.cover,
+                        ),
+                      );
+                    },
                   ),
-                  itemCount: snapshot.data!.docs.length,
-                  itemBuilder: (context, index) {
-                    var post = snapshot.data!.docs[index];
-                    return Image.network(
-                      post['post_image'],
-                      fit: BoxFit.cover,
-                    );
-                  },
                 );
               },
             ),
+            const SizedBox(height: 20), // Spasi bawah agar tidak mentok
           ],
         ),
       ),
