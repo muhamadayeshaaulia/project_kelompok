@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,7 +7,6 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:project_kelompok/screen/home_page.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 import 'package:project_kelompok/services/supabase_service.dart';
 
@@ -20,17 +18,20 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final nameCtrl = TextEditingController();
-  final genderCtrl = TextEditingController();
-  final addressCtrl = TextEditingController();
-  final descCtrl = TextEditingController();
-  final socialMediaCtrl = TextEditingController();
+  late TextEditingController nameCtrl;
+  late TextEditingController genderCtrl;
+  late TextEditingController addressCtrl;
+  late TextEditingController descCtrl;
+  late TextEditingController socialMediaCtrl;
 
   final user = FirebaseAuth.instance.currentUser;
-
   bool isEditing = false;
   bool isSaving = false;
   bool isFetching = true;
+
+  int postCount = 0;
+  int followerCount = 0;
+  int followingCount = 0;
 
   Uint8List? _imageBytes;
   String? _imageExtension;
@@ -39,82 +40,50 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
+    _initControllers();
     _loadUserData();
   }
 
-  // --- LOGIKA SOSIAL MEDIA ---
-  Widget _getSocialIcon(String url) {
-    String lowerUrl = url.toLowerCase();
-    if (lowerUrl.contains("github.com"))
-      return const FaIcon(
-        FontAwesomeIcons.github,
-        color: Color(0xFF181717),
-        size: 22,
-      );
-    if (lowerUrl.contains("instagram.com"))
-      return const FaIcon(
-        FontAwesomeIcons.instagram,
-        color: Color(0xFFE4405F),
-        size: 22,
-      );
-    if (lowerUrl.contains("facebook.com"))
-      return const FaIcon(
-        FontAwesomeIcons.facebook,
-        color: Color(0xFF1877F2),
-        size: 22,
-      );
-    if (lowerUrl.contains("twitter.com") || lowerUrl.contains("x.com"))
-      return const FaIcon(
-        FontAwesomeIcons.xTwitter,
-        color: Colors.black,
-        size: 22,
-      );
-    if (lowerUrl.contains("linkedin.com"))
-      return const FaIcon(
-        FontAwesomeIcons.linkedin,
-        color: Color(0xFF0077B5),
-        size: 22,
-      );
-    if (lowerUrl.contains("youtube.com"))
-      return const FaIcon(
-        FontAwesomeIcons.youtube,
-        color: Color(0xFFFF0000),
-        size: 22,
-      );
-    if (lowerUrl.contains("tiktok.com"))
-      return const FaIcon(
-        FontAwesomeIcons.tiktok,
-        color: Colors.black,
-        size: 22,
-      );
-    return const FaIcon(FontAwesomeIcons.link, color: Colors.grey, size: 20);
+  void _initControllers() {
+    nameCtrl = TextEditingController();
+    genderCtrl = TextEditingController();
+    addressCtrl = TextEditingController();
+    descCtrl = TextEditingController();
+    socialMediaCtrl = TextEditingController();
   }
 
-  Future<void> _launchURL(String url) async {
-    final cleanUrl = url.trim();
-    if (cleanUrl.isEmpty) return;
-    final Uri uri = Uri.parse(
-      cleanUrl.startsWith('http') ? cleanUrl : 'https://$cleanUrl',
-    );
-    try {
-      if (!await launchUrl(uri, mode: LaunchMode.externalApplication))
-        throw 'Error';
-    } catch (e) {
-      if (mounted)
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text("Gagal membuka link")));
+  @override
+  void dispose() {
+    nameCtrl.dispose();
+    genderCtrl.dispose();
+    addressCtrl.dispose();
+    descCtrl.dispose();
+    socialMediaCtrl.dispose();
+    super.dispose();
+  }
+
+  List<String> _createSearchKeywords(String name) {
+    List<String> keywords = [];
+    String lowerName = name.toLowerCase().trim();
+    List<String> words = lowerName.split(" ");
+    for (String word in words) {
+      String temp = "";
+      for (var i = 0; i < word.length; i++) {
+        temp = temp + word[i];
+        if (!keywords.contains(temp)) keywords.add(temp);
+      }
     }
+    return keywords;
   }
 
   Future<void> _loadUserData() async {
     if (user == null) return;
     setState(() => isFetching = true);
     try {
-      final doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user!.uid)
-          .get();
+      final String uid = user!.uid;
+      final firestore = FirebaseFirestore.instance;
+
+      final doc = await firestore.collection('users').doc(uid).get();
       if (doc.exists && mounted) {
         final data = doc.data();
         setState(() {
@@ -124,6 +93,30 @@ class _ProfilePageState extends State<ProfilePage> {
           descCtrl.text = data?['keterangan'] ?? '';
           socialMediaCtrl.text = data?['sosmed_link'] ?? '';
           _currentPhotoUrl = data?['photo_url'];
+          _imageBytes = null;
+        });
+      }
+
+      final postsQuery = await firestore
+          .collection('posts')
+          .where('uid', isEqualTo: uid)
+          .get();
+      final followersQuery = await firestore
+          .collection('users')
+          .doc(uid)
+          .collection('followers')
+          .get();
+      final followingQuery = await firestore
+          .collection('users')
+          .doc(uid)
+          .collection('following')
+          .get();
+
+      if (mounted) {
+        setState(() {
+          postCount = postsQuery.docs.length;
+          followerCount = followersQuery.docs.length;
+          followingCount = followingQuery.docs.length;
         });
       }
     } finally {
@@ -131,35 +124,14 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Future<void> _saveProfile() async {
-    setState(() => isSaving = true);
-    try {
-      String? newUrl;
-      if (_imageBytes != null) newUrl = await _uploadImageToSupabase();
-      await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
-        'nama': nameCtrl.text,
-        'jenis_kelamin': genderCtrl.text,
-        'alamat': addressCtrl.text,
-        'sosmed_link': socialMediaCtrl.text,
-        'keterangan': descCtrl.text,
-        if (newUrl != null) 'photo_url': newUrl,
-      }, SetOptions(merge: true));
-      setState(() {
-        isEditing = false;
-        if (newUrl != null) _currentPhotoUrl = newUrl;
-      });
-    } finally {
-      setState(() => isSaving = false);
-    }
-  }
-
   Future<void> _deleteAccount() async {
-    if (user == null) return;
     bool confirm = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Hapus Akun?"),
-        content: const Text("Semua data Anda akan dihapus permanen."),
+        title: const Text("Hapus Akun Permanen?"),
+        content: const Text(
+          "Tindakan ini akan menghapus Postingan, Foto di Storage, serta semua jejak Like & Komentar Anda secara permanen.",
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -175,19 +147,93 @@ class _ProfilePageState extends State<ProfilePage> {
     );
     if (confirm != true) return;
     setState(() => isSaving = true);
+
     try {
-      final uid = user!.uid;
+      final String uid = user!.uid;
       final firestore = FirebaseFirestore.instance;
+      try {
+        final List<FileObject> postFiles = await SupabaseService.client.storage
+            .from('photos')
+            .list(path: 'uploads/$uid');
+        if (postFiles.isNotEmpty) {
+          await SupabaseService.client.storage
+              .from('photos')
+              .remove(postFiles.map((e) => 'uploads/$uid/${e.name}').toList());
+        }
+      } catch (e) {
+        debugPrint("Post Storage Cleanup Error: $e");
+      }
+      try {
+        final List<FileObject> profileFiles = await SupabaseService
+            .client
+            .storage
+            .from('photos')
+            .list(path: 'profile/$uid');
+        if (profileFiles.isNotEmpty) {
+          await SupabaseService.client.storage
+              .from('photos')
+              .remove(
+                profileFiles.map((e) => 'profile/$uid/${e.name}').toList(),
+              );
+        }
+      } catch (e) {
+        debugPrint("Profile Storage Cleanup Error: $e");
+      }
+      final myPosts = await firestore
+          .collection('posts')
+          .where('uid', isEqualTo: uid)
+          .get();
+      for (var doc in myPosts.docs) {
+        final pLikes = await doc.reference.collection('likes').get();
+        for (var l in pLikes.docs) await l.reference.delete();
+        final pComments = await doc.reference.collection('comments').get();
+        for (var c in pComments.docs) await c.reference.delete();
+        await doc.reference.delete();
+      }
+      final globalFollowers = await firestore
+          .collectionGroup('followers')
+          .get();
+      for (var doc in globalFollowers.docs) {
+        if (doc.id == uid) await doc.reference.delete();
+      }
+
+      final globalFollowing = await firestore
+          .collectionGroup('following')
+          .get();
+      for (var doc in globalFollowing.docs) {
+        if (doc.id == uid) await doc.reference.delete();
+      }
+
+      final globalLikes = await firestore.collectionGroup('likes').get();
+      for (var doc in globalLikes.docs) {
+        if (doc.id == uid) await doc.reference.delete();
+      }
+
+      final globalComments = await firestore
+          .collectionGroup('comments')
+          .where('uid', isEqualTo: uid)
+          .get();
+      for (var doc in globalComments.docs) {
+        await doc.reference.delete();
+      }
       await firestore.collection('users').doc(uid).delete();
       await firestore.terminate();
       await firestore.clearPersistence();
       await user!.delete();
-      if (mounted)
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Akun dan seluruh karya berhasil dihapus"),
+            backgroundColor: Colors.red,
+          ),
+        );
         Navigator.of(
           context,
         ).pushNamedAndRemoveUntil('/login', (route) => false);
+      }
     } catch (e) {
-      debugPrint("Error: $e");
+      debugPrint("Error Hapus: $e");
     } finally {
       if (mounted) setState(() => isSaving = false);
     }
@@ -210,10 +256,15 @@ class _ProfilePageState extends State<ProfilePage> {
         title: const Text("Profil", style: TextStyle(color: Colors.black)),
         actions: [
           TextButton(
-            onPressed: () => setState(() {
-              isEditing = !isEditing;
-              if (!isEditing) _loadUserData();
-            }),
+            onPressed: () {
+              setState(() {
+                if (isEditing) {
+                  _initControllers();
+                  _loadUserData();
+                }
+                isEditing = !isEditing;
+              });
+            },
             child: Text(
               isEditing ? "Batal" : "Edit",
               style: const TextStyle(
@@ -232,12 +283,12 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Column(
                     children: [
                       _buildHeader(),
+                      _buildStatsSection(),
                       Padding(
                         padding: const EdgeInsets.all(20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildSectionTitle("Informasi Personal"),
                             _buildInfoField(
                               "Nama Lengkap",
                               nameCtrl,
@@ -252,16 +303,30 @@ class _ProfilePageState extends State<ProfilePage> {
                               isEditing,
                               maxLines: 3,
                             ),
-                            const SizedBox(height: 30),
                             if (isEditing) _buildSaveButton(),
-                            if (!isEditing) _buildDeleteButton(),
+                            if (!isEditing)
+                              Center(
+                                child: TextButton(
+                                  onPressed: _deleteAccount,
+                                  child: const Text(
+                                    "Hapus Akun Permanen",
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ),
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-                if (isSaving) _buildSavingOverlay(),
+                if (isSaving)
+                  Container(
+                    color: Colors.black26,
+                    child: const Center(
+                      child: CircularProgressIndicator(color: Colors.yellow),
+                    ),
+                  ),
               ],
             ),
       bottomNavigationBar: const CustomButtomNav(currentIndex: 3),
@@ -270,7 +335,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildHeader() {
     return Container(
-      height: 200,
+      padding: const EdgeInsets.symmetric(vertical: 20),
       width: double.infinity,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -280,42 +345,16 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           GestureDetector(
             onTap: isEditing ? _pickImage : null,
-            child: Stack(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundColor: Colors.grey[200],
-                    backgroundImage: _getProfileImage(),
-                  ),
-                ),
-                if (isEditing)
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: Colors.orange,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.camera_alt,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-              ],
+            child: CircleAvatar(
+              radius: 50,
+              backgroundColor: Colors.white,
+              child: CircleAvatar(
+                radius: 47,
+                backgroundImage: _getProfileImage(),
+              ),
             ),
           ),
           const SizedBox(height: 12),
@@ -328,17 +367,29 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Colors.orange,
-        ),
+  Widget _buildStatsSection() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _statItem("Post", postCount),
+          _statItem("Followers", followerCount),
+          _statItem("Following", followingCount),
+        ],
       ),
+    );
+  }
+
+  Widget _statItem(String label, int count) {
+    return Column(
+      children: [
+        Text(
+          count.toString(),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+      ],
     );
   }
 
@@ -353,8 +404,8 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-          const SizedBox(height: 8),
+          Text(label, style: const TextStyle(fontSize: 13, color: Colors.grey)),
+          const SizedBox(height: 5),
           editing
               ? TextField(
                   controller: ctrl,
@@ -363,7 +414,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     filled: true,
                     fillColor: Colors.grey[50],
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                       borderSide: BorderSide(color: Colors.grey[300]!),
                     ),
                   ),
@@ -388,15 +439,15 @@ class _ProfilePageState extends State<ProfilePage> {
         children: [
           const Text(
             "Jenis Kelamin",
-            style: TextStyle(fontSize: 14, color: Colors.grey),
+            style: TextStyle(fontSize: 13, color: Colors.grey),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 5),
           isEditing
               ? Row(
                   children: [
-                    _genderOption("Laki-laki", Icons.male, Colors.blue),
-                    const SizedBox(width: 15),
-                    _genderOption("Perempuan", Icons.female, Colors.pink),
+                    _genderOpt("Laki-laki", Icons.male, Colors.blue),
+                    const SizedBox(width: 10),
+                    _genderOpt("Perempuan", Icons.female, Colors.pink),
                   ],
                 )
               : Row(
@@ -408,7 +459,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       color: genderCtrl.text == "Laki-laki"
                           ? Colors.blue
                           : Colors.pink,
-                      size: 20,
+                      size: 18,
                     ),
                     const SizedBox(width: 8),
                     Text(
@@ -425,27 +476,24 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _genderOption(String val, IconData icon, Color color) {
-    bool isSelected = genderCtrl.text == val;
+  Widget _genderOpt(String val, IconData icon, Color color) {
+    bool sel = genderCtrl.text == val;
     return Expanded(
       child: GestureDetector(
         onTap: () => setState(() => genderCtrl.text = val),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: isSelected ? color.withOpacity(0.1) : Colors.grey[50],
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: isSelected ? color : Colors.grey[300]!),
+            color: sel ? color.withOpacity(0.1) : Colors.grey[50],
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: sel ? color : Colors.grey[300]!),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: isSelected ? color : Colors.grey),
-              const SizedBox(width: 8),
-              Text(
-                val,
-                style: TextStyle(color: isSelected ? color : Colors.black54),
-              ),
+              Icon(icon, color: sel ? color : Colors.grey, size: 18),
+              const SizedBox(width: 5),
+              Text(val, style: TextStyle(fontSize: 12)),
             ],
           ),
         ),
@@ -461,19 +509,18 @@ class _ProfilePageState extends State<ProfilePage> {
         children: [
           const Text(
             "Sosial Media",
-            style: TextStyle(fontSize: 14, color: Colors.grey),
+            style: TextStyle(fontSize: 13, color: Colors.grey),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 5),
           isEditing
               ? TextField(
                   controller: socialMediaCtrl,
                   decoration: InputDecoration(
-                    hintText: "Pisahkan dengan koma (github.com/user, ...)",
+                    hintText: "github.com/user, ...",
                     filled: true,
-                    fillColor: Colors.grey[50],
+                    fillColor: Colors.grey[100],
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                 )
@@ -510,6 +557,35 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  Widget _getSocialIcon(String url) {
+    String lowerUrl = url.toLowerCase();
+    if (lowerUrl.contains("github.com"))
+      return const FaIcon(FontAwesomeIcons.github, size: 20);
+    if (lowerUrl.contains("instagram.com"))
+      return const FaIcon(
+        FontAwesomeIcons.instagram,
+        color: Colors.pink,
+        size: 20,
+      );
+    if (lowerUrl.contains("facebook.com"))
+      return const FaIcon(
+        FontAwesomeIcons.facebook,
+        color: Colors.blue,
+        size: 20,
+      );
+    return const FaIcon(FontAwesomeIcons.link, size: 18);
+  }
+
+  Future<void> _launchURL(String url) async {
+    final cleanUrl = url.trim();
+    if (cleanUrl.isEmpty) return;
+    final Uri uri = Uri.parse(
+      cleanUrl.startsWith('http') ? cleanUrl : 'https://$cleanUrl',
+    );
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication))
+      debugPrint("Error launch");
+  }
+
   Widget _buildSaveButton() {
     return SizedBox(
       width: double.infinity,
@@ -517,9 +593,9 @@ class _ProfilePageState extends State<ProfilePage> {
         onPressed: isSaving ? null : _saveProfile,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.yellow[800],
-          padding: const EdgeInsets.symmetric(vertical: 15),
+          padding: const EdgeInsets.all(15),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10),
           ),
         ),
         child: const Text(
@@ -530,28 +606,53 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildDeleteButton() {
-    return Center(
-      child: TextButton(
-        onPressed: _deleteAccount,
-        child: const Text("Hapus Akun", style: TextStyle(color: Colors.red)),
-      ),
-    );
-  }
-
-  Widget _buildSavingOverlay() {
-    return Container(
-      color: Colors.black26,
-      child: const Center(
-        child: CircularProgressIndicator(color: Colors.yellow),
-      ),
-    );
-  }
-
   dynamic _getProfileImage() {
     if (_imageBytes != null) return MemoryImage(_imageBytes!);
-    if (_currentPhotoUrl != null) return NetworkImage(_currentPhotoUrl!);
+    if (_currentPhotoUrl != null && _currentPhotoUrl!.isNotEmpty)
+      return NetworkImage(_currentPhotoUrl!);
     return null;
+  }
+
+  Future<void> _saveProfile() async {
+    setState(() => isSaving = true);
+    try {
+      String? newUrl;
+      if (_imageBytes != null) {
+        await _deleteOldProfilePhotos();
+        newUrl = await _uploadImageToSupabase();
+      }
+      await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
+        'nama': nameCtrl.text,
+        'jenis_kelamin': genderCtrl.text,
+        'alamat': addressCtrl.text,
+        'sosmed_link': socialMediaCtrl.text,
+        'keterangan': descCtrl.text,
+        'search_keywords': _createSearchKeywords(nameCtrl.text),
+        if (newUrl != null) 'photo_url': newUrl,
+      }, SetOptions(merge: true));
+      setState(() {
+        isEditing = false;
+        if (newUrl != null) _currentPhotoUrl = newUrl;
+      });
+      _loadUserData();
+    } finally {
+      setState(() => isSaving = false);
+    }
+  }
+
+  Future<void> _deleteOldProfilePhotos() async {
+    try {
+      final List<FileObject> objects = await SupabaseService.client.storage
+          .from('photos')
+          .list(path: 'profile/${user!.uid}');
+      if (objects.isNotEmpty) {
+        await SupabaseService.client.storage
+            .from('photos')
+            .remove(
+              objects.map((e) => 'profile/${user!.uid}/${e.name}').toList(),
+            );
+      }
+    } catch (_) {}
   }
 
   Future<String?> _uploadImageToSupabase() async {

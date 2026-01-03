@@ -374,20 +374,17 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _showPostConfirmation(String imageUrl) {
-    String detectedTemplate = 'classic_2'; // Default
+    String detectedTemplate = 'classic_2';
 
-    // --- LOGIKA DETEKSI YANG BARU ---
     if (imageUrl.contains('C4_')) {
       detectedTemplate = 'classic_4';
     } else if (imageUrl.contains('V1_')) {
-      // Ini tambahannya!
       detectedTemplate = 'vintage';
     } else if (imageUrl.contains('C2_')) {
       detectedTemplate = 'classic_2';
     } else if (imageUrl.contains('vintage_')) {
       detectedTemplate = 'vintage';
     }
-    // --------------------------------
 
     showDialog(
       context: context,

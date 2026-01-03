@@ -159,36 +159,64 @@ class _PostDetailPageState extends State<PostDetailPage> {
     String commentText = _commentController.text.trim();
     if (commentText.isEmpty || currentUser == null) return;
 
-    await FirebaseFirestore.instance
-        .collection('posts')
-        .doc(widget.postId)
-        .collection('comments')
-        .add({
-          'uid': currentUser!.uid,
-          'nama': _myUserName,
-          'photo_url': _myProfilePic,
-          'komentar': commentText,
-          'parent_id': replyingToId,
-          'reply_to_name': replyingToName,
-          'timestamp': FieldValue.serverTimestamp(),
-          'likes': [],
-        });
+    try {
+      await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(widget.postId)
+          .collection('comments')
+          .add({
+            'uid': currentUser!.uid,
+            'nama': _myUserName,
+            'photo_url': _myProfilePic,
+            'komentar': commentText,
+            'parent_id': replyingToId,
+            'reply_to_name': replyingToName,
+            'timestamp': FieldValue.serverTimestamp(),
+            'likes': [],
+          });
 
-    setState(() {
-      _commentController.clear();
-      replyingToId = null;
-      replyingToName = null;
-    });
-    FocusScope.of(context).unfocus();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Komentar berhasil ditambahkan"),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+
+      setState(() {
+        _commentController.clear();
+        replyingToId = null;
+        replyingToName = null;
+      });
+      FocusScope.of(context).unfocus();
+    } catch (e) {
+      debugPrint("Error adding comment: $e");
+    }
   }
 
   void _deleteComment(String commentId) async {
-    await FirebaseFirestore.instance
-        .collection('posts')
-        .doc(widget.postId)
-        .collection('comments')
-        .doc(commentId)
-        .delete();
+    try {
+      await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(widget.postId)
+          .collection('comments')
+          .doc(commentId)
+          .delete();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Komentar berhasil dihapus"),
+            backgroundColor: Colors.grey,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint("Error deleting comment: $e");
+    }
   }
 
   void _toggleCommentLike(String commentId, List likes) async {
@@ -261,12 +289,10 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     width: double.infinity,
                     fit: BoxFit.contain,
                   ),
-
                   Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        // Logika Navigasi Template
                         if (detectedTemplate == 'classic_4') {
                           Navigator.push(
                             context,
@@ -307,7 +333,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
                       ),
                     ),
                   ),
-
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
@@ -496,7 +521,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
               ),
               if (likes.isNotEmpty)
                 Text(
-                  "  ${likes.length} ❤️",
+                  "   ${likes.length} ❤️",
                   style: const TextStyle(fontSize: 11),
                 ),
             ],
