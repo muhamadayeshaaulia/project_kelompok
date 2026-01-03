@@ -1,14 +1,14 @@
 import 'dart:typed_data';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:project_kelompok/screen/home_page.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 import 'package:project_kelompok/services/supabase_service.dart';
-import 'dart:io';
-import 'package:image_cropper/image_cropper.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -42,18 +42,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _loadUserData() async {
     if (user == null) return;
-
     setState(() => isFetching = true);
-
     try {
       final doc = await FirebaseFirestore.instance
           .collection('users')
           .doc(user!.uid)
           .get();
-
       if (doc.exists && mounted) {
         final data = doc.data();
-
         setState(() {
           nameCtrl.text = data?['nama'] ?? '';
           genderCtrl.text = data?['jenis_kelamin'] ?? '';
@@ -64,149 +60,254 @@ class _ProfilePageState extends State<ProfilePage> {
         });
       }
     } catch (e) {
-      print("Error loading data: $e");
+      debugPrint("Error loading data: $e");
     } finally {
       if (mounted) setState(() => isFetching = false);
     }
   }
-
-  Future<void> _pickImage() async {
-    if (!isEditing) return;
-
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      CroppedFile? croppedFile = await ImageCropper().cropImage(
-        sourcePath: pickedFile.path,
-        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
-        uiSettings: [
-          AndroidUiSettings(
-            toolbarTitle: 'Atur Foto Profil',
-            toolbarColor: Colors.yellow[700],
-            toolbarWidgetColor: Colors.white,
-            initAspectRatio: CropAspectRatioPreset.square,
-            lockAspectRatio: true,
+  Future<bool> _reauthenticateUser() async {
+    final passwordCtrl = TextEditingController();
+    bool success = false;
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text("Konfirmasi Kata Sandi"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("Sesi habis. Masukkan kata sandi untuk menghapus akun."),
+            TextField(
+              controller: passwordCtrl,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: "Kata Sandi"),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Batal"),
           ),
-          IOSUiSettings(title: 'Atur Foto Profil'),
+          ElevatedButton(
+            onPressed: () async {
+              try {
+                AuthCredential cred = EmailAuthProvider.credential(
+                  email: user!.email!,
+                  password: passwordCtrl.text.trim(),
+                );
+                await user!.reauthenticateWithCredential(cred);
+                success = true;
+                if (mounted) Navigator.pop(context);
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Kata sandi salah.")),
+                );
+              }
+            },
+            child: const Text("Konfirmasi"),
+          ),
         ],
-      );
+      ),
+    );
+    return success;
+  }
+  Future<void> _deleteAccount() async {
+    if (user == null) return;
 
-      if (croppedFile != null) {
-        final bytes = await croppedFile.readAsBytes();
-        final extension = croppedFile.path.split('.').last;
+    bool confirm = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Hapus Akun & Semua Data?"),
+        content: const Text(
+          "Tindakan ini permanen. Semua postingan, komentar, dan like Anda akan dihapus.",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Batal"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text("Hapus", style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
 
-        setState(() {
-          _imageBytes = bytes;
-          _imageExtension = extension;
-        });
+    if (confirm != true) return;
+    setState(() => isSaving = true);
+
+    try {
+      final String uid = user!.uid;
+      final firestore = FirebaseFirestore.instance;
+      try {
+        final List<FileObject> profileFiles = await SupabaseService
+            .client
+            .storage
+            .from('photos')
+            .list(path: 'profile/$uid');
+        final List<FileObject> postFiles = await SupabaseService.client.storage
+            .from('photos')
+            .list(path: 'uploads/$uid');
+        if (profileFiles.isNotEmpty) {
+          await SupabaseService.client.storage
+              .from('photos')
+              .remove(
+                profileFiles.map((e) => 'profile/$uid/${e.name}').toList(),
+              );
+        }
+        if (postFiles.isNotEmpty) {
+          await SupabaseService.client.storage
+              .from('photos')
+              .remove(postFiles.map((e) => 'uploads/$uid/${e.name}').toList());
+        }
+      } catch (e) {
+        debugPrint("Storage Skip: $e");
       }
+      final comments = await firestore
+          .collectionGroup('comments')
+          .where('uid', isEqualTo: uid)
+          .get();
+      for (var doc in comments.docs) {
+        await doc.reference.delete();
+      }
+      final posts = await firestore.collection('posts').get();
+      for (var pDoc in posts.docs) {
+        await pDoc.reference.collection('likes').doc(uid).delete();
+      }
+      final allUsers = await firestore.collection('users').get();
+      for (var uDoc in allUsers.docs) {
+        await uDoc.reference.collection('followers').doc(uid).delete();
+        await uDoc.reference.collection('following').doc(uid).delete();
+      }
+      final myPosts = await firestore
+          .collection('posts')
+          .where('uid', isEqualTo: uid)
+          .get();
+      for (var doc in myPosts.docs) {
+        final subC = await doc.reference.collection('comments').get();
+        for (var c in subC.docs) {
+          await c.reference.delete();
+        }
+        final subL = await doc.reference.collection('likes').get();
+        for (var l in subL.docs) {
+          await l.reference.delete();
+        }
+        await doc.reference.delete();
+      }
+      final userRef = firestore.collection('users').doc(uid);
+      final myFollowers = await userRef.collection('followers').get();
+      for (var doc in myFollowers.docs) {
+        await doc.reference.delete();
+      }
+      final myFollowing = await userRef.collection('following').get();
+      for (var doc in myFollowing.docs) {
+        await doc.reference.delete();
+      }
+      await userRef.delete();
+      await firestore.terminate();
+      await firestore.clearPersistence();
+      try {
+        await user!.delete();
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'requires-recent-login') {
+          setState(() => isSaving = false);
+          if (await _reauthenticateUser()) {
+            setState(() => isSaving = true);
+            await user!.delete();
+          } else {
+            return;
+          }
+        }
+      }
+
+      if (mounted) {
+        Navigator.of(
+          context,
+        ).pushNamedAndRemoveUntil('/login', (route) => false);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Akun Berhasil Dihapus.')));
+      }
+    } catch (e) {
+      debugPrint("Error Total: $e");
+      if (mounted)
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red),
+        );
+    } finally {
+      if (mounted) setState(() => isSaving = false);
+    }
+  }
+
+  // --- SAVE & PICK IMAGE ---
+  Future<void> _saveProfile() async {
+    if (user == null) return;
+    setState(() => isSaving = true);
+    try {
+      String? newPhotoUrl;
+      if (_imageBytes != null) newPhotoUrl = await _uploadImageToSupabase();
+      Map<String, dynamic> updateData = {
+        'nama': nameCtrl.text,
+        'jenis_kelamin': genderCtrl.text,
+        'alamat': addressCtrl.text,
+        'keterangan': descCtrl.text,
+        'sosmed_link': socialMediaCtrl.text,
+        'updated_at': DateTime.now(),
+      };
+      if (newPhotoUrl != null) updateData['photo_url'] = newPhotoUrl;
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .set(updateData, SetOptions(merge: true));
+      if (mounted) {
+        setState(() {
+          if (newPhotoUrl != null) _currentPhotoUrl = newPhotoUrl;
+          isEditing = false;
+        });
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Profil disimpan!')));
+      }
+    } finally {
+      if (mounted) setState(() => isSaving = false);
     }
   }
 
   Future<String?> _uploadImageToSupabase() async {
     if (_imageBytes == null || user == null) return null;
-
-    try {
-      if (_currentPhotoUrl != null && _currentPhotoUrl!.isNotEmpty) {
-        try {
-          final uri = Uri.parse(_currentPhotoUrl!);
-          final oldFileName = uri.pathSegments.last;
-          await SupabaseService.client.storage.from('photos').remove([
-            'profile/${user!.uid}/$oldFileName',
-          ]);
-          print("Foto lama berhasil dihapus");
-        } catch (e) {
-          print("Gagal hapus foto lama (mungkin tidak ada): $e");
-        }
-      }
-      String safeExt = _imageExtension ?? "jpg";
-
-      final fileName = '${DateTime.now().millisecondsSinceEpoch}.$safeExt';
-      final path = 'profile/${user!.uid}/$fileName';
-
-      await SupabaseService.client.storage
-          .from('photos')
-          .uploadBinary(
-            path,
-            _imageBytes!,
-            fileOptions: FileOptions(
-              contentType: 'image/$safeExt',
-              upsert: true,
-            ),
-          );
-
-      final imageUrl = SupabaseService.client.storage
-          .from('photos')
-          .getPublicUrl(path);
-      return imageUrl;
-    } catch (e) {
-      print("GAGAL PROSES SUPABASE: $e");
-      return null;
-    }
+    String safeExt = _imageExtension ?? "jpg";
+    final path =
+        'profile/${user!.uid}/${DateTime.now().millisecondsSinceEpoch}.$safeExt';
+    await SupabaseService.client.storage
+        .from('photos')
+        .uploadBinary(
+          path,
+          _imageBytes!,
+          fileOptions: FileOptions(contentType: 'image/$safeExt', upsert: true),
+        );
+    return SupabaseService.client.storage.from('photos').getPublicUrl(path);
   }
 
-  Future<void> _saveProfile() async {
-    if (user == null) return;
-    setState(() => isSaving = true);
-
-    try {
-      String? newPhotoUrl;
-
-      if (_imageBytes != null) {
-        newPhotoUrl = await _uploadImageToSupabase();
-        if (newPhotoUrl == null) {
-          throw Exception("Gagal upload gambar. Cek koneksi atau format file.");
-        }
-      }
-      List<String> generateSearchKeywords(String name) {
-        String cleanedName = name
-            .toLowerCase()
-            .replaceAll('.', '')
-            .replaceAll(',', '');
-        List<String> words = cleanedName.split(' ');
-        return words.where((word) => word.isNotEmpty).toList();
-      }
-
-      Map<String, dynamic> updateData = {
-        'nama': nameCtrl.text,
-        'search_keywords': generateSearchKeywords(nameCtrl.text),
-        'jenis_kelamin': genderCtrl.text,
-        'alamat': addressCtrl.text,
-        'keterangan': descCtrl.text,
-        'sosmed_link': socialMediaCtrl.text,
-        'email': user!.email,
-        'updated_at': DateTime.now(),
-      };
-
-      if (newPhotoUrl != null) {
-        updateData['photo_url'] = newPhotoUrl;
-        await user!.updatePhotoURL(newPhotoUrl);
-      }
-
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user!.uid)
-          .set(updateData, SetOptions(merge: true));
-
-      if (mounted) {
-        setState(() {
-          if (newPhotoUrl != null) _currentPhotoUrl = newPhotoUrl;
-          _imageBytes = null;
-          isEditing = false;
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profil berhasil disimpan!')),
-        );
-      }
-    } catch (e) {
-      print("Error Saving: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(backgroundColor: Colors.red, content: Text('Error: $e')),
+  Future<void> _pickImage() async {
+    if (!isEditing) return;
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+    );
+    if (pickedFile != null) {
+      CroppedFile? croppedFile = await ImageCropper().cropImage(
+        sourcePath: pickedFile.path,
+        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
       );
-    } finally {
-      if (mounted) setState(() => isSaving = false);
+      if (croppedFile != null) {
+        final bytes = await croppedFile.readAsBytes();
+        setState(() {
+          _imageBytes = bytes;
+          _imageExtension = croppedFile.path.split('.').last;
+        });
+      }
     }
   }
 
@@ -227,27 +328,18 @@ class _ProfilePageState extends State<ProfilePage> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const MyHomePage()),
-            );
-          },
+          onPressed: () => Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const MyHomePage()),
+          ),
         ),
         title: const Text("Profil", style: TextStyle(color: Colors.black)),
         actions: [
           TextButton(
-            onPressed: isSaving
-                ? null
-                : () {
-                    setState(() {
-                      isEditing = !isEditing;
-                      if (!isEditing) {
-                        _imageBytes = null;
-                        _loadUserData();
-                      }
-                    });
-                  },
+            onPressed: () => setState(() {
+              isEditing = !isEditing;
+              if (!isEditing) _loadUserData();
+            }),
             child: Text(
               isEditing ? "Batal" : "Edit",
               style: const TextStyle(
@@ -260,23 +352,26 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       body: isFetching
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              child: Column(
-                children: [
-                  Container(
-                    height: 200,
-                    width: double.infinity,
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Color.fromRGBO(255, 192, 45, 1), Colors.white],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Stack(
+          : Stack(
+              children: [
+                SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 200,
+                        width: double.infinity,
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Color.fromRGBO(255, 192, 45, 1),
+                              Colors.white,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             GestureDetector(
                               onTap: _pickImage,
@@ -287,12 +382,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                     color: Colors.white,
                                     width: 3,
                                   ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 10,
-                                    ),
-                                  ],
                                 ),
                                 child: ClipOval(
                                   child: SizedBox(
@@ -303,159 +392,108 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                               ),
                             ),
-                            if (isEditing)
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Container(
-                                  height: 35,
-                                  width: 35,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Colors.grey[300]!,
-                                    ),
-                                  ),
-                                  child: const Icon(
-                                    Icons.camera_alt,
-                                    size: 20,
-                                    color: Colors.orange,
-                                  ),
-                                ),
+                            const SizedBox(height: 12),
+                            Text(
+                              nameCtrl.text.isEmpty
+                                  ? "Fotografer"
+                                  : nameCtrl.text,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
                               ),
+                            ),
                           ],
                         ),
-                        const SizedBox(height: 12),
-                        Text(
-                          nameCtrl.text.isEmpty ? "Fotografer" : nameCtrl.text,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Pengaturan Personal",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        _buildField(
-                          "Nama Lengkap",
-                          nameCtrl,
-                          enabled: isEditing,
-                        ),
-                        _buildField(
-                          "Jenis Kelamin",
-                          genderCtrl,
-                          enabled: isEditing,
-                        ),
-                        _buildEmailField("Email", user?.email ?? ""),
-                        _buildField("Alamat", addressCtrl, enabled: isEditing),
-                        _buildField(
-                          "Sosial Media (Link)",
-                          socialMediaCtrl,
-                          enabled: isEditing,
-                        ),
-                        _buildField(
-                          "Tentang saya",
-                          descCtrl,
-                          maxLines: 3,
-                          enabled: isEditing,
-                        ),
-
-                        const SizedBox(height: 24),
-                        const Text(
-                          "Kontrol Akun",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 8),
-
-                        if (isEditing)
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: isSaving ? null : _saveProfile,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.yellow[800],
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Pengaturan Personal",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            _buildField(
+                              "Nama Lengkap",
+                              nameCtrl,
+                              enabled: isEditing,
+                            ),
+                            _buildField(
+                              "Jenis Kelamin",
+                              genderCtrl,
+                              enabled: isEditing,
+                            ),
+                            _buildField(
+                              "Alamat",
+                              addressCtrl,
+                              enabled: isEditing,
+                            ),
+                            _buildField(
+                              "Sosial Media",
+                              socialMediaCtrl,
+                              enabled: isEditing,
+                            ),
+                            _buildField(
+                              "Tentang saya",
+                              descCtrl,
+                              maxLines: 3,
+                              enabled: isEditing,
+                            ),
+                            const SizedBox(height: 24),
+                            if (isEditing)
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: isSaving ? null : _saveProfile,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.yellow[800],
+                                  ),
+                                  child: const Text(
+                                    "Simpan Perubahan",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                 ),
                               ),
-                              child: isSaving
-                                  ? const SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : const Text(
-                                      "Simpan Perubahan",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                      ),
-                                    ),
+                            const SizedBox(height: 8),
+                            Center(
+                              child: TextButton(
+                                onPressed: isSaving ? null : _deleteAccount,
+                                child: const Text(
+                                  "Hapus Profil",
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
                             ),
-                          ),
-
-                        TextButton(
-                          onPressed: () {},
-                          child: const Text(
-                            "Hapus Profil",
-                            style: TextStyle(color: Colors.red),
-                          ),
+                          ],
                         ),
-                      ],
+                      ),
+                    ],
+                  ),
+                ),
+                if (isSaving)
+                  Container(
+                    color: Colors.black.withOpacity(0.5),
+                    child: const Center(
+                      child: CircularProgressIndicator(color: Colors.yellow),
                     ),
                   ),
-                ],
-              ),
+              ],
             ),
       bottomNavigationBar: const CustomButtomNav(currentIndex: 3),
     );
   }
 
   Widget _buildProfileImage() {
-    if (_imageBytes != null) {
+    if (_imageBytes != null)
       return Image.memory(_imageBytes!, fit: BoxFit.cover);
-    }
-
-    if (_currentPhotoUrl != null && _currentPhotoUrl!.isNotEmpty) {
-      return Image.network(
-        _currentPhotoUrl!,
-        fit: BoxFit.cover,
-        loadingBuilder: (context, child, progress) {
-          if (progress == null) return child;
-          return const Center(child: CircularProgressIndicator());
-        },
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            color: Colors.grey[300],
-            child: const Icon(Icons.broken_image, color: Colors.red),
-          );
-        },
-      );
-    }
-
-    return Container(
-      color: Colors.grey[200],
-      child: const Icon(Icons.person, size: 50, color: Colors.grey),
-    );
+    if (_currentPhotoUrl != null && _currentPhotoUrl!.isNotEmpty)
+      return Image.network(_currentPhotoUrl!, fit: BoxFit.cover);
+    return const Icon(Icons.person, size: 50, color: Colors.grey);
   }
 
   Widget _buildField(
@@ -481,51 +519,7 @@ class _ProfilePageState extends State<ProfilePage> {
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: Colors.orange),
-              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmailField(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: const TextStyle(color: Colors.grey)),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: TextEditingController(text: value),
-                  enabled: false,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                height: 56,
-                width: 56,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.teal),
-                ),
-                child: const Icon(Icons.verified, color: Colors.teal),
-              ),
-            ],
           ),
         ],
       ),
