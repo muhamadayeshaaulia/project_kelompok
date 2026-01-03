@@ -42,8 +42,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
   final ImagePicker _picker = ImagePicker();
   final GlobalKey _boundaryKey = GlobalKey();
   bool _isLoading = false;
-
-  // Matrix untuk efek Sepia (Kecoklatan jadul)
   static const List<double> _sepiaMatrix = [
     0.393,
     0.769,
@@ -147,7 +145,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
               as RenderRepaintBoundary?;
 
       if (boundary == null) throw "Gagal render widget.";
-
       ui.Image image = await boundary.toImage(pixelRatio: 1.5);
       ByteData? byteData = await image.toByteData(
         format: ui.ImageByteFormat.png,
@@ -169,7 +166,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
           debugPrint("Skip galeri: $e");
         }
       }
-
       final fileName =
           'vintage_strip_${DateTime.now().millisecondsSinceEpoch}.png';
       final filePath = 'uploads/${user.uid}/$fileName';
@@ -213,7 +209,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
 
   @override
   Widget build(BuildContext context) {
-    // Logika warna text berdasarkan gelap/terang background frame
     bool isDark = _frameColor.computeLuminance() < 0.5;
     Color textColor = isDark
         ? const Color(0xFFFDF5E6)
@@ -221,7 +216,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
     Color borderColor = isDark ? Colors.white12 : Colors.black12;
 
     return Scaffold(
-      // Background App Vintage (Krem agak gelap)
       backgroundColor: const Color(0xFFEEE0C9),
       appBar: AppBar(
         title: const Text(
@@ -267,7 +261,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
                             offset: const Offset(5, 5),
                           ),
                         ],
-                        // Border tipis agar terlihat seperti kertas foto
                         border: Border.all(
                           color: Colors.grey.withOpacity(0.2),
                           width: 1,
@@ -288,6 +281,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
                                   color: const Color(
                                     0xFFD7CCC8,
                                   ), // Placeholder coklat muda
+
                                   border: Border.all(
                                     color: borderColor,
                                     width: 1,
@@ -314,7 +308,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
                                           ),
                                         ],
                                       )
-                                    // Terapkan Filter Sepia pada Gambar
                                     : ColorFiltered(
                                         colorFilter: const ColorFilter.matrix(
                                           _sepiaMatrix,
@@ -327,8 +320,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
                               ),
                             );
                           }),
-
-                          // Footer Text Vintage
                           Padding(
                             padding: const EdgeInsets.only(top: 15),
                             child: Column(
@@ -365,8 +356,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
                 ),
 
                 const SizedBox(height: 40),
-
-                // Pemilih Warna Frame
                 Text(
                   "FRAME COLOR",
                   style: TextStyle(
@@ -427,7 +416,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
                 ),
 
                 const SizedBox(height: 40),
-
                 // Tombol Simpan
                 ElevatedButton.icon(
                   onPressed: _isLoading ? null : _captureAndUpload,
@@ -470,6 +458,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     CircularProgressIndicator(color: Color(0xFFFDF5E6)),
+
                   ],
                 ),
               ),

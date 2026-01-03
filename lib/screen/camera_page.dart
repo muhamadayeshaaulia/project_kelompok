@@ -178,6 +178,7 @@ class _CameraPageState extends State<CameraPage> {
                         horizontal: 30,
                         vertical: 15,
                       ),
+
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
                     ),

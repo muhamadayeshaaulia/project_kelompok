@@ -59,7 +59,6 @@ class CustomButtomNav extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildCameraOption(
     BuildContext context, {
     required IconData icon,
