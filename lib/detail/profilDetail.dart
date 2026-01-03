@@ -133,7 +133,7 @@ class _ProfildetailState extends State<Profildetail> {
                                 .snapshots(),
                             builder: (context, snapshot) {
                               int followerCount = snapshot.hasData ? snapshot.data!.docs.length : 0;
-                              return _buildStatColumn("Followers", followerCount, () {
+                              return _buildStatColumn("Pengikut", followerCount, () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -157,7 +157,7 @@ class _ProfildetailState extends State<Profildetail> {
                                 .snapshots(),
                             builder: (context, snapshot) {
                               int followingCount = snapshot.hasData ? snapshot.data!.docs.length : 0;
-                              return _buildStatColumn("Following", followingCount, () {
+                              return _buildStatColumn("Mengikuti", followingCount, () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
