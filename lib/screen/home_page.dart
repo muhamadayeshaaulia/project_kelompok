@@ -392,7 +392,11 @@ class _MyHomePageState extends State<MyHomePage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         title: const Text("Posting ke Explore?"),
         content: Text(
-          "Sistem mendeteksi ini adalah ${detectedTemplate == 'classic_4' ? 'Classic 4' : detectedTemplate == 'vintage' ? 'Vintage' : 'Classic 2'}. "
+          "Sistem mendeteksi ini adalah ${detectedTemplate == 'classic_4'
+              ? 'Classic 4'
+              : detectedTemplate == 'vintage'
+              ? 'Vintage'
+              : 'Classic 2'}. "
           "Karya kamu akan muncul di halaman publik.",
         ),
         actions: [
