@@ -122,7 +122,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
 
       if (boundary == null) throw "Gagal render widget.";
 
-      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      ui.Image image = await boundary.toImage(pixelRatio: 1.5);
       ByteData? byteData = await image.toByteData(
         format: ui.ImageByteFormat.png,
       );
@@ -138,7 +138,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
             '${tempDir.path}/photostrip_${DateTime.now().millisecondsSinceEpoch}.png',
           ).create();
           await file.writeAsBytes(fullImageBytes);
-          await Gal.putImage(file.path, album: 'PhotoBooth');
+          await Gal.putImage(file.path, album: 'Booth-Art');
         } catch (e) {
           debugPrint("Skip galeri: $e");
         }
@@ -192,8 +192,16 @@ class _PhotoBoothPageState extends State<PhotoBoothPage2> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Custom Photostrip"),
-        backgroundColor: Colors.yellow[700],
+        title: const Text(
+          "Classic 2",
+          style: TextStyle(
+            fontFamily: 'monospace',
+            fontWeight: FontWeight.bold,
+            letterSpacing: 2,
+            color: Colors.black,
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Stack(
         children: [

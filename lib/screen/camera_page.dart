@@ -3,11 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:project_kelompok/template/photoboothpage.dart';
 import 'package:project_kelompok/template/photoboothpage2.dart';
-
+import 'package:project_kelompok/template/template_vintage.dart';
 
 class CameraPage extends StatefulWidget {
   final int photoCount;
-  const CameraPage({super.key, required this.photoCount});
+  final String templateType;
+
+  const CameraPage({
+    super.key,
+    required this.photoCount,
+    required this.templateType,
+  });
 
   @override
   State<CameraPage> createState() => _CameraPageState();
@@ -42,28 +48,31 @@ class _CameraPageState extends State<CameraPage> {
   }
 
   void _goToEditingPage() {
-    if (widget.photoCount == 2) {
+    if (widget.templateType == 'vintage') {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => PhotoBoothPage2(
-            initialImages: _capturedPhotos,
-          ),
+          builder: (context) => PhotoBoothPage3(initialImages: _capturedPhotos),
+        ),
+      );
+    } else if (widget.photoCount == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PhotoBoothPage2(initialImages: _capturedPhotos),
         ),
       );
     } else if (widget.photoCount == 4) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => PhotoBoothPage(
-            initialImages: _capturedPhotos,
-          ),
+          builder: (context) => PhotoBoothPage(initialImages: _capturedPhotos),
         ),
       );
     } else {
-       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Template untuk ${widget.photoCount} foto belum tersedia.")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Template belum tersedia.")));
     }
   }
 
@@ -74,7 +83,9 @@ class _CameraPageState extends State<CameraPage> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text("Ambil Foto (${_capturedPhotos.length}/${widget.photoCount})"),
+        title: Text(
+          "Ambil Foto (${_capturedPhotos.length}/${widget.photoCount})",
+        ),
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
         actions: [
@@ -82,7 +93,7 @@ class _CameraPageState extends State<CameraPage> {
             onPressed: _resetPhotos,
             icon: const Icon(Icons.refresh),
             tooltip: "Ulangi Foto",
-          )
+          ),
         ],
       ),
       body: Column(
@@ -95,7 +106,7 @@ class _CameraPageState extends State<CameraPage> {
                   crossAxisCount: widget.photoCount == 2 ? 1 : 2,
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
-                  childAspectRatio: 4/3,
+                  childAspectRatio: 4 / 3,
                 ),
                 itemCount: widget.photoCount,
                 itemBuilder: (context, index) {
@@ -120,9 +131,9 @@ class _CameraPageState extends State<CameraPage> {
                         child: Text(
                           "${index + 1}",
                           style: const TextStyle(
-                            color: Colors.white54, 
-                            fontSize: 40, 
-                            fontWeight: FontWeight.bold
+                            color: Colors.white54,
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
@@ -132,12 +143,13 @@ class _CameraPageState extends State<CameraPage> {
               ),
             ),
           ),
-
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: Colors.grey[900],
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -148,10 +160,12 @@ class _CameraPageState extends State<CameraPage> {
                     icon: const Icon(Icons.camera_alt),
                     label: Text("Ambil Foto #${_capturedPhotos.length + 1}"),
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 15,
+                      ),
                       backgroundColor: Colors.yellow[700],
                       foregroundColor: Colors.black,
-                      textStyle: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   )
                 else
@@ -160,10 +174,13 @@ class _CameraPageState extends State<CameraPage> {
                     icon: const Icon(Icons.edit),
                     label: const Text("Lanjut Edit Frame"),
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 15,
+                      ),
+
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
-                      textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ),
               ],

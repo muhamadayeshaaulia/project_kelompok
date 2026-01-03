@@ -8,39 +8,40 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:gal/gal.dart';
-import 'package:project_kelompok/screen/home_page.dart';
+import 'package:project_kelompok/screen/home_page.dart'; // Pastikan import ini sesuai
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:project_kelompok/services/supabase_service.dart';
+import 'package:project_kelompok/services/supabase_service.dart'; // Pastikan import ini sesuai
 
-class TemplateVintage extends StatefulWidget {
+class PhotoBoothPage3 extends StatefulWidget {
   final List<File>? initialImages;
 
-  const TemplateVintage({super.key, this.initialImages});
+  const PhotoBoothPage3({super.key, this.initialImages});
 
   @override
-  State<TemplateVintage> createState() => _PhotoBoothPageState();
+  State<PhotoBoothPage3> createState() => _PhotoBoothPageState();
 }
 
-class _PhotoBoothPageState extends State<TemplateVintage> {
+class _PhotoBoothPageState extends State<PhotoBoothPage3> {
+  // Default warna frame jadi Krem Vintage
   Color _frameColor = const Color(0xFFFDF5E6);
 
+  // Pilihan Warna Tema Vintage (Earth Tones)
   final List<Color> _colorOptions = [
-    const Color(0xFFFDF5E6),
-    const Color(0xFF2C2C2C),
-    const Color(0xFF8D6E63),
-    const Color(0xFF556B2F),
-    const Color(0xFF8FBC8F),
-    const Color(0xFFD2B48C),
-    const Color(0xFFBC8F8F),
-    const Color(0xFFA9A9A9),
+    const Color(0xFFFDF5E6), // Old Lace (Krem)
+    const Color(0xFF2C2C2C), // Charcoal (Hitam Pudar)
+    const Color(0xFF8D6E63), // Antique Bronze
+    const Color(0xFF556B2F), // Dark Olive
+    const Color(0xFF8FBC8F), // Dark Sea Green
+    const Color(0xFFD2B48C), // Tan
+    const Color(0xFFBC8F8F), // Rosy Brown
+    const Color(0xFFA9A9A9), // Dark Gray
   ];
 
   final List<Uint8List?> _imageBytesList = List.filled(2, null);
   final ImagePicker _picker = ImagePicker();
   final GlobalKey _boundaryKey = GlobalKey();
   bool _isLoading = false;
-
   static const List<double> _sepiaMatrix = [
     0.393,
     0.769,
@@ -99,7 +100,7 @@ class _PhotoBoothPageState extends State<TemplateVintage> {
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: 'Potong Foto Vintage',
-            toolbarColor: const Color(0xFF5D4037),
+            toolbarColor: Colors.yellow[700],
             toolbarWidgetColor: Colors.white,
             activeControlsWidgetColor: const Color(0xFFD7CCC8),
             lockAspectRatio: true,
@@ -144,8 +145,7 @@ class _PhotoBoothPageState extends State<TemplateVintage> {
               as RenderRepaintBoundary?;
 
       if (boundary == null) throw "Gagal render widget.";
-
-      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      ui.Image image = await boundary.toImage(pixelRatio: 1.5);
       ByteData? byteData = await image.toByteData(
         format: ui.ImageByteFormat.png,
       );
@@ -157,19 +157,17 @@ class _PhotoBoothPageState extends State<TemplateVintage> {
         try {
           await Gal.requestAccess();
           final tempDir = await getTemporaryDirectory();
-          // Diubah menjadi V1_strip
           final file = await File(
-            '${tempDir.path}/V1_strip_${DateTime.now().millisecondsSinceEpoch}.png',
+            '${tempDir.path}/vintage_strip_${DateTime.now().millisecondsSinceEpoch}.png',
           ).create();
           await file.writeAsBytes(fullImageBytes);
-          await Gal.putImage(file.path, album: 'VintageBooth');
+          await Gal.putImage(file.path, album: 'Booth-Art');
         } catch (e) {
           debugPrint("Skip galeri: $e");
         }
       }
-
-      // Diubah menjadi V1_strip
-      final fileName = 'V1_strip_${DateTime.now().millisecondsSinceEpoch}.png';
+      final fileName =
+          'vintage_strip_${DateTime.now().millisecondsSinceEpoch}.png';
       final filePath = 'uploads/${user.uid}/$fileName';
 
       await SupabaseService.client.storage
@@ -187,7 +185,7 @@ class _PhotoBoothPageState extends State<TemplateVintage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Tersimpan dalam kenangan!"),
-            backgroundColor: Color(0xFF5D4037),
+            backgroundColor: Colors.green,
           ),
         );
 
@@ -226,12 +224,12 @@ class _PhotoBoothPageState extends State<TemplateVintage> {
             fontFamily: 'monospace',
             fontWeight: FontWeight.bold,
             letterSpacing: 2,
-            color: Colors.white,
+            color: Colors.black,
           ),
         ),
         centerTitle: true,
-        backgroundColor: const Color(0xFF5D4037),
-        elevation: 4,
+        backgroundColor: Colors.yellow[700],
+        elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Stack(
@@ -246,10 +244,16 @@ class _PhotoBoothPageState extends State<TemplateVintage> {
                     key: _boundaryKey,
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
-                      width: 260,
-                      padding: const EdgeInsets.fromLTRB(20, 30, 20, 40),
+                      width: 260, // Sedikit lebih lebar
+                      padding: const EdgeInsets.fromLTRB(
+                        20,
+                        30,
+                        20,
+                        40,
+                      ), // Padding bawah lebih besar untuk text
                       decoration: BoxDecoration(
                         color: _frameColor,
+                        // Efek kertas fisik dengan shadow halus
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.3),
@@ -274,7 +278,10 @@ class _PhotoBoothPageState extends State<TemplateVintage> {
                                 width: double.infinity,
                                 margin: const EdgeInsets.only(bottom: 15),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFD7CCC8),
+                                  color: const Color(
+                                    0xFFD7CCC8,
+                                  ), // Placeholder coklat muda
+
                                   border: Border.all(
                                     color: borderColor,
                                     width: 1,
@@ -313,7 +320,6 @@ class _PhotoBoothPageState extends State<TemplateVintage> {
                               ),
                             );
                           }),
-
                           Padding(
                             padding: const EdgeInsets.only(top: 15),
                             child: Column(
@@ -322,7 +328,7 @@ class _PhotoBoothPageState extends State<TemplateVintage> {
                                   "MEMORIES",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    fontFamily: 'monospace',
+                                    fontFamily: 'monospace', // Font mesin tik
                                     fontWeight: FontWeight.w900,
                                     letterSpacing: 5,
                                     fontSize: 14,
@@ -331,7 +337,7 @@ class _PhotoBoothPageState extends State<TemplateVintage> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  "${DateTime.now().day} . ${DateTime.now().month} . ${DateTime.now().year}",
+                                  "${DateTime.now().year}",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontFamily: 'monospace',
@@ -350,7 +356,6 @@ class _PhotoBoothPageState extends State<TemplateVintage> {
                 ),
 
                 const SizedBox(height: 40),
-
                 Text(
                   "FRAME COLOR",
                   style: TextStyle(
@@ -375,21 +380,21 @@ class _PhotoBoothPageState extends State<TemplateVintage> {
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
                           margin: const EdgeInsets.symmetric(horizontal: 8),
-                          width: isSelected ? 50 : 40,
+                          width: isSelected ? 50 : 40, // Animasi ukuran
                           height: isSelected ? 50 : 40,
                           decoration: BoxDecoration(
                             color: color,
                             shape: BoxShape.circle,
                             border: Border.all(
                               color: isSelected
-                                  ? const Color(0xFF5D4037)
-                                  : Colors.grey[400]!,
+                                  ? Colors.blue
+                                  : Colors.grey[300]!,
                               width: isSelected ? 3 : 1,
                             ),
                             boxShadow: [
                               if (isSelected)
                                 BoxShadow(
-                                  color: Colors.brown.withOpacity(0.4),
+                                  color: Colors.blue.withOpacity(0.4),
                                   blurRadius: 8,
                                   spreadRadius: 1,
                                 ),
@@ -411,12 +416,15 @@ class _PhotoBoothPageState extends State<TemplateVintage> {
                 ),
 
                 const SizedBox(height: 40),
-
+                // Tombol Simpan
                 ElevatedButton.icon(
                   onPressed: _isLoading ? null : _captureAndUpload,
-                  icon: const Icon(Icons.print, color: Colors.white),
+                  icon: const Icon(
+                    Icons.save_alt,
+                    color: Colors.white,
+                  ),
                   label: const Text(
-                    "PRINT MEMORY",
+                    "Simpan Photostrip",
                     style: TextStyle(
                       color: Colors.white,
                       fontFamily: 'monospace',
@@ -425,13 +433,15 @@ class _PhotoBoothPageState extends State<TemplateVintage> {
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF5D4037),
+                    backgroundColor: Colors.yellow[700],
                     padding: const EdgeInsets.symmetric(
                       horizontal: 50,
                       vertical: 18,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
+                      borderRadius: BorderRadius.circular(
+                        30,
+                      ),
                     ),
                     elevation: 5,
                   ),
@@ -442,20 +452,13 @@ class _PhotoBoothPageState extends State<TemplateVintage> {
 
           if (_isLoading)
             Container(
-              color: const Color(0xFF5D4037).withOpacity(0.8),
+              color: Colors.black.withOpacity(0.8),
               child: const Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     CircularProgressIndicator(color: Color(0xFFFDF5E6)),
-                    SizedBox(height: 10),
-                    Text(
-                      "DEVELOPING PHOTO...",
-                      style: TextStyle(
-                        color: Color(0xFFFDF5E6),
-                        fontFamily: 'monospace',
-                      ),
-                    ),
+
                   ],
                 ),
               ),

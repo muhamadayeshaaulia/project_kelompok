@@ -43,7 +43,6 @@ class _ExplorPageState extends State<ExplorPage> {
           ),
         ),
         elevation: 0,
-        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.person_search_outlined, color: Colors.black),

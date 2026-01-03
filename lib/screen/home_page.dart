@@ -384,6 +384,8 @@ class _MyHomePageState extends State<MyHomePage> {
       detectedTemplate = 'vintage';
     } else if (imageUrl.contains('C2_')) {
       detectedTemplate = 'classic_2';
+    } else if (imageUrl.contains('vintage_')) {
+      detectedTemplate = 'vintage';
     }
     // --------------------------------
 
@@ -393,8 +395,7 @@ class _MyHomePageState extends State<MyHomePage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         title: const Text("Posting ke Explore?"),
         content: Text(
-          // Update text dialognya biar dinamis
-          "Sistem mendeteksi ini adalah ${detectedTemplate == 'vintage' ? 'Vintage' : (detectedTemplate == 'classic_4' ? 'Classic 4' : 'Classic 2')}. "
+          "Sistem mendeteksi ini adalah ${detectedTemplate == 'classic_4' ? 'Classic 4' : detectedTemplate == 'vintage' ? 'Vintage' : 'Classic 2'}. "
           "Karya kamu akan muncul di halaman publik.",
         ),
         actions: [
@@ -411,7 +412,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             onPressed: () {
               Navigator.pop(context);
-              // Kirim detectedTemplate yang sudah benar ke database
               _postImage(imageUrl, detectedTemplate);
             },
             child: const Text(
@@ -619,6 +619,7 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
+            color: Colors.white,
             onPressed: () {
               showDialog(
                 context: context,
@@ -771,7 +772,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         final result = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const TemplateVintage(),
+                            builder: (context) => const PhotoBoothPage3(),
                           ),
                         );
                         if (result == true) _loadPhotos();
