@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:project_kelompok/template/photoboothpage.dart';
 import 'package:project_kelompok/template/photoboothpage2.dart';
+import 'package:project_kelompok/template/template_vintage.dart';
 
 class PostDetailPage extends StatefulWidget {
   final String postId;
@@ -266,9 +267,16 @@ class _PostDetailPageState extends State<PostDetailPage> {
   @override
   Widget build(BuildContext context) {
     String detectedTemplate = widget.postData['template_type'] ?? 'classic_2';
-    String templateLabel = detectedTemplate == 'classic_4'
-        ? 'Classic 4'
-        : 'Classic 2';
+
+    // Logika Penamaan Tombol
+    String templateLabel;
+    if (detectedTemplate == 'classic_4') {
+      templateLabel = 'Classic 4';
+    } else if (detectedTemplate == 'vintage') {
+      templateLabel = 'Vintage';
+    } else {
+      templateLabel = 'Classic 2';
+    }
 
     bool isOwner = currentUser?.uid == widget.postData['uid'];
 
@@ -317,11 +325,19 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     padding: const EdgeInsets.all(12.0),
                     child: ElevatedButton.icon(
                       onPressed: () {
+                        // Logika Navigasi Template
                         if (detectedTemplate == 'classic_4') {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => const PhotoBoothPage(),
+                            ),
+                          );
+                        } else if (detectedTemplate == 'vintage') {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const TemplateVintage(),
                             ),
                           );
                         } else {

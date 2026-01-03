@@ -6,7 +6,6 @@ import 'package:project_kelompok/screen/info_page.dart';
 import 'package:project_kelompok/screen/profile_page.dart';
 import 'package:project_kelompok/screen/camera_page.dart';
 
-
 class CustomButtomNav extends StatelessWidget {
   final int currentIndex;
   const CustomButtomNav({super.key, required this.currentIndex});
@@ -35,34 +34,72 @@ class CustomButtomNav extends StatelessWidget {
                 GestureDetector(
                   onTap: () {
                     Navigator.pop(context);
-                    _openCamera(context, 2);
+                    _openCamera(context, 2, 'classic_2');
                   },
                   child: Column(
                     children: [
                       CircleAvatar(
                         radius: 30,
                         backgroundColor: Colors.blue[100],
-                        child: const Icon(Icons.filter_2, color: Colors.blue, size: 30),
+                        child: const Icon(
+                          Icons.filter_2,
+                          color: Colors.blue,
+                          size: 30,
+                        ),
                       ),
                       const SizedBox(height: 8),
-                      const Text("Classic 2", style: TextStyle(fontWeight: FontWeight.bold)),
+                      const Text(
+                        "Classic 2",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ],
                   ),
                 ),
                 GestureDetector(
                   onTap: () {
                     Navigator.pop(context);
-                    _openCamera(context, 4);
+                    _openCamera(context, 4, 'classic_4');
                   },
                   child: Column(
                     children: [
                       CircleAvatar(
                         radius: 30,
                         backgroundColor: Colors.purple[100],
-                        child: const Icon(Icons.filter_4, color: Colors.purple, size: 30),
+                        child: const Icon(
+                          Icons.filter_4,
+                          color: Colors.purple,
+                          size: 30,
+                        ),
                       ),
                       const SizedBox(height: 8),
-                      const Text("Classic 4", style: TextStyle(fontWeight: FontWeight.bold)),
+                      const Text(
+                        "Classic 4",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                    _openCamera(context, 2, 'vintage');
+                  },
+                  child: Column(
+                    children: [
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundColor: Colors.green[100],
+                        child: const Icon(
+                          Icons.camera_roll,
+                          color: Colors.green,
+                          size: 30,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        "Vintage",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ],
                   ),
                 ),
@@ -75,10 +112,16 @@ class CustomButtomNav extends StatelessWidget {
     );
   }
 
-  void _openCamera(BuildContext context, int count) {
+  void _openCamera(BuildContext context, int count, String templateType) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => CameraPage(photoCount: count)),
+      MaterialPageRoute(
+        builder: (context) => CameraPage(
+          photoCount: count,
+          // Pastikan CameraPage kamu menerima parameter ini
+          // templateType: templateType,
+        ),
+      ),
     );
   }
 
@@ -95,7 +138,6 @@ class CustomButtomNav extends StatelessWidget {
           children: [
             _buildNavItem(context, Icons.home, 'Home', 0),
             _buildNavItem(context, Icons.explore_outlined, 'Explore', 1),
-            
             GestureDetector(
               onTap: () {
                 _showCameraOptions(context);
@@ -106,12 +148,15 @@ class CustomButtomNav extends StatelessWidget {
                   CircleAvatar(
                     radius: 25,
                     backgroundColor: Colors.yellow[700],
-                    child: const Icon(Icons.camera_alt, color: Colors.white, size: 25),
-                  )
+                    child: const Icon(
+                      Icons.camera_alt,
+                      color: Colors.white,
+                      size: 25,
+                    ),
+                  ),
                 ],
               ),
             ),
-
             _buildNavItem(context, Icons.info, 'Info', 2),
             _buildNavItem(context, Icons.person, 'Profile', 3),
           ],
