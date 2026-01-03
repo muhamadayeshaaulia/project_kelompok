@@ -164,7 +164,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
             '${tempDir.path}/vintage_strip_${DateTime.now().millisecondsSinceEpoch}.png',
           ).create();
           await file.writeAsBytes(fullImageBytes);
-          await Gal.putImage(file.path, album: 'VintageBooth');
+          await Gal.putImage(file.path, album: 'Booth-Art');
         } catch (e) {
           debugPrint("Skip galeri: $e");
         }
