@@ -18,6 +18,13 @@ class InfoAplikasiPage extends StatelessWidget {
       },
     );
 
+    try {
+      await launchUrl(emailLaunchUri);
+    } catch (e) {
+      debugPrint("Gagal membuka email: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -107,8 +114,8 @@ class InfoAplikasiPage extends StatelessWidget {
               Icons.arrow_forward_ios, 
               size: 16, 
               color: Colors.grey
-            ), // Tambahkan panah agar user tau ini bisa dipencet
-            onTap: _launchEmail, // Panggil fungsi launch di sini
+            ), 
+            onTap: _launchEmail, 
           ),
           ListTile(
             leading: const Icon(Icons.privacy_tip),
