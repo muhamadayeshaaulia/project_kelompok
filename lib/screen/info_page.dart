@@ -10,18 +10,20 @@ class InfoAplikasiPage extends StatelessWidget {
   const InfoAplikasiPage({super.key});
 
   Future<void> _launchEmail() async {
-    final Uri emailLaunchUri = Uri(
-      scheme: 'mailto',
-      path: 'developer@gmail.com',
-      queryParameters: {
-        'subject': 'Tanya Seputar Aplikasi',
-      },
+    final String email = 'developer@gmail.com';
+    final String subject = 'Tanya Seputar Aplikasi';
+
+    final Uri gmailUrl = Uri.parse(
+      'https://mail.google.com/mail/?view=cm&fs=1&to=$email&su=$subject'
     );
 
     try {
-      await launchUrl(emailLaunchUri);
+      await launchUrl(
+        gmailUrl,
+        mode: LaunchMode.externalApplication,
+      );
     } catch (e) {
-      debugPrint("Gagal membuka email: $e");
+      debugPrint("Gagal membuka Gmail: $e");
     }
   }
 
