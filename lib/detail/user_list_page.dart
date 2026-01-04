@@ -3,9 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_kelompok/detail/profilDetail.dart';
 
 class UserListPage extends StatelessWidget {
-  final String title;     // Judul: "Pengikut" atau "Mengikuti"
-  final String uid;       // UID user yang sedang dilihat
-  final String collectionName; // 'followers' atau 'following'
+  final String title;
+  final String uid;
+  final String collectionName;
 
   const UserListPage({
     super.key,
@@ -18,8 +18,16 @@ class UserListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
-        backgroundColor: Colors.yellow[700],
+        title: Text(title, style: TextStyle(color: Colors.black),),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color.fromRGBO(255, 192, 45, 1), Colors.white],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         foregroundColor: Colors.white,
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -34,9 +42,7 @@ class UserListPage extends StatelessWidget {
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(
-              child: Text("Belum ada ${title.toLowerCase()}."),
-            );
+            return Center(child: Text("Belum ada ${title.toLowerCase()}."));
           }
 
           var userDocs = snapshot.data!.docs;
@@ -59,7 +65,8 @@ class UserListPage extends StatelessWidget {
                     );
                   }
 
-                  var userData = userSnapshot.data!.data() as Map<String, dynamic>?;
+                  var userData =
+                      userSnapshot.data!.data() as Map<String, dynamic>?;
                   if (userData == null) return const SizedBox();
 
                   return ListTile(
@@ -75,7 +82,6 @@ class UserListPage extends StatelessWidget {
                       userData['nama'] ?? "User",
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    subtitle: Text(userData['email'] ?? ""),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                     onTap: () {
                       Navigator.push(

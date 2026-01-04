@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:project_kelompok/screen/explor.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
+import 'package:project_kelompok/detail/profilDetail.dart';
 
 class FollowingPage extends StatefulWidget {
   const FollowingPage({super.key});
@@ -130,6 +131,7 @@ class _FollowingPageState extends State<FollowingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text("Cari User"),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -140,13 +142,17 @@ class _FollowingPageState extends State<FollowingPage> {
             ),
           ),
         ),
-        actions: [IconButton(
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const ExplorPage()),
-            );
-        }, icon: const Icon(Icons.explore_outlined))],
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const ExplorPage()),
+              );
+            },
+            icon: const Icon(Icons.explore_outlined),
+          ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(70),
           child: Padding(
@@ -306,6 +312,14 @@ class _FollowingPageState extends State<FollowingPage> {
                     }
 
                     return ListTile(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Profildetail(uid: targetUid),
+                          ),
+                        );
+                      },
                       leading: CircleAvatar(
                         backgroundImage: userData['photo_url'] != null
                             ? NetworkImage(userData['photo_url'])
@@ -315,7 +329,6 @@ class _FollowingPageState extends State<FollowingPage> {
                             : null,
                       ),
                       title: Text(userData['nama'] ?? "User"),
-                      subtitle: Text(userData['email'] ?? ""),
                       trailing: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: buttonColor,
@@ -340,7 +353,7 @@ class _FollowingPageState extends State<FollowingPage> {
                 );
               },
             ),
-      bottomNavigationBar: const CustomButtomNav(currentIndex: 1),
+      bottomNavigationBar: const CustomButtomNav(currentIndex: 0),
     );
   }
 }

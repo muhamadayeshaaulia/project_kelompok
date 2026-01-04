@@ -613,6 +613,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       extendBody: true,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('Photo Booth App'),
         backgroundColor: Colors.yellow[700],
         elevation: 0,
