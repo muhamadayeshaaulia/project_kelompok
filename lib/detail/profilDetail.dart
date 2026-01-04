@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_kelompok/detail/postingan.dart';
 import 'package:project_kelompok/detail/user_list_page.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Profildetail extends StatefulWidget {
   final String uid;
@@ -14,6 +14,10 @@ class Profildetail extends StatefulWidget {
 }
 
 class _ProfildetailState extends State<Profildetail> {
+
+  bool isFollowing = false;
+  bool isMe = false;
+  final String currentUid = FirebaseAuth.instance.currentUser!.uid;
   
   Widget _buildStatColumn(String label, int count, VoidCallback onTap) {
     return InkWell(
