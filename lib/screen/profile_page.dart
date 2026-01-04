@@ -595,6 +595,18 @@ class _ProfilePageState extends State<ProfilePage> {
         color: Colors.blue,
         size: 20,
       );
+      if (lowerUrl.contains("youtube.com"))
+      return const FaIcon(
+        FontAwesomeIcons.youtube,
+        color: Colors.red,
+        size: 22,
+      );
+      if (lowerUrl.contains("linkedin.com"))
+      return const FaIcon(
+        FontAwesomeIcons.linkedin,
+        color: Colors.blue,
+        size: 22,
+      );
     return const FaIcon(FontAwesomeIcons.link, size: 18);
   }
 

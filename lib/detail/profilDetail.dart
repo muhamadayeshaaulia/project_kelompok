@@ -146,6 +146,12 @@ class _ProfildetailState extends State<Profildetail> {
         color: Colors.red,
         size: 22,
       );
+      if (lowerUrl.contains("linkedin.com"))
+      return const FaIcon(
+        FontAwesomeIcons.linkedin,
+        color: Colors.blue,
+        size: 22,
+      );
     return const FaIcon(FontAwesomeIcons.link, color: Colors.black54, size: 20);
   }
 
@@ -183,7 +189,7 @@ class _ProfildetailState extends State<Profildetail> {
           decoration: const BoxDecoration(gradient: profileGradient),
         ),
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: CustomScrollView(
         slivers: [
@@ -337,8 +343,6 @@ class _ProfildetailState extends State<Profildetail> {
                           ),
                         ),
                       const SizedBox(height: 25),
-
-                      // --- TOMBOL AKSI DENGAN LOGIKA TEMAN & IKUTI BALIK ---
                       Row(
                         children: [
                           Expanded(
