@@ -394,9 +394,9 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _statItem("Post", postCount),
-          _statItem("Followers", followerCount),
-          _statItem("Following", followingCount),
+          _statItem("Postingan", postCount),
+          _statItem("Pengikut", followerCount),
+          _statItem("Mengikuti", followingCount),
         ],
       ),
     );
