@@ -75,7 +75,6 @@ class UserListPage extends StatelessWidget {
                       userData['nama'] ?? "User",
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    subtitle: Text(userData['email'] ?? ""),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                     onTap: () {
                       Navigator.push(
