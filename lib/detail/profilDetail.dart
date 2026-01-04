@@ -113,10 +113,19 @@ class _ProfildetailState extends State<Profildetail> {
         slivers: [
           SliverAppBar(
             pinned: true,
-            expandedHeight: 50.0,
-            title: const Text("Profil Pengguna"),
-            centerTitle: true,
-            backgroundColor: Colors.yellow[700],
+            title: const Text(
+              "Profil Pengguna",
+              style: TextStyle(color: Colors.black),
+            ),
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color.fromRGBO(255, 192, 45, 1), Colors.white],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+            ),
             foregroundColor: Colors.white,
           ),
 
