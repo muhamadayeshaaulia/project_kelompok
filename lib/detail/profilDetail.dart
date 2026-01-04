@@ -146,7 +146,7 @@ class _ProfildetailState extends State<Profildetail> {
         color: Colors.red,
         size: 22,
       );
-      if (lowerUrl.contains("linkedin.com"))
+    if (lowerUrl.contains("linkedin.com"))
       return const FaIcon(
         FontAwesomeIcons.linkedin,
         color: Colors.blue,
