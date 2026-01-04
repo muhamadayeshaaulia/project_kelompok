@@ -18,6 +18,72 @@ class _ProfildetailState extends State<Profildetail> {
   bool isFollowing = false;
   bool isMe = false;
   final String currentUid = FirebaseAuth.instance.currentUser!.uid;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfFollowing();
+  }
+
+  // 1. FUNGSI CEK STATUS FOLLOW
+  void _checkIfFollowing() async {
+    // Kalau profil yang dibuka adalah diri sendiri
+    if (widget.uid == currentUid) {
+      setState(() {
+        isMe = true;
+      });
+      return;
+    }
+
+    // Cek ke database apakah saya ada di list followers dia
+    DocumentSnapshot doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(widget.uid)
+        .collection('followers')
+        .doc(currentUid)
+        .get();
+
+    if (mounted) {
+      setState(() {
+        isFollowing = doc.exists;
+      });
+    }
+  }
+
+  // 2. FUNGSI TOMBOL DITEKAN (FOLLOW / UNFOLLOW)
+  void _handleFollow() async {
+    var batch = FirebaseFirestore.instance.batch();
+
+    DocumentReference myFollowingRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUid)
+        .collection('following')
+        .doc(widget.uid);
+
+    DocumentReference otherFollowerRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(widget.uid)
+        .collection('followers')
+        .doc(currentUid);
+
+    // Optimistic UI Update (Ubah tampilan dulu biar terasa cepat)
+    setState(() {
+      isFollowing = !isFollowing;
+    });
+
+    if (isFollowing) {
+      // LOGIKA FOLLOW (Tambah Data)
+      batch.set(myFollowingRef, {'timestamp': FieldValue.serverTimestamp()});
+      batch.set(otherFollowerRef, {'timestamp': FieldValue.serverTimestamp()});
+    } else {
+      // LOGIKA UNFOLLOW (Hapus Data)
+      batch.delete(myFollowingRef);
+      batch.delete(otherFollowerRef);
+    }
+
+    // Jalankan update ke database
+    await batch.commit();
+  }
   
   Widget _buildStatColumn(String label, int count, VoidCallback onTap) {
     return InkWell(
