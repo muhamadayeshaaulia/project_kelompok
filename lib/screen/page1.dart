@@ -46,11 +46,9 @@ class _MyPage1State extends State<MyPage1> {
           Positioned.fill(
             child: Image.asset('assets/images/home1.jpg', fit: BoxFit.cover),
           ),
-
           Positioned.fill(
             child: Container(color: Colors.black.withOpacity(0.25)),
           ),
-
           SafeArea(
             child: Column(
               children: [
@@ -59,12 +57,10 @@ class _MyPage1State extends State<MyPage1> {
                   'assets/images/global.png',
                   width: 140,
                   height: 140,
-                  fit: BoxFit.contain,
                 ),
                 const SizedBox(height: 10),
                 const Text(
                   'MyPhotoBooth',
-                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 48,
                     color: Colors.white,
@@ -75,7 +71,6 @@ class _MyPage1State extends State<MyPage1> {
                 Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
                       _isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
@@ -84,9 +79,7 @@ class _MyPage1State extends State<MyPage1> {
                               text: 'Sambungkan dengan Google',
                               onTap: _handleGoogleSignIn,
                             ),
-
                       const SizedBox(height: 12),
-
                       _authButton(
                         imagePath: 'assets/images/email3.png',
                         text: 'Lanjut dengan Email',
@@ -100,10 +93,9 @@ class _MyPage1State extends State<MyPage1> {
                           );
                         },
                       ),
-
                       const SizedBox(height: 20),
                       const Text(
-                        'Dengan mendaftar, kamu menyetujui\nKetentuan Penggunaan dan Kebijakan Privasi kami',
+                        'Dengan mendaftar, kamu menyetujui Ketentuan...',
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Colors.white70, fontSize: 12),
                       ),
@@ -130,7 +122,6 @@ class _MyPage1State extends State<MyPage1> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
                     ],
                   ),
                 ),

@@ -8,15 +8,20 @@ class AuthService {
 
   Future<User?> signInWithGoogle() async {
     try {
+      await _googleSignIn.signOut();
+
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      await _auth.signOut();
+
       if (googleUser == null) return null;
+
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
+
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
+
       final UserCredential userCredential = await _auth.signInWithCredential(
         credential,
       );
@@ -27,6 +32,7 @@ class AuthService {
             .collection('users')
             .doc(user.uid)
             .get();
+
         if (!userDoc.exists) {
           await FirebaseFirestore.instance
               .collection('users')
@@ -48,6 +54,11 @@ class AuthService {
       print("Error Google Sign-In: $e");
       return null;
     }
+  }
+
+  Future<void> signOut() async {
+    await _googleSignIn.signOut();
+    await _auth.signOut();
   }
 
   List<String> _createSearchKeywords(String name) {
