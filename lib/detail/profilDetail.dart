@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:project_kelompok/detail/postingan.dart';
 import 'package:project_kelompok/detail/user_list_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:project_kelompok/screen/profile_page.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 
@@ -26,17 +28,12 @@ class _ProfildetailState extends State<Profildetail> {
     _checkIfFollowing();
   }
 
-  // 1. FUNGSI CEK STATUS FOLLOW
   void _checkIfFollowing() async {
-    // Kalau profil yang dibuka adalah diri sendiri
     if (widget.uid == currentUid) {
-      setState(() {
-        isMe = true;
-      });
+      if (mounted) setState(() => isMe = true);
       return;
     }
 
-    // Cek ke database apakah saya ada di list followers dia
     DocumentSnapshot doc = await FirebaseFirestore.instance
         .collection('users')
         .doc(widget.uid)
@@ -51,7 +48,6 @@ class _ProfildetailState extends State<Profildetail> {
     }
   }
 
-  // 2. FUNGSI TOMBOL DITEKAN (FOLLOW / UNFOLLOW)
   void _handleFollow() async {
     var batch = FirebaseFirestore.instance.batch();
 
@@ -82,6 +78,53 @@ class _ProfildetailState extends State<Profildetail> {
     await batch.commit();
   }
 
+  Future<void> _launchURL(String url) async {
+    final cleanUrl = url.trim();
+    if (cleanUrl.isEmpty) return;
+
+    final Uri uri = Uri.parse(
+      cleanUrl.startsWith('http') ? cleanUrl : 'https://$cleanUrl',
+    );
+
+    try {
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        throw 'Could not launch $cleanUrl';
+      }
+    } catch (e) {
+      debugPrint("Error launching URL: $e");
+    }
+  }
+
+  Widget _getSocialIcon(String url) {
+    String lowerUrl = url.toLowerCase();
+    if (lowerUrl.contains("instagram.com")) {
+      return const FaIcon(
+        FontAwesomeIcons.instagram,
+        color: Colors.pink,
+        size: 22,
+      );
+    } else if (lowerUrl.contains("facebook.com")) {
+      return const FaIcon(
+        FontAwesomeIcons.facebook,
+        color: Colors.blue,
+        size: 22,
+      );
+    } else if (lowerUrl.contains("github.com")) {
+      return const FaIcon(
+        FontAwesomeIcons.github,
+        color: Colors.black,
+        size: 22,
+      );
+    } else if (lowerUrl.contains("twitter.com") || lowerUrl.contains("x.com")) {
+      return const FaIcon(
+        FontAwesomeIcons.xTwitter,
+        color: Colors.black,
+        size: 22,
+      );
+    }
+    return const FaIcon(FontAwesomeIcons.link, color: Colors.grey, size: 20);
+  }
+
   Widget _buildStatColumn(String label, int count, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
@@ -89,7 +132,6 @@ class _ProfildetailState extends State<Profildetail> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               count.toString(),
@@ -118,7 +160,7 @@ class _ProfildetailState extends State<Profildetail> {
               style: TextStyle(color: Colors.black),
             ),
             flexibleSpace: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Color.fromRGBO(255, 192, 45, 1), Colors.white],
                   begin: Alignment.topLeft,
@@ -128,7 +170,6 @@ class _ProfildetailState extends State<Profildetail> {
             ),
             foregroundColor: Colors.white,
           ),
-
           SliverToBoxAdapter(
             child: FutureBuilder<DocumentSnapshot>(
               future: FirebaseFirestore.instance
@@ -136,55 +177,44 @@ class _ProfildetailState extends State<Profildetail> {
                   .doc(widget.uid)
                   .get(),
               builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Center(child: CircularProgressIndicator()),
-                  );
-                }
-                var userData = snapshot.data!.data() as Map<String, dynamic>?;
+                if (!snapshot.hasData)
+                  return const Center(child: CircularProgressIndicator());
 
+                var userData = snapshot.data!.data() as Map<String, dynamic>?;
                 if (userData == null)
                   return const Center(child: Text("User tidak ditemukan"));
 
                 return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 20.0,
-                    horizontal: 16.0,
-                  ),
+                  padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      Center(
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundColor: Colors.grey[200],
-                          backgroundImage: userData['photo_url'] != null
-                              ? NetworkImage(userData['photo_url'])
-                              : null,
-                          child: userData['photo_url'] == null
-                              ? const Icon(
-                                  Icons.person,
-                                  size: 50,
-                                  color: Colors.grey,
-                                )
-                              : null,
-                        ),
+                      CircleAvatar(
+                        radius: 50,
+                        backgroundColor: Colors.grey[200],
+                        backgroundImage:
+                            userData['photo_url'] != null &&
+                                userData['photo_url'] != ''
+                            ? NetworkImage(userData['photo_url'])
+                            : null,
+                        child:
+                            userData['photo_url'] == null ||
+                                userData['photo_url'] == ''
+                            ? const Icon(
+                                Icons.person,
+                                size: 50,
+                                color: Colors.grey,
+                              )
+                            : null,
                       ),
                       const SizedBox(height: 12),
-                      Center(
-                        child: Text(
-                          userData['nama'] ?? "Tanpa Nama",
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
+                      Text(
+                        userData['nama'] ?? "Tanpa Nama",
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-
                       const SizedBox(height: 24),
-
-                      // --- BAGIAN TOMBOL FOLLOW / EDIT ---
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -193,138 +223,148 @@ class _ProfildetailState extends State<Profildetail> {
                                 .collection('posts')
                                 .where('uid', isEqualTo: widget.uid)
                                 .snapshots(),
-                            builder: (context, snapshot) {
-                              int postCount = snapshot.hasData
-                                  ? snapshot.data!.docs.length
+                            builder: (context, snap) {
+                              int count = snap.hasData
+                                  ? snap.data!.docs.length
                                   : 0;
                               return _buildStatColumn(
                                 "Postingan",
-                                postCount,
+                                count,
                                 () {},
                               );
                             },
                           ),
-                          Container(
-                            height: 30,
-                            width: 1,
-                            color: Colors.grey[300],
-                          ),
-
                           StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('users')
                                 .doc(widget.uid)
                                 .collection('followers')
                                 .snapshots(),
-                            builder: (context, snapshot) {
-                              int followerCount = snapshot.hasData
-                                  ? snapshot.data!.docs.length
+                            builder: (context, snap) {
+                              int count = snap.hasData
+                                  ? snap.data!.docs.length
                                   : 0;
-                              return _buildStatColumn(
-                                "Pengikut",
-                                followerCount,
-                                () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => UserListPage(
-                                        title: "Pengikut",
-                                        uid: widget.uid,
-                                        collectionName: 'followers',
-                                      ),
+                              return _buildStatColumn("Pengikut", count, () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (c) => UserListPage(
+                                      title: "Pengikut",
+                                      uid: widget.uid,
+                                      collectionName: 'followers',
                                     ),
-                                  );
-                                },
-                              );
+                                  ),
+                                );
+                              });
                             },
                           ),
-                          Container(
-                            height: 30,
-                            width: 1,
-                            color: Colors.grey[300],
-                          ),
-
                           StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('users')
                                 .doc(widget.uid)
                                 .collection('following')
                                 .snapshots(),
-                            builder: (context, snapshot) {
-                              int followingCount = snapshot.hasData
-                                  ? snapshot.data!.docs.length
+                            builder: (context, snap) {
+                              int count = snap.hasData
+                                  ? snap.data!.docs.length
                                   : 0;
-                              return _buildStatColumn(
-                                "Mengikuti",
-                                followingCount,
-                                () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => UserListPage(
-                                        title: "Mengikuti",
-                                        uid: widget.uid,
-                                        collectionName: 'following',
-                                      ),
+                              return _buildStatColumn("Mengikuti", count, () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (c) => UserListPage(
+                                      title: "Mengikuti",
+                                      uid: widget.uid,
+                                      collectionName: 'following',
                                     ),
-                                  );
-                                },
-                              );
+                                  ),
+                                );
+                              });
                             },
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
-                      if (isMe)
-                        SizedBox(
-                          width: double.infinity,
-                          child: OutlinedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const ProfilePage(),
-                                ),
-                              );
-                            },
-                            style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: Colors.grey),
-                            ),
-                            child: const Text(
-                              "Edit Profil",
-                              style: TextStyle(color: Colors.black),
-                            ),
+
+                      if (userData['keterangan'] != null &&
+                          userData['keterangan'].toString().isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 8.0,
+                            left: 30,
+                            right: 30,
                           ),
-                        )
-                      else
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: _handleFollow,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: isFollowing
-                                  ? Colors.grey[300]
-                                  : Colors.blue,
-                              foregroundColor: isFollowing
-                                  ? Colors.black
-                                  : Colors.white,
-                              elevation: 0,
+                          child: Text(
+                            userData['keterangan'],
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Colors.black87,
+                              fontSize: 14,
                             ),
-                            child: Text(isFollowing ? "Mengikuti" : "Ikuti"),
                           ),
                         ),
+                      if (userData['sosmed_link'] != null &&
+                          userData['sosmed_link'].toString().isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 15.0),
+                          child: Wrap(
+                            spacing: 20,
+                            children: userData['sosmed_link']
+                                .toString()
+                                .split(',')
+                                .map<Widget>((link) {
+                                  return GestureDetector(
+                                    onTap: () => _launchURL(link),
+                                    child: _getSocialIcon(link),
+                                  );
+                                })
+                                .toList(),
+                          ),
+                        ),
+
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: isMe
+                            ? OutlinedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const ProfilePage(),
+                                    ),
+                                  );
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(color: Colors.grey),
+                                ),
+                                child: const Text(
+                                  "Edit Profil",
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              )
+                            : ElevatedButton(
+                                onPressed: _handleFollow,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: isFollowing
+                                      ? Colors.grey[300]
+                                      : Colors.blue,
+                                  foregroundColor: isFollowing
+                                      ? Colors.black
+                                      : Colors.white,
+                                  elevation: 0,
+                                ),
+                                child: Text(
+                                  isFollowing ? "Mengikuti" : "Ikuti",
+                                ),
+                              ),
+                      ),
                       const SizedBox(height: 10),
                       const Divider(thickness: 1),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 10),
-                        child: Center(
-                          child: Text(
-                            "Karya Pengguna Ini",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
+                      const Text(
+                        "Karya Pengguna Ini",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
                         ),
                       ),
                     ],
@@ -333,27 +373,22 @@ class _ProfildetailState extends State<Profildetail> {
               },
             ),
           ),
-
           StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('posts')
                 .where('uid', isEqualTo: widget.uid)
                 .snapshots(),
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const SliverToBoxAdapter(
-                  child: Center(child: CircularProgressIndicator()),
-                );
-              }
               if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                 return const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.all(50.0),
-                    child: Center(child: Text("Belum ada postingan.")),
+                  child: Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(40),
+                      child: Text("Belum ada postingan."),
+                    ),
                   ),
                 );
               }
-
               return SliverGrid(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
@@ -363,37 +398,24 @@ class _ProfildetailState extends State<Profildetail> {
                 delegate: SliverChildBuilderDelegate((context, index) {
                   var post = snapshot.data!.docs[index];
                   var postData = post.data() as Map<String, dynamic>;
-                  String postId = post.id;
                   return InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PostDetailPage(
-                            postId: postId,
-                            postData: postData,
-                          ),
-                        ),
-                      );
-                    },
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: Image.network(
-                        postData['post_image'],
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          color: Colors.grey[300],
-                          child: const Icon(Icons.error),
-                        ),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (c) =>
+                            PostDetailPage(postId: post.id, postData: postData),
                       ),
+                    ),
+                    child: Image.network(
+                      postData['post_image'],
+                      fit: BoxFit.cover,
                     ),
                   );
                 }, childCount: snapshot.data!.docs.length),
               );
             },
           ),
-
-          const SliverToBoxAdapter(child: SizedBox(height: 40)),
+          const SliverToBoxAdapter(child: SizedBox(height: 80)),
         ],
       ),
       bottomNavigationBar: const CustomButtomNav(currentIndex: 0),
