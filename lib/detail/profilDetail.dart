@@ -367,7 +367,7 @@ class _ProfildetailState extends State<Profildetail> {
                                       ),
                                     ),
                                     child: const Text(
-                                      "Edit Profil",
+                                      "Settings Profil",
                                       style: TextStyle(
                                         color: Colors.black,
                                         fontWeight: FontWeight.bold,

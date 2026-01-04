@@ -141,13 +141,17 @@ class _FollowingPageState extends State<FollowingPage> {
             ),
           ),
         ),
-        actions: [IconButton(
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const ExplorPage()),
-            );
-        }, icon: const Icon(Icons.explore_outlined))],
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const ExplorPage()),
+              );
+            },
+            icon: const Icon(Icons.explore_outlined),
+          ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(70),
           child: Padding(
