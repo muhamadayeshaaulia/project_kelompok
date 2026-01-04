@@ -7,50 +7,6 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1043234910102:android:2da2a59da6368fc848f7b7",
-        "android_client_info": {
-          "package_name": "com.booth_art.app"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "1043234910102-as4csdidc2sn06164fnvnmlg1ecqdblh.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.booth_art.app",
-            "certificate_hash": "6ef34fab59b938b683f441c4cb50a1f9ee08bd03"
-          }
-        },
-        {
-          "client_id": "1043234910102-m0ujonle7fpj2531a2upjgabssth1h4b.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAmsZFAuEUr8Olj9bYpVIvgiyVhC5rZkR0"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "1043234910102-m0ujonle7fpj2531a2upjgabssth1h4b.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "1043234910102-oo0grnac19f2k77nitc0cc6uj7549fkm.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.notifLearn"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:1043234910102:android:1912f2c9523440c748f7b7",
         "android_client_info": {
           "package_name": "com.example.belajar_upload"
