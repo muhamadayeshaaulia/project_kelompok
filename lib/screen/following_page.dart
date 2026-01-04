@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:project_kelompok/screen/explor.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
+import 'package:project_kelompok/detail/profilDetail.dart';
 
 class FollowingPage extends StatefulWidget {
   const FollowingPage({super.key});
@@ -311,6 +312,14 @@ class _FollowingPageState extends State<FollowingPage> {
                     }
 
                     return ListTile(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Profildetail(uid: targetUid),
+                          ),
+                        );
+                      },
                       leading: CircleAvatar(
                         backgroundImage: userData['photo_url'] != null
                             ? NetworkImage(userData['photo_url'])
@@ -344,7 +353,7 @@ class _FollowingPageState extends State<FollowingPage> {
                 );
               },
             ),
-      bottomNavigationBar: const CustomButtomNav(currentIndex: 1),
+      bottomNavigationBar: const CustomButtomNav(currentIndex: 0),
     );
   }
 }
