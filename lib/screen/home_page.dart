@@ -615,7 +615,6 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: const Text('Photo Booth App'),
         backgroundColor: Colors.yellow[700],
-        foregroundColor: Colors.black,
         elevation: 0,
         actions: [
           IconButton(
@@ -804,7 +803,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
-      bottomNavigationBar: const CustomButtomNav(currentIndex: 0),
+      bottomNavigationBar: const CustomButtomNav(currentIndex: 1),
     );
   }
 }

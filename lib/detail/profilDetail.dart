@@ -4,6 +4,7 @@ import 'package:project_kelompok/detail/postingan.dart';
 import 'package:project_kelompok/detail/user_list_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:project_kelompok/screen/profile_page.dart';
+import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 
 class Profildetail extends StatefulWidget {
   final String uid;
@@ -15,7 +16,6 @@ class Profildetail extends StatefulWidget {
 }
 
 class _ProfildetailState extends State<Profildetail> {
-
   bool isFollowing = false;
   bool isMe = false;
   final String currentUid = FirebaseAuth.instance.currentUser!.uid;
@@ -81,7 +81,7 @@ class _ProfildetailState extends State<Profildetail> {
 
     await batch.commit();
   }
-  
+
   Widget _buildStatColumn(String label, int count, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
@@ -93,18 +93,12 @@ class _ProfildetailState extends State<Profildetail> {
           children: [
             Text(
               count.toString(),
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             Text(
               label,
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 14,
-              ),
+              style: const TextStyle(color: Colors.grey, fontSize: 14),
             ),
           ],
         ),
@@ -118,11 +112,20 @@ class _ProfildetailState extends State<Profildetail> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            pinned: true, 
-            expandedHeight: 50.0,
-            title: const Text("Profil Pengguna"),
-            centerTitle: true,
-            backgroundColor: Colors.yellow[700],
+            pinned: true,
+            title: const Text(
+              "Profil Pengguna",
+              style: TextStyle(color: Colors.black),
+            ),
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color.fromRGBO(255, 192, 45, 1), Colors.white],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+            ),
             foregroundColor: Colors.white,
           ),
 
@@ -141,10 +144,14 @@ class _ProfildetailState extends State<Profildetail> {
                 }
                 var userData = snapshot.data!.data() as Map<String, dynamic>?;
 
-                if (userData == null) return const Center(child: Text("User tidak ditemukan"));
+                if (userData == null)
+                  return const Center(child: Text("User tidak ditemukan"));
 
                 return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 20.0,
+                    horizontal: 16.0,
+                  ),
                   child: Column(
                     children: [
                       Center(
@@ -155,7 +162,11 @@ class _ProfildetailState extends State<Profildetail> {
                               ? NetworkImage(userData['photo_url'])
                               : null,
                           child: userData['photo_url'] == null
-                              ? const Icon(Icons.person, size: 50, color: Colors.grey)
+                              ? const Icon(
+                                  Icons.person,
+                                  size: 50,
+                                  color: Colors.grey,
+                                )
                               : null,
                         ),
                       ),
@@ -164,14 +175,9 @@ class _ProfildetailState extends State<Profildetail> {
                         child: Text(
                           userData['nama'] ?? "Tanpa Nama",
                           style: const TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      Center(
-                        child: Text(
-                          userData['email'] ?? "-",
-                          style: const TextStyle(color: Colors.grey),
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -179,6 +185,96 @@ class _ProfildetailState extends State<Profildetail> {
                       const SizedBox(height: 24),
 
                       // --- BAGIAN TOMBOL FOLLOW / EDIT ---
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('posts')
+                                .where('uid', isEqualTo: widget.uid)
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              int postCount = snapshot.hasData
+                                  ? snapshot.data!.docs.length
+                                  : 0;
+                              return _buildStatColumn(
+                                "Postingan",
+                                postCount,
+                                () {},
+                              );
+                            },
+                          ),
+                          Container(
+                            height: 30,
+                            width: 1,
+                            color: Colors.grey[300],
+                          ),
+
+                          StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(widget.uid)
+                                .collection('followers')
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              int followerCount = snapshot.hasData
+                                  ? snapshot.data!.docs.length
+                                  : 0;
+                              return _buildStatColumn(
+                                "Pengikut",
+                                followerCount,
+                                () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => UserListPage(
+                                        title: "Pengikut",
+                                        uid: widget.uid,
+                                        collectionName: 'followers',
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                          Container(
+                            height: 30,
+                            width: 1,
+                            color: Colors.grey[300],
+                          ),
+
+                          StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(widget.uid)
+                                .collection('following')
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              int followingCount = snapshot.hasData
+                                  ? snapshot.data!.docs.length
+                                  : 0;
+                              return _buildStatColumn(
+                                "Mengikuti",
+                                followingCount,
+                                () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => UserListPage(
+                                        title: "Mengikuti",
+                                        uid: widget.uid,
+                                        collectionName: 'following',
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
                       if (isMe)
                         SizedBox(
                           width: double.infinity,
@@ -190,10 +286,14 @@ class _ProfildetailState extends State<Profildetail> {
                                   builder: (context) => const ProfilePage(),
                                 ),
                               );
-                            }, 
+                            },
                             style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: Colors.grey)),
-                            child: const Text("Edit Profil", style: TextStyle(color: Colors.black)),
+                              side: const BorderSide(color: Colors.grey),
+                            ),
+                            child: const Text(
+                              "Edit Profil",
+                              style: TextStyle(color: Colors.black),
+                            ),
                           ),
                         )
                       else
@@ -202,79 +302,17 @@ class _ProfildetailState extends State<Profildetail> {
                           child: ElevatedButton(
                             onPressed: _handleFollow,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: isFollowing ? Colors.grey[300] : Colors.blue,
-                              foregroundColor: isFollowing ? Colors.black : Colors.white,
+                              backgroundColor: isFollowing
+                                  ? Colors.grey[300]
+                                  : Colors.blue,
+                              foregroundColor: isFollowing
+                                  ? Colors.black
+                                  : Colors.white,
                               elevation: 0,
                             ),
                             child: Text(isFollowing ? "Mengikuti" : "Ikuti"),
                           ),
                         ),
-                      
-                      const SizedBox(height: 20),
-                      
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('posts')
-                                .where('uid', isEqualTo: widget.uid)
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              int postCount = snapshot.hasData ? snapshot.data!.docs.length : 0;
-                              return _buildStatColumn("Postingan", postCount, () {});
-                            },
-                          ),
-                          Container(height: 30, width: 1, color: Colors.grey[300]),
-                          
-                          StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('users')
-                                .doc(widget.uid)
-                                .collection('followers')
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              int followerCount = snapshot.hasData ? snapshot.data!.docs.length : 0;
-                              return _buildStatColumn("Pengikut", followerCount, () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => UserListPage(
-                                      title: "Pengikut",
-                                      uid: widget.uid,
-                                      collectionName: 'followers',
-                                    ),
-                                  ),
-                                );
-                              });
-                            },
-                          ),
-                          Container(height: 30, width: 1, color: Colors.grey[300]),
-
-                          StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('users')
-                                .doc(widget.uid)
-                                .collection('following')
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              int followingCount = snapshot.hasData ? snapshot.data!.docs.length : 0;
-                              return _buildStatColumn("Mengikuti", followingCount, () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => UserListPage(
-                                      title: "Mengikuti",
-                                      uid: widget.uid,
-                                      collectionName: 'following',
-                                    ),
-                                  ),
-                                );
-                              });
-                            },
-                          ),
-                        ],
-                      ),
                       const SizedBox(height: 10),
                       const Divider(thickness: 1),
                       const Padding(
@@ -282,7 +320,10 @@ class _ProfildetailState extends State<Profildetail> {
                         child: Center(
                           child: Text(
                             "Karya Pengguna Ini",
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
                         ),
                       ),
@@ -300,7 +341,9 @@ class _ProfildetailState extends State<Profildetail> {
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator()));
+                return const SliverToBoxAdapter(
+                  child: Center(child: CircularProgressIndicator()),
+                );
               }
               if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                 return const SliverToBoxAdapter(
@@ -317,43 +360,43 @@ class _ProfildetailState extends State<Profildetail> {
                   crossAxisSpacing: 4,
                   mainAxisSpacing: 4,
                 ),
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    var post = snapshot.data!.docs[index];
-                    var postData = post.data() as Map<String, dynamic>;
-                    String postId = post.id;
-                    return InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PostDetailPage(
-                              postId: postId,
-                              postData: postData,
-                            ),
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  var post = snapshot.data!.docs[index];
+                  var postData = post.data() as Map<String, dynamic>;
+                  String postId = post.id;
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PostDetailPage(
+                            postId: postId,
+                            postData: postData,
                           ),
-                        );
-                      },
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: Image.network(
-                          postData['post_image'],
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(color: Colors.grey[300], child: const Icon(Icons.error)),
+                        ),
+                      );
+                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: Image.network(
+                        postData['post_image'],
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.error),
                         ),
                       ),
-                    );
-                  },
-                  childCount: snapshot.data!.docs.length,
-                ),
+                    ),
+                  );
+                }, childCount: snapshot.data!.docs.length),
               );
             },
           ),
-          
+
           const SliverToBoxAdapter(child: SizedBox(height: 40)),
         ],
       ),
+      bottomNavigationBar: const CustomButtomNav(currentIndex: 0),
     );
   }
 }

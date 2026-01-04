@@ -67,7 +67,7 @@ class _ExplorPageState extends State<ExplorPage> {
           _buildRecentList(),
         ],
       ),
-      bottomNavigationBar: const CustomButtomNav(currentIndex: 1),
+      bottomNavigationBar: const CustomButtomNav(currentIndex: 2),
     );
   }
 
