@@ -316,7 +316,6 @@ class _FollowingPageState extends State<FollowingPage> {
                             : null,
                       ),
                       title: Text(userData['nama'] ?? "User"),
-                      subtitle: Text(userData['email'] ?? ""),
                       trailing: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: buttonColor,
