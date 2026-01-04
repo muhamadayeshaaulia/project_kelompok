@@ -10,7 +10,6 @@ import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 
 class Profildetail extends StatefulWidget {
   final String uid;
-
   const Profildetail({super.key, required this.uid});
 
   @override
@@ -33,39 +32,29 @@ class _ProfildetailState extends State<Profildetail> {
       if (mounted) setState(() => isMe = true);
       return;
     }
-
     DocumentSnapshot doc = await FirebaseFirestore.instance
         .collection('users')
         .doc(widget.uid)
         .collection('followers')
         .doc(currentUid)
         .get();
-
-    if (mounted) {
-      setState(() {
-        isFollowing = doc.exists;
-      });
-    }
+    if (mounted) setState(() => isFollowing = doc.exists);
   }
 
   void _handleFollow() async {
     var batch = FirebaseFirestore.instance.batch();
-
     DocumentReference myFollowingRef = FirebaseFirestore.instance
         .collection('users')
         .doc(currentUid)
         .collection('following')
         .doc(widget.uid);
-
     DocumentReference otherFollowerRef = FirebaseFirestore.instance
         .collection('users')
         .doc(widget.uid)
         .collection('followers')
         .doc(currentUid);
 
-    setState(() {
-      isFollowing = !isFollowing;
-    });
+    setState(() => isFollowing = !isFollowing);
 
     if (isFollowing) {
       batch.set(myFollowingRef, {'timestamp': FieldValue.serverTimestamp()});
@@ -74,102 +63,84 @@ class _ProfildetailState extends State<Profildetail> {
       batch.delete(myFollowingRef);
       batch.delete(otherFollowerRef);
     }
-
     await batch.commit();
   }
 
   Future<void> _launchURL(String url) async {
     final cleanUrl = url.trim();
     if (cleanUrl.isEmpty) return;
-
     final Uri uri = Uri.parse(
       cleanUrl.startsWith('http') ? cleanUrl : 'https://$cleanUrl',
     );
-
-    try {
-      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-        throw 'Could not launch $cleanUrl';
-      }
-    } catch (e) {
-      debugPrint("Error launching URL: $e");
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      debugPrint("Error launching URL");
     }
   }
 
   Widget _getSocialIcon(String url) {
     String lowerUrl = url.toLowerCase();
-    if (lowerUrl.contains("instagram.com")) {
+    if (lowerUrl.contains("instagram.com"))
       return const FaIcon(
         FontAwesomeIcons.instagram,
         color: Colors.pink,
         size: 22,
       );
-    } else if (lowerUrl.contains("facebook.com")) {
+    if (lowerUrl.contains("facebook.com"))
       return const FaIcon(
         FontAwesomeIcons.facebook,
         color: Colors.blue,
         size: 22,
       );
-    } else if (lowerUrl.contains("github.com")) {
+    if (lowerUrl.contains("github.com"))
       return const FaIcon(
         FontAwesomeIcons.github,
         color: Colors.black,
         size: 22,
       );
-    } else if (lowerUrl.contains("twitter.com") || lowerUrl.contains("x.com")) {
-      return const FaIcon(
-        FontAwesomeIcons.xTwitter,
-        color: Colors.black,
-        size: 22,
-      );
-    }
-    return const FaIcon(FontAwesomeIcons.link, color: Colors.grey, size: 20);
+    return const FaIcon(FontAwesomeIcons.link, color: Colors.black54, size: 20);
   }
 
-  Widget _buildStatColumn(String label, int count, VoidCallback onTap) {
-    return InkWell(
+  Widget _buildStatItem(String label, int count, VoidCallback onTap) {
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-        child: Column(
-          children: [
-            Text(
-              count.toString(),
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: const TextStyle(color: Colors.grey, fontSize: 14),
-            ),
-          ],
-        ),
+      child: Column(
+        children: [
+          Text(
+            count.toString(),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 14, color: Colors.black87),
+          ),
+        ],
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    const profileGradient = LinearGradient(
+      colors: [Color.fromRGBO(255, 192, 45, 1), Colors.white],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+
     return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text(
+          "Profil Pengguna",
+          style: TextStyle(color: Colors.black),
+        ),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(gradient: profileGradient),
+        ),
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
+      ),
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(
-            pinned: true,
-            title: const Text(
-              "Profil Pengguna",
-              style: TextStyle(color: Colors.black),
-            ),
-            flexibleSpace: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color.fromRGBO(255, 192, 45, 1), Colors.white],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-            ),
-            foregroundColor: Colors.white,
-          ),
           SliverToBoxAdapter(
             child: FutureBuilder<DocumentSnapshot>(
               future: FirebaseFirestore.instance
@@ -179,135 +150,136 @@ class _ProfildetailState extends State<Profildetail> {
               builder: (context, snapshot) {
                 if (!snapshot.hasData)
                   return const Center(child: CircularProgressIndicator());
-
                 var userData = snapshot.data!.data() as Map<String, dynamic>?;
                 if (userData == null)
                   return const Center(child: Text("User tidak ditemukan"));
 
-                return Padding(
-                  padding: const EdgeInsets.all(16.0),
+                return Container(
+                  width: double.infinity,
+                  decoration: const BoxDecoration(gradient: profileGradient),
+                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundColor: Colors.grey[200],
-                        backgroundImage:
-                            userData['photo_url'] != null &&
-                                userData['photo_url'] != ''
-                            ? NetworkImage(userData['photo_url'])
-                            : null,
-                        child:
-                            userData['photo_url'] == null ||
-                                userData['photo_url'] == ''
-                            ? const Icon(
-                                Icons.person,
-                                size: 50,
-                                color: Colors.grey,
-                              )
-                            : null,
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 45,
+                            backgroundColor: Colors.white,
+                            child: CircleAvatar(
+                              radius: 42,
+                              backgroundColor: Colors.grey[200],
+                              backgroundImage:
+                                  userData['photo_url'] != null &&
+                                      userData['photo_url'] != ''
+                                  ? NetworkImage(userData['photo_url'])
+                                  : null,
+                              child:
+                                  userData['photo_url'] == null ||
+                                      userData['photo_url'] == ''
+                                  ? const Icon(
+                                      Icons.person,
+                                      size: 40,
+                                      color: Colors.grey,
+                                    )
+                                  : null,
+                            ),
+                          ),
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                StreamBuilder<QuerySnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('posts')
+                                      .where('uid', isEqualTo: widget.uid)
+                                      .snapshots(),
+                                  builder: (context, snap) => _buildStatItem(
+                                    "Post",
+                                    snap.hasData ? snap.data!.docs.length : 0,
+                                    () {},
+                                  ),
+                                ),
+                                StreamBuilder<QuerySnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('users')
+                                      .doc(widget.uid)
+                                      .collection('followers')
+                                      .snapshots(),
+                                  builder: (context, snap) => _buildStatItem(
+                                    "Follower",
+                                    snap.hasData ? snap.data!.docs.length : 0,
+                                    () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (c) => UserListPage(
+                                            title: "Followers",
+                                            uid: widget.uid,
+                                            collectionName: 'followers',
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                StreamBuilder<QuerySnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('users')
+                                      .doc(widget.uid)
+                                      .collection('following')
+                                      .snapshots(),
+                                  builder: (context, snap) => _buildStatItem(
+                                    "Following",
+                                    snap.hasData ? snap.data!.docs.length : 0,
+                                    () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (c) => UserListPage(
+                                            title: "Following",
+                                            uid: widget.uid,
+                                            collectionName: 'following',
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 12),
+
+                      const SizedBox(height: 15),
                       Text(
                         userData['nama'] ?? "Tanpa Nama",
                         style: const TextStyle(
-                          fontSize: 20,
                           fontWeight: FontWeight.bold,
+                          fontSize: 18,
                         ),
-                      ),
-                      const SizedBox(height: 24),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('posts')
-                                .where('uid', isEqualTo: widget.uid)
-                                .snapshots(),
-                            builder: (context, snap) {
-                              int count = snap.hasData
-                                  ? snap.data!.docs.length
-                                  : 0;
-                              return _buildStatColumn(
-                                "Postingan",
-                                count,
-                                () {},
-                              );
-                            },
-                          ),
-                          StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('users')
-                                .doc(widget.uid)
-                                .collection('followers')
-                                .snapshots(),
-                            builder: (context, snap) {
-                              int count = snap.hasData
-                                  ? snap.data!.docs.length
-                                  : 0;
-                              return _buildStatColumn("Pengikut", count, () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (c) => UserListPage(
-                                      title: "Pengikut",
-                                      uid: widget.uid,
-                                      collectionName: 'followers',
-                                    ),
-                                  ),
-                                );
-                              });
-                            },
-                          ),
-                          StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('users')
-                                .doc(widget.uid)
-                                .collection('following')
-                                .snapshots(),
-                            builder: (context, snap) {
-                              int count = snap.hasData
-                                  ? snap.data!.docs.length
-                                  : 0;
-                              return _buildStatColumn("Mengikuti", count, () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (c) => UserListPage(
-                                      title: "Mengikuti",
-                                      uid: widget.uid,
-                                      collectionName: 'following',
-                                    ),
-                                  ),
-                                );
-                              });
-                            },
-                          ),
-                        ],
                       ),
 
                       if (userData['keterangan'] != null &&
                           userData['keterangan'].toString().isNotEmpty)
                         Padding(
-                          padding: const EdgeInsets.only(
-                            top: 8.0,
-                            left: 30,
-                            right: 30,
-                          ),
+                          padding: const EdgeInsets.only(top: 4),
                           child: Text(
                             userData['keterangan'],
-                            textAlign: TextAlign.center,
                             style: const TextStyle(
+                              fontSize: 15,
                               color: Colors.black87,
-                              fontSize: 14,
                             ),
                           ),
                         ),
+
                       if (userData['sosmed_link'] != null &&
                           userData['sosmed_link'].toString().isNotEmpty)
                         Padding(
-                          padding: const EdgeInsets.only(top: 15.0),
+                          padding: const EdgeInsets.only(top: 12),
                           child: Wrap(
-                            spacing: 20,
+                            spacing: 15,
                             children: userData['sosmed_link']
                                 .toString()
                                 .split(',')
@@ -321,51 +293,62 @@ class _ProfildetailState extends State<Profildetail> {
                           ),
                         ),
 
-                      const SizedBox(height: 20),
-                      SizedBox(
-                        width: double.infinity,
-                        child: isMe
-                            ? OutlinedButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const ProfilePage(),
+                      const SizedBox(height: 25),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: isMe
+                                ? OutlinedButton(
+                                    onPressed: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const ProfilePage(),
+                                      ),
                                     ),
-                                  );
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  side: const BorderSide(color: Colors.grey),
-                                ),
-                                child: const Text(
-                                  "Edit Profil",
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                              )
-                            : ElevatedButton(
-                                onPressed: _handleFollow,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: isFollowing
-                                      ? Colors.grey[300]
-                                      : Colors.blue,
-                                  foregroundColor: isFollowing
-                                      ? Colors.black
-                                      : Colors.white,
-                                  elevation: 0,
-                                ),
-                                child: Text(
-                                  isFollowing ? "Mengikuti" : "Ikuti",
-                                ),
-                              ),
-                      ),
-                      const SizedBox(height: 10),
-                      const Divider(thickness: 1),
-                      const Text(
-                        "Karya Pengguna Ini",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
+                                    style: OutlinedButton.styleFrom(
+                                      backgroundColor: Colors.white.withOpacity(
+                                        0.5,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      side: const BorderSide(
+                                        color: Colors.black26,
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      "Edit Profil",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  )
+                                : ElevatedButton(
+                                    onPressed: _handleFollow,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: isFollowing
+                                          ? Colors.white.withOpacity(0.7)
+                                          : Colors.blue,
+                                      foregroundColor: isFollowing
+                                          ? Colors.black
+                                          : Colors.white,
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      isFollowing ? "Mengikuti" : "Ikuti",
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -373,6 +356,22 @@ class _ProfildetailState extends State<Profildetail> {
               },
             ),
           ),
+          const SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Divider(height: 1, thickness: 1),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  child: Text(
+                    "Karya Pengguna Ini",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
           StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('posts')
@@ -392,8 +391,8 @@ class _ProfildetailState extends State<Profildetail> {
               return SliverGrid(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
-                  crossAxisSpacing: 4,
-                  mainAxisSpacing: 4,
+                  crossAxisSpacing: 2,
+                  mainAxisSpacing: 2,
                 ),
                 delegate: SliverChildBuilderDelegate((context, index) {
                   var post = snapshot.data!.docs[index];
