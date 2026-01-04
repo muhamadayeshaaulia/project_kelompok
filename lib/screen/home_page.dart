@@ -804,7 +804,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
-      bottomNavigationBar: const CustomButtomNav(currentIndex: 0),
+      bottomNavigationBar: const CustomButtomNav(currentIndex: 1),
     );
   }
 }

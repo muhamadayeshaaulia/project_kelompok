@@ -103,12 +103,12 @@ class CustomButtomNav extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildNavItem(context, Icons.home_rounded, 'Home', 0, '/home'),
+            _buildNavItem(context, Icons.home_rounded, 'Home', 1, '/home'),
             _buildNavItem(
               context,
               Icons.explore_rounded,
               'Explore',
-              1,
+              2,
               '/explor',
             ),
             GestureDetector(
@@ -123,12 +123,12 @@ class CustomButtomNav extends StatelessWidget {
                 ),
               ),
             ),
-            _buildNavItem(context, Icons.info_rounded, 'Info', 2, '/info'),
+            _buildNavItem(context, Icons.info_rounded, 'Info', 3, '/info'),
             _buildNavItem(
               context,
               Icons.person_rounded,
               'Profile',
-              3,
+              4,
               '/profile',
             ),
           ],

@@ -154,7 +154,7 @@ class InfoAplikasiPage extends StatelessWidget {
         ],
       ),
 
-      bottomNavigationBar: const CustomButtomNav(currentIndex: 2),
+      bottomNavigationBar: const CustomButtomNav(currentIndex: 3),
     );
   }
 }
