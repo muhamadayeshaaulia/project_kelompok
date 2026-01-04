@@ -18,30 +18,73 @@ class Profildetail extends StatefulWidget {
 
 class _ProfildetailState extends State<Profildetail> {
   bool isFollowing = false;
+  bool isHeFollowingMe = false;
+  bool isMutual = false;
   bool isMe = false;
   final String currentUid = FirebaseAuth.instance.currentUser!.uid;
 
   @override
   void initState() {
     super.initState();
-    _checkIfFollowing();
+    _checkStatus();
   }
 
-  void _checkIfFollowing() async {
+  void _checkStatus() async {
     if (widget.uid == currentUid) {
       if (mounted) setState(() => isMe = true);
       return;
     }
-    DocumentSnapshot doc = await FirebaseFirestore.instance
+
+    DocumentSnapshot myFollowDoc = await FirebaseFirestore.instance
         .collection('users')
         .doc(widget.uid)
         .collection('followers')
         .doc(currentUid)
         .get();
-    if (mounted) setState(() => isFollowing = doc.exists);
+    DocumentSnapshot hisFollowDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUid)
+        .collection('followers')
+        .doc(widget.uid)
+        .get();
+
+    if (mounted) {
+      setState(() {
+        isFollowing = myFollowDoc.exists;
+        isHeFollowingMe = hisFollowDoc.exists;
+        isMutual = myFollowDoc.exists && hisFollowDoc.exists;
+      });
+    }
   }
 
-  void _handleFollow() async {
+  void _confirmUnfollow(String userName) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: const Text("Berhenti Mengikuti?"),
+        content: Text("Apakah Anda yakin ingin berhenti mengikuti $userName?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Batal", style: TextStyle(color: Colors.grey)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _handleFollowAction(false);
+            },
+            child: const Text(
+              "Berhenti Mengikuti",
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleFollowAction(bool startFollowing) async {
     var batch = FirebaseFirestore.instance.batch();
     DocumentReference myFollowingRef = FirebaseFirestore.instance
         .collection('users')
@@ -54,16 +97,16 @@ class _ProfildetailState extends State<Profildetail> {
         .collection('followers')
         .doc(currentUid);
 
-    setState(() => isFollowing = !isFollowing);
-
-    if (isFollowing) {
+    if (startFollowing) {
       batch.set(myFollowingRef, {'timestamp': FieldValue.serverTimestamp()});
       batch.set(otherFollowerRef, {'timestamp': FieldValue.serverTimestamp()});
     } else {
       batch.delete(myFollowingRef);
       batch.delete(otherFollowerRef);
     }
+
     await batch.commit();
+    _checkStatus(); // Refresh status seketika
   }
 
   Future<void> _launchURL(String url) async {
@@ -95,6 +138,12 @@ class _ProfildetailState extends State<Profildetail> {
       return const FaIcon(
         FontAwesomeIcons.github,
         color: Colors.black,
+        size: 22,
+      );
+    if (lowerUrl.contains("youtube.com"))
+      return const FaIcon(
+        FontAwesomeIcons.youtube,
+        color: Colors.red,
         size: 22,
       );
     return const FaIcon(FontAwesomeIcons.link, color: Colors.black54, size: 20);
@@ -150,6 +199,7 @@ class _ProfildetailState extends State<Profildetail> {
                 var userData = snapshot.data!.data() as Map<String, dynamic>?;
                 if (userData == null)
                   return const Center(child: Text("User tidak ditemukan"));
+                String userName = userData['nama'] ?? "User";
 
                 return Container(
                   width: double.infinity,
@@ -250,14 +300,14 @@ class _ProfildetailState extends State<Profildetail> {
                       ),
                       const SizedBox(height: 15),
                       Text(
-                        userData['nama'] ?? "Tanpa Nama",
+                        userName,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                         ),
                       ),
                       if (userData['keterangan'] != null &&
-                          userData['keterangan'].toString().isNotEmpty)
+                          userData['keterangan'].isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Text(
@@ -269,7 +319,7 @@ class _ProfildetailState extends State<Profildetail> {
                           ),
                         ),
                       if (userData['sosmed_link'] != null &&
-                          userData['sosmed_link'].toString().isNotEmpty)
+                          userData['sosmed_link'].isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 12),
                           child: Wrap(
@@ -287,6 +337,8 @@ class _ProfildetailState extends State<Profildetail> {
                           ),
                         ),
                       const SizedBox(height: 25),
+
+                      // --- TOMBOL AKSI DENGAN LOGIKA TEMAN & IKUTI BALIK ---
                       Row(
                         children: [
                           Expanded(
@@ -318,26 +370,87 @@ class _ProfildetailState extends State<Profildetail> {
                                       ),
                                     ),
                                   )
-                                : ElevatedButton(
-                                    onPressed: _handleFollow,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: isFollowing
-                                          ? Colors.white.withOpacity(0.7)
-                                          : Colors.blue,
-                                      foregroundColor: isFollowing
-                                          ? Colors.black
-                                          : Colors.white,
-                                      elevation: 0,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
+                                : Row(
+                                    children: [
+                                      Expanded(
+                                        child: ElevatedButton(
+                                          onPressed: isMutual
+                                              ? null
+                                              : () => _handleFollowAction(
+                                                  !isFollowing,
+                                                ),
+                                          style: ElevatedButton.styleFrom(
+                                            disabledBackgroundColor:
+                                                Colors.grey[200],
+                                            disabledForegroundColor:
+                                                Colors.black54,
+                                            backgroundColor: isFollowing
+                                                ? Colors.white.withOpacity(0.7)
+                                                : Colors.blue,
+                                            foregroundColor: isFollowing
+                                                ? Colors.black
+                                                : Colors.white,
+                                            elevation: 0,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                          child: Text(
+                                            isMutual
+                                                ? "Teman"
+                                                : (isFollowing
+                                                      ? "Mengikuti"
+                                                      : (isHeFollowingMe
+                                                            ? "Ikuti Balik"
+                                                            : "Ikuti")),
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                    child: Text(
-                                      isFollowing ? "Mengikuti" : "Ikuti",
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
+                                      if (isFollowing) ...[
+                                        const SizedBox(width: 8),
+                                        Container(
+                                          width: 40,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withOpacity(
+                                              0.5,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                            border: Border.all(
+                                              color: Colors.black12,
+                                            ),
+                                          ),
+                                          child: PopupMenuButton<String>(
+                                            padding: EdgeInsets.zero,
+                                            onSelected: (value) {
+                                              if (value == 'unfollow')
+                                                _confirmUnfollow(userName);
+                                            },
+                                            itemBuilder: (context) => [
+                                              const PopupMenuItem(
+                                                value: 'unfollow',
+                                                child: Text(
+                                                  "Berhenti Mengikuti",
+                                                  style: TextStyle(
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                            icon: const Icon(
+                                              Icons.keyboard_arrow_down,
+                                              size: 20,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ],
                                   ),
                           ),
                         ],
