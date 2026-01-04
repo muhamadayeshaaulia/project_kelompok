@@ -260,14 +260,14 @@ class _ProfildetailState extends State<Profildetail> {
                                       .collection('followers')
                                       .snapshots(),
                                   builder: (context, snap) => _buildStatItem(
-                                    "Follower",
+                                    "Pengikut",
                                     snap.hasData ? snap.data!.docs.length : 0,
                                     () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder: (c) => UserListPage(
-                                            title: "Followers",
+                                            title: "Pengikut",
                                             uid: widget.uid,
                                             collectionName: 'followers',
                                           ),
@@ -283,14 +283,14 @@ class _ProfildetailState extends State<Profildetail> {
                                       .collection('following')
                                       .snapshots(),
                                   builder: (context, snap) => _buildStatItem(
-                                    "Following",
+                                    "Mengikuti",
                                     snap.hasData ? snap.data!.docs.length : 0,
                                     () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder: (c) => UserListPage(
-                                            title: "Following",
+                                            title: "Mengikuti",
                                             uid: widget.uid,
                                             collectionName: 'following',
                                           ),
