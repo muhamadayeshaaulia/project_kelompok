@@ -437,17 +437,20 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
 
                           if (!isEditing) ...[
-                            const Divider(height: 1),
-                            const Padding(
-                              padding: EdgeInsets.symmetric(
+                            const Divider(height: 1, thickness: 1),
+                            Container(
+                              alignment: Alignment
+                                  .centerLeft,
+                              padding: const EdgeInsets.symmetric(
                                 horizontal: 16,
                                 vertical: 15,
                               ),
-                              child: Text(
+                              child: const Text(
                                 "Karya Saya",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
+                                  color: Colors.black,
                                 ),
                               ),
                             ),
