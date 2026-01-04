@@ -230,7 +230,7 @@ class _MyRegisState extends State<MyRegis> {
                       style: TextStyle(color: Colors.black54),
                     ),
                     GestureDetector(
-                      onTap: () => Navigator.pop(context),
+                      onTap: () => Navigator.pushReplacementNamed(context, '/login'),
                       child: const Text(
                         "Login",
                         style: TextStyle(
