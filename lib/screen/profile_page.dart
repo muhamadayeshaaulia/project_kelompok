@@ -446,7 +446,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 vertical: 15,
                               ),
                               child: const Text(
-                                "Karya Saya",
+                                "Postingan Saya",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
