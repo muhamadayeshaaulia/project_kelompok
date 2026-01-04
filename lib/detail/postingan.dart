@@ -31,20 +31,18 @@ class _PostDetailPageState extends State<PostDetailPage> {
   String _myUserName = "Loading...";
   String? _myProfilePic;
 
-  void _navigateToProfile(String uid) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => Profildetail(uid: uid),
-      ),
-    );
-  }
-
   @override
   void initState() {
     super.initState();
     _checkIfLiked();
     _fetchMyName();
+  }
+
+  void _navigateToProfile(String uid) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => Profildetail(uid: uid)),
+    );
   }
 
   String formatPostTime(Timestamp? timestamp) {
@@ -279,7 +277,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
       appBar: AppBar(
         title: const Text("Postingan", style: TextStyle(color: Colors.black)),
         flexibleSpace: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [Color.fromRGBO(255, 192, 45, 1), Colors.white],
               begin: Alignment.topLeft,
@@ -304,7 +302,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  
                   ListTile(
                     leading: GestureDetector(
                       onTap: () => _navigateToProfile(widget.postData['uid']),
@@ -330,7 +327,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
                       ),
                     ),
                   ),
-
                   Image.network(
                     widget.postData['post_image'],
                     width: double.infinity,
@@ -344,21 +340,21 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const PhotoBoothPage(),
+                              builder: (c) => const PhotoBoothPage(),
                             ),
                           );
                         } else if (detectedTemplate == 'vintage') {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const PhotoBoothPage3(),
+                              builder: (c) => const PhotoBoothPage3(),
                             ),
                           );
                         } else {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const PhotoBoothPage2(),
+                              builder: (c) => const PhotoBoothPage2(),
                             ),
                           );
                         }
@@ -445,23 +441,27 @@ class _PostDetailPageState extends State<PostDetailPage> {
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return const Center(
+          return Center(
             child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 40),
+              padding: const EdgeInsets.symmetric(vertical: 40),
               child: Column(
                 children: [
-                  Icon(Icons.chat_bubble_outline, color: Colors.grey, size: 40),
-                  SizedBox(height: 10),
-                  Text(
+                  const Icon(
+                    Icons.chat_bubble_outline_rounded,
+                    color: Colors.grey,
+                    size: 50,
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
                     "Belum ada komentar.",
                     style: TextStyle(
                       color: Colors.grey,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Text(
+                  const Text(
                     "Jadilah yang pertama mengomentari!",
-                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                    style: TextStyle(color: Colors.grey, fontSize: 13),
                   ),
                 ],
               ),
@@ -533,11 +533,28 @@ class _PostDetailPageState extends State<PostDetailPage> {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          GestureDetector(
-            onTap: () => _navigateToProfile(data['uid']),
-            child: Text(
-              data['nama'] ?? "User",
-              style: const TextStyle(fontWeight: FontWeight.bold),
+          Expanded(
+            child: GestureDetector(
+              onTap: () => _navigateToProfile(data['uid']),
+              child: RichText(
+                text: TextSpan(
+                  style: const TextStyle(color: Colors.black, fontSize: 13),
+                  children: [
+                    TextSpan(
+                      text: "${data['nama'] ?? "User"} ",
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(
+                      text: formatPostTime(data['timestamp'] as Timestamp?),
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 10,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
           if (isMyComment)
@@ -547,11 +564,15 @@ class _PostDetailPageState extends State<PostDetailPage> {
             ),
         ],
       ),
-
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(data['komentar'] ?? ""),
+          const SizedBox(height: 2),
+          Text(
+            data['komentar'] ?? "",
+            style: const TextStyle(color: Colors.black87, fontSize: 13),
+          ),
+          const SizedBox(height: 4),
           Row(
             children: [
               GestureDetector(
