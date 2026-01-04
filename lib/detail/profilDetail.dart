@@ -174,7 +174,39 @@ class _ProfildetailState extends State<Profildetail> {
                           textAlign: TextAlign.center,
                         ),
                       ),
+
                       const SizedBox(height: 24),
+
+                      // --- BAGIAN TOMBOL FOLLOW / EDIT ---
+                      if (isMe)
+                        // Kalau profil sendiri: Tampilkan tombol Edit (Dummy)
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton(
+                            onPressed: () {
+                              // Navigasi ke Edit Profil (opsional)
+                            }, 
+                            style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: Colors.grey)),
+                            child: const Text("Edit Profil", style: TextStyle(color: Colors.black)),
+                          ),
+                        )
+                      else
+                        // Kalau profil orang lain: Tampilkan Follow/Unfollow
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _handleFollow,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: isFollowing ? Colors.grey[300] : Colors.blue,
+                              foregroundColor: isFollowing ? Colors.black : Colors.white,
+                              elevation: 0,
+                            ),
+                            child: Text(isFollowing ? "Mengikuti" : "Ikuti"),
+                          ),
+                        ),
+                      
+                      const SizedBox(height: 20),
                       
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
