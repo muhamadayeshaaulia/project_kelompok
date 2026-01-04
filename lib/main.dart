@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:project_kelompok/screen/explor.dart';
+import 'package:project_kelompok/screen/home_page.dart';
+import 'package:project_kelompok/screen/info_page.dart';
 import 'package:project_kelompok/screen/login.dart';
 import 'package:project_kelompok/screen/page1.dart';
+import 'package:project_kelompok/screen/profile_page.dart';
 import 'package:project_kelompok/screen/register.dart';
 import 'package:project_kelompok/screen/splash_screen.dart';
 import 'firebase_options.dart';
@@ -32,6 +36,10 @@ class MyApp extends StatelessWidget {
         '/page1': (context) => const MyPage1(),
         '/login': (context) => const MyLogin(),
         '/register': (context) => const MyRegis(),
+        '/home': (context) => const MyHomePage(),
+        '/explor': (context) => const ExplorPage(),
+        '/info': (context) => const InfoAplikasiPage(),
+        '/profile': (context) => const ProfilePage(),
       },
     );
   }

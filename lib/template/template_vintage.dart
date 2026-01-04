@@ -8,10 +8,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:gal/gal.dart';
-import 'package:project_kelompok/screen/home_page.dart'; // Pastikan import ini sesuai
+import 'package:project_kelompok/screen/home_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:project_kelompok/services/supabase_service.dart'; // Pastikan import ini sesuai
+import 'package:project_kelompok/services/supabase_service.dart';
 
 class PhotoBoothPage3 extends StatefulWidget {
   final List<File>? initialImages;
@@ -457,7 +457,7 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    CircularProgressIndicator(color: Color(0xFFFDF5E6)),
+                    CircularProgressIndicator(color: Colors.white),
 
                   ],
                 ),

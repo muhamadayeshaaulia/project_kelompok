@@ -169,36 +169,84 @@ class _PostDetailPageState extends State<PostDetailPage> {
     String commentText = _commentController.text.trim();
     if (commentText.isEmpty || currentUser == null) return;
 
-    await FirebaseFirestore.instance
-        .collection('posts')
-        .doc(widget.postId)
-        .collection('comments')
-        .add({
-          'uid': currentUser!.uid,
-          'nama': _myUserName,
-          'photo_url': _myProfilePic,
-          'komentar': commentText,
-          'parent_id': replyingToId,
-          'reply_to_name': replyingToName,
-          'timestamp': FieldValue.serverTimestamp(),
-          'likes': [],
-        });
+    try {
+      await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(widget.postId)
+          .collection('comments')
+          .add({
+            'uid': currentUser!.uid,
+            'nama': _myUserName,
+            'photo_url': _myProfilePic,
+            'komentar': commentText,
+            'parent_id': replyingToId,
+            'reply_to_name': replyingToName,
+            'timestamp': FieldValue.serverTimestamp(),
+            'likes': [],
+          });
 
-    setState(() {
-      _commentController.clear();
-      replyingToId = null;
-      replyingToName = null;
-    });
-    FocusScope.of(context).unfocus();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Komentar berhasil ditambahkan"),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+
+      setState(() {
+        _commentController.clear();
+        replyingToId = null;
+        replyingToName = null;
+      });
+      FocusScope.of(context).unfocus();
+    } catch (e) {
+      debugPrint("Error adding comment: $e");
+    }
   }
 
   void _deleteComment(String commentId) async {
-    await FirebaseFirestore.instance
-        .collection('posts')
-        .doc(widget.postId)
-        .collection('comments')
-        .doc(commentId)
-        .delete();
+    bool? confirm = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Hapus Komentar"),
+        content: const Text("Apakah Anda yakin ingin menghapus komentar ini?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Batal"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text("Hapus", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(widget.postId)
+          .collection('comments')
+          .doc(commentId)
+          .delete();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Komentar berhasil dihapus"),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint("Error deleting comment: $e");
+    }
   }
 
   void _toggleCommentLike(String commentId, List likes) async {
@@ -229,13 +277,22 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Postingan"),
-        backgroundColor: Colors.yellow[700],
+        title: const Text("Postingan", style: TextStyle(color: Colors.black)),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color.fromRGBO(255, 192, 45, 1), Colors.white],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         foregroundColor: Colors.white,
         actions: [
           if (isOwner)
             IconButton(
               icon: const Icon(Icons.delete_outline),
+              color: Colors.black,
               onPressed: _deletePost,
             ),
         ],
@@ -279,7 +336,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     width: double.infinity,
                     fit: BoxFit.contain,
                   ),
-
                   Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: ElevatedButton.icon(
@@ -324,7 +380,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
                       ),
                     ),
                   ),
-
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
@@ -395,11 +450,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
               padding: EdgeInsets.symmetric(vertical: 40),
               child: Column(
                 children: [
-                  Icon(Icons.chat_bubble_outline, color: Colors.grey, size: 50),
+                  Icon(Icons.chat_bubble_outline, color: Colors.grey, size: 40),
                   SizedBox(height: 10),
                   Text(
                     "Belum ada komentar.",
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   Text(
                     "Jadilah yang pertama mengomentari!",
@@ -410,10 +468,12 @@ class _PostDetailPageState extends State<PostDetailPage> {
             ),
           );
         }
+
         var allDocs = snapshot.data!.docs;
-        var mainComments = allDocs
-            .where((doc) => doc['parent_id'] == null)
-            .toList();
+        var mainComments = allDocs.where((doc) {
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          return data['parent_id'] == null;
+        }).toList();
 
         return ListView.builder(
           shrinkWrap: true,
@@ -421,9 +481,11 @@ class _PostDetailPageState extends State<PostDetailPage> {
           itemCount: mainComments.length,
           itemBuilder: (context, index) {
             var doc = mainComments[index];
-            var replies = allDocs
-                .where((d) => d['parent_id'] == doc.id)
-                .toList();
+            var replies = allDocs.where((d) {
+              Map<String, dynamic> data = d.data() as Map<String, dynamic>;
+              return data['parent_id'] == doc.id;
+            }).toList();
+
             return Column(
               children: [
                 _commentTile(doc.id, doc.data() as Map<String, dynamic>),
@@ -520,7 +582,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
               ),
               if (likes.isNotEmpty)
                 Text(
-                  "  ${likes.length} ❤️",
+                  "   ${likes.length} ❤️",
                   style: const TextStyle(fontSize: 11),
                 ),
             ],

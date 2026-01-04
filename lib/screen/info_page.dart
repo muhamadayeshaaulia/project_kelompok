@@ -135,20 +135,19 @@ class InfoAplikasiPage extends StatelessWidget {
           ),
 
           ListTile(
-  leading: const Icon(Icons.description),
-  title: const Text("Syarat & Ketentuan"),
-  subtitle: const Text("Lihat syarat dan ketentuan"),
-  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-  onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const TermsConditionsPage(),
-      ),
-    );
-  },
-),
-
+            leading: const Icon(Icons.description),
+            title: const Text("Syarat & Ketentuan"),
+            subtitle: const Text("Lihat syarat dan ketentuan"),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const TermsConditionsPage(),
+                ),
+              );
+            },
+          ),
 
           /// 🔹 Jarak aman dari Bottom Nav
           const SizedBox(height: 80),

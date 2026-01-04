@@ -17,7 +17,7 @@ class _MySplashScreenState extends State<MySplashScreen> {
   }
 
   _navigateToHome() async {
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 1));
     if (mounted) {
       Navigator.pushReplacementNamed(context, widget.nextRoute);
     }
@@ -42,20 +42,19 @@ class _MySplashScreenState extends State<MySplashScreen> {
             children: [
               Lottie.asset(
                 'assets/animations/Running_Cat.json',
-                width: 300,
-                height: 300,
+                width: 400,
+                height: 150,
                 fit: BoxFit.contain,
               ),
-              const SizedBox(height: 4),
               const Text(
                 'Sabar Boss..!',
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 30,
                   fontWeight: FontWeight.bold,
                   color: Colors.blue,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               const CircularProgressIndicator(),
             ],
           ),

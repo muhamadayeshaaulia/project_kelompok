@@ -71,7 +71,7 @@ class _MyLoginState extends State<MyLogin> {
               height: MediaQuery.of(context).size.height,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.white, Colors.yellow],
+                  colors: [Color.fromRGBO(251, 192, 45, 1), Colors.white],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),

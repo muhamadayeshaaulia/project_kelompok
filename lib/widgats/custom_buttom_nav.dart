@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:project_kelompok/screen/explor.dart';
-import 'package:project_kelompok/screen/home_page.dart';
-import 'package:project_kelompok/screen/info_page.dart';
-import 'package:project_kelompok/screen/profile_page.dart';
+import 'package:project_kelompok/screen/splash_screen.dart';
 import 'package:project_kelompok/screen/camera_page.dart';
 
 class CustomButtomNav extends StatelessWidget {
   final int currentIndex;
   const CustomButtomNav({super.key, required this.currentIndex});
-
   void _showCameraOptions(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.transparent,  
       builder: (context) => Container(
         decoration: const BoxDecoration(
           color: Colors.white,
@@ -59,6 +55,7 @@ class CustomButtomNav extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildCameraOption(
     BuildContext context, {
     required IconData icon,
@@ -89,10 +86,7 @@ class CustomButtomNav extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CameraPage(
-          photoCount: count,
-          templateType: type,
-        ),
+        builder: (context) => CameraPage(photoCount: count, templateType: type),
       ),
     );
   }
@@ -103,83 +97,91 @@ class CustomButtomNav extends StatelessWidget {
       shape: const CircularNotchedRectangle(),
       notchMargin: 8.0,
       color: Colors.white,
+      elevation: 10,
       child: SizedBox(
         height: 60,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildNavItem(context, Icons.home, 'Home', 0),
-            _buildNavItem(context, Icons.explore_outlined, 'Explore', 1),
+            _buildNavItem(context, Icons.home_rounded, 'Home', 0, '/home'),
+            _buildNavItem(
+              context,
+              Icons.explore_rounded,
+              'Explore',
+              1,
+              '/explor',
+            ),
             GestureDetector(
               onTap: () => _showCameraOptions(context),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircleAvatar(
-                    radius: 25,
-                    backgroundColor: Colors.yellow[700],
-                    child: const Icon(
-                      Icons.camera_alt,
-                      color: Colors.white,
-                      size: 25,
-                    ),
-                  ),
-                ],
+              child: CircleAvatar(
+                radius: 25,
+                backgroundColor: Colors.yellow[700],
+                child: const Icon(
+                  Icons.camera_alt,
+                  color: Colors.white,
+                  size: 25,
+                ),
               ),
             ),
-            _buildNavItem(context, Icons.info, 'Info', 2),
-            _buildNavItem(context, Icons.person, 'Profile', 3),
+            _buildNavItem(context, Icons.info_rounded, 'Info', 2, '/info'),
+            _buildNavItem(
+              context,
+              Icons.person_rounded,
+              'Profile',
+              3,
+              '/profile',
+            ),
           ],
         ),
       ),
     );
   }
-
   Widget _buildNavItem(
     BuildContext context,
     IconData icon,
     String label,
     int index,
+    String routeName,
   ) {
     bool isActive = index == currentIndex;
-    return MaterialButton(
-      minWidth: 40,
-      onPressed: () {
+    return InkWell(
+      onTap: () {
         if (isActive) return;
-        Widget page;
-        switch (index) {
-          case 0:
-            page = const MyHomePage();
-            break;
-          case 1:
-            page = const ExplorPage();
-            break;
-          case 2:
-            page = const InfoAplikasiPage();
-            break;
-          case 3:
-            page = const ProfilePage();
-            break;
-          default:
-            page = const MyHomePage();
-        }
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => page),
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                MySplashScreen(
+                  nextRoute:
+                      routeName,
+                ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+          ),
         );
       },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: isActive ? Colors.yellow[700] : Colors.grey),
-          Text(
-            label,
-            style: TextStyle(
-              color: isActive ? Colors.yellow[700] : Colors.grey,
-              fontSize: 12,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: isActive ? Colors.yellow[700] : Colors.grey[400],
+              size: isActive ? 28 : 24,
             ),
-          ),
-        ],
+            Text(
+              label,
+              style: TextStyle(
+                color: isActive ? Colors.yellow[700] : Colors.grey[400],
+                fontSize: 11,
+                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
