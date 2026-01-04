@@ -4,9 +4,28 @@ import 'package:project_kelompok/screen/member_card.dart';
 import 'package:project_kelompok/screen/privacy_policy_page.dart';
 import 'package:project_kelompok/screen/terms_conditions_page.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class InfoAplikasiPage extends StatelessWidget {
   const InfoAplikasiPage({super.key});
+
+  Future<void> _launchEmail() async {
+    final String email = 'developer@gmail.com';
+    final String subject = 'Tanya Seputar Aplikasi';
+
+    final Uri gmailUrl = Uri.parse(
+      'https://mail.google.com/mail/?view=cm&fs=1&to=$email&su=$subject'
+    );
+
+    try {
+      await launchUrl(
+        gmailUrl,
+        mode: LaunchMode.externalApplication,
+      );
+    } catch (e) {
+      debugPrint("Gagal membuka Gmail: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,10 +108,16 @@ class InfoAplikasiPage extends StatelessWidget {
               );
             },
           ),
-          const ListTile(
-            leading: Icon(Icons.email),
-            title: Text("Email"),
-            subtitle: Text("developer@gmail.com"),
+          ListTile(
+            leading: const Icon(Icons.email),
+            title: const Text("Email"),
+            subtitle: const Text("developer@gmail.com"),
+            trailing: const Icon(
+              Icons.arrow_forward_ios, 
+              size: 16, 
+              color: Colors.grey
+            ), 
+            onTap: _launchEmail, 
           ),
           ListTile(
             leading: const Icon(Icons.privacy_tip),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:project_kelompok/detail/profilDetail.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:project_kelompok/template/photoboothpage.dart';
@@ -29,6 +30,15 @@ class _PostDetailPageState extends State<PostDetailPage> {
   String? replyingToName;
   String _myUserName = "Loading...";
   String? _myProfilePic;
+
+  void _navigateToProfile(String uid) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Profildetail(uid: uid),
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -294,18 +304,25 @@ class _PostDetailPageState extends State<PostDetailPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  
                   ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage: widget.postData['user_image'] != null
-                          ? NetworkImage(widget.postData['user_image'])
-                          : null,
-                      child: widget.postData['user_image'] == null
-                          ? const Icon(Icons.person)
-                          : null,
+                    leading: GestureDetector(
+                      onTap: () => _navigateToProfile(widget.postData['uid']),
+                      child: CircleAvatar(
+                        backgroundImage: widget.postData['user_image'] != null
+                            ? NetworkImage(widget.postData['user_image'])
+                            : null,
+                        child: widget.postData['user_image'] == null
+                            ? const Icon(Icons.person)
+                            : null,
+                      ),
                     ),
-                    title: Text(
-                      widget.postData['nama'] ?? "User",
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    title: GestureDetector(
+                      onTap: () => _navigateToProfile(widget.postData['uid']),
+                      child: Text(
+                        widget.postData['nama'] ?? "User",
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                     subtitle: Text(
                       formatPostTime(
@@ -313,6 +330,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                       ),
                     ),
                   ),
+
                   Image.network(
                     widget.postData['post_image'],
                     width: double.infinity,
@@ -500,21 +518,27 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
     return ListTile(
       dense: true,
-      leading: CircleAvatar(
-        radius: isReply ? 12 : 15,
-        backgroundImage: data['photo_url'] != null
-            ? NetworkImage(data['photo_url'])
-            : null,
-        child: data['photo_url'] == null
-            ? const Icon(Icons.person, size: 18)
-            : null,
+      leading: GestureDetector(
+        onTap: () => _navigateToProfile(data['uid']),
+        child: CircleAvatar(
+          radius: isReply ? 12 : 15,
+          backgroundImage: data['photo_url'] != null
+              ? NetworkImage(data['photo_url'])
+              : null,
+          child: data['photo_url'] == null
+              ? const Icon(Icons.person, size: 18)
+              : null,
+        ),
       ),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            data['nama'] ?? "User",
-            style: const TextStyle(fontWeight: FontWeight.bold),
+          GestureDetector(
+            onTap: () => _navigateToProfile(data['uid']),
+            child: Text(
+              data['nama'] ?? "User",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
           if (isMyComment)
             GestureDetector(
@@ -523,6 +547,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
             ),
         ],
       ),
+
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
