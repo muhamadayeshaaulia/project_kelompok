@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_kelompok/detail/postingan.dart';
 import 'package:project_kelompok/detail/user_list_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:project_kelompok/screen/profile_page.dart';
 
 class Profildetail extends StatefulWidget {
   final String uid;
@@ -179,12 +180,16 @@ class _ProfildetailState extends State<Profildetail> {
 
                       // --- BAGIAN TOMBOL FOLLOW / EDIT ---
                       if (isMe)
-                        // Kalau profil sendiri: Tampilkan tombol Edit (Dummy)
                         SizedBox(
                           width: double.infinity,
                           child: OutlinedButton(
                             onPressed: () {
-                              // Navigasi ke Edit Profil (opsional)
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ProfilePage(),
+                                ),
+                              );
                             }, 
                             style: OutlinedButton.styleFrom(
                                 side: const BorderSide(color: Colors.grey)),
@@ -192,7 +197,6 @@ class _ProfildetailState extends State<Profildetail> {
                           ),
                         )
                       else
-                        // Kalau profil orang lain: Tampilkan Follow/Unfollow
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
