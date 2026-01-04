@@ -537,7 +537,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ? TextField(
                   controller: socialMediaCtrl,
                   decoration: InputDecoration(
-                    hintText: "github.com/user, ...",
+                    hintText: "gunakan ',' untuk memisahkan link",
                     filled: true,
                     fillColor: Colors.grey[100],
                     border: OutlineInputBorder(

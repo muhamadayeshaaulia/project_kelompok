@@ -115,7 +115,7 @@ class _MyRegisState extends State<MyRegis> {
           height: MediaQuery.of(context).size.height,
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.white, Colors.yellow],
+              colors: [Color.fromRGBO(251, 192, 45, 1), Colors.white],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -230,7 +230,7 @@ class _MyRegisState extends State<MyRegis> {
                       style: TextStyle(color: Colors.black54),
                     ),
                     GestureDetector(
-                      onTap: () => Navigator.pop(context),
+                      onTap: () => Navigator.pushReplacementNamed(context, '/login'),
                       child: const Text(
                         "Login",
                         style: TextStyle(
