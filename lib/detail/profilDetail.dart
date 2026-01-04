@@ -106,7 +106,7 @@ class _ProfildetailState extends State<Profildetail> {
     }
 
     await batch.commit();
-    _checkStatus(); // Refresh status seketika
+    _checkStatus();
   }
 
   Future<void> _launchURL(String url) async {
