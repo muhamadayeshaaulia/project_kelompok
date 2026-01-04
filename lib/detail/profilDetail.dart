@@ -129,10 +129,7 @@ class _ProfildetailState extends State<Profildetail> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          "Profil Pengguna",
-          style: TextStyle(color: Colors.black),
-        ),
+        title: const Text("Profil", style: TextStyle(color: Colors.black)),
         flexibleSpace: Container(
           decoration: const BoxDecoration(gradient: profileGradient),
         ),
@@ -251,7 +248,6 @@ class _ProfildetailState extends State<Profildetail> {
                           ),
                         ],
                       ),
-
                       const SizedBox(height: 15),
                       Text(
                         userData['nama'] ?? "Tanpa Nama",
@@ -260,7 +256,6 @@ class _ProfildetailState extends State<Profildetail> {
                           fontSize: 18,
                         ),
                       ),
-
                       if (userData['keterangan'] != null &&
                           userData['keterangan'].toString().isNotEmpty)
                         Padding(
@@ -273,7 +268,6 @@ class _ProfildetailState extends State<Profildetail> {
                             ),
                           ),
                         ),
-
                       if (userData['sosmed_link'] != null &&
                           userData['sosmed_link'].toString().isNotEmpty)
                         Padding(
@@ -292,9 +286,7 @@ class _ProfildetailState extends State<Profildetail> {
                                 .toList(),
                           ),
                         ),
-
                       const SizedBox(height: 25),
-
                       Row(
                         children: [
                           Expanded(
@@ -356,22 +348,27 @@ class _ProfildetailState extends State<Profildetail> {
               },
             ),
           ),
-          const SliverToBoxAdapter(
+          SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Divider(height: 1, thickness: 1),
+                const Divider(height: 1, thickness: 1),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
                   child: Text(
-                    "Karya Pengguna Ini",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    isMe ? "Karya Saya" : "Karya Pengguna Ini",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-
           StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('posts')
