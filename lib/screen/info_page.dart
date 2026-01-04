@@ -31,6 +31,7 @@ class InfoAplikasiPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text("Info Aplikasi"),
         flexibleSpace: Container(
           decoration: const BoxDecoration(

@@ -30,6 +30,7 @@ class _ExplorPageState extends State<ExplorPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text(
           "Jelajahi Karya",
           style: TextStyle(color: Colors.black),

@@ -130,6 +130,7 @@ class _FollowingPageState extends State<FollowingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text("Cari User"),
         flexibleSpace: Container(
           decoration: const BoxDecoration(

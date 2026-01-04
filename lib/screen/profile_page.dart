@@ -253,6 +253,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
         ),
+        automaticallyImplyLeading: false,
         title: const Text("Profil", style: TextStyle(color: Colors.black)),
         actions: [
           TextButton(
