@@ -66,22 +66,18 @@ class _ProfildetailState extends State<Profildetail> {
         .collection('followers')
         .doc(currentUid);
 
-    // Optimistic UI Update (Ubah tampilan dulu biar terasa cepat)
     setState(() {
       isFollowing = !isFollowing;
     });
 
     if (isFollowing) {
-      // LOGIKA FOLLOW (Tambah Data)
       batch.set(myFollowingRef, {'timestamp': FieldValue.serverTimestamp()});
       batch.set(otherFollowerRef, {'timestamp': FieldValue.serverTimestamp()});
     } else {
-      // LOGIKA UNFOLLOW (Hapus Data)
       batch.delete(myFollowingRef);
       batch.delete(otherFollowerRef);
     }
 
-    // Jalankan update ke database
     await batch.commit();
   }
   
