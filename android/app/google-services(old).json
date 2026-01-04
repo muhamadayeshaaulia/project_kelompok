@@ -3,6 +3,7 @@
     "project_number": "1043234910102",
     "project_id": "myfristproject-dd7da",
     "storage_bucket": "myfristproject-dd7da.firebasestorage.app"
+
   },
   "client": [
     {
@@ -29,13 +30,6 @@
             {
               "client_id": "1043234910102-m0ujonle7fpj2531a2upjgabssth1h4b.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "1043234910102-oo0grnac19f2k77nitc0cc6uj7549fkm.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.notifLearn"
-              }
             }
           ]
         }
@@ -65,49 +59,6 @@
             {
               "client_id": "1043234910102-m0ujonle7fpj2531a2upjgabssth1h4b.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "1043234910102-oo0grnac19f2k77nitc0cc6uj7549fkm.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.notifLearn"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:1043234910102:android:9b3b6e97f36b8d8f48f7b7",
-        "android_client_info": {
-          "package_name": "com.example.notif_learn"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "1043234910102-m0ujonle7fpj2531a2upjgabssth1h4b.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAmsZFAuEUr8Olj9bYpVIvgiyVhC5rZkR0"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "1043234910102-m0ujonle7fpj2531a2upjgabssth1h4b.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "1043234910102-oo0grnac19f2k77nitc0cc6uj7549fkm.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.notifLearn"
-              }
             }
           ]
         }
@@ -122,14 +73,6 @@
       },
       "oauth_client": [
         {
-          "client_id": "1043234910102-0ughsbv55h4jdesheou32868ls6vrqvq.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.project_kelompok",
-            "certificate_hash": "6ef34fab59b938b683f441c4cb50a1f9ee08bd03"
-          }
-        },
-        {
           "client_id": "1043234910102-m0ujonle7fpj2531a2upjgabssth1h4b.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -145,13 +88,6 @@
             {
               "client_id": "1043234910102-m0ujonle7fpj2531a2upjgabssth1h4b.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "1043234910102-oo0grnac19f2k77nitc0cc6uj7549fkm.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.notifLearn"
-              }
             }
           ]
         }
