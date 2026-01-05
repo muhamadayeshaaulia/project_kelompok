@@ -249,12 +249,48 @@ class _ProfilePageState extends State<ProfilePage> {
       await user!.delete();
 
       if (mounted) {
-        Navigator.of(
-          context,
-        ).pushNamedAndRemoveUntil('/login', (route) => false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Akun Anda telah berhasil dihapus secara permanen."),
+            backgroundColor: Colors.redAccent,
+            duration: Duration(seconds: 3),
+          ),
+        );
+
+        Future.delayed(const Duration(seconds: 2), () {
+          if (mounted) {
+            Navigator.of(
+              context,
+            ).pushNamedAndRemoveUntil('/login', (route) => false);
+          }
+        });
       }
     } catch (e) {
       debugPrint("Error Hapus: $e");
+      if (mounted) {
+        String errorMsg = "Gagal menghapus akun.";
+        if (e.toString().contains("requires-recent-login")) {
+          errorMsg =
+              "Demi keamanan, silakan Logout lalu Login kembali sebelum menghapus akun.";
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMsg),
+            backgroundColor: Colors.red,
+            action: SnackBarAction(
+              label: "LOGOUT",
+              textColor: Colors.white,
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil('/login', (route) => false);
+              },
+            ),
+          ),
+        );
+      }
     } finally {
       if (mounted) setState(() => isSaving = false);
     }
@@ -439,8 +475,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           if (!isEditing) ...[
                             const Divider(height: 1, thickness: 1),
                             Container(
-                              alignment: Alignment
-                                  .centerLeft,
+                              alignment: Alignment.centerLeft,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 16,
                                 vertical: 15,
