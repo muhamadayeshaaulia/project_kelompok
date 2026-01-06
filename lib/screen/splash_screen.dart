@@ -15,16 +15,16 @@ class _MySplashScreenState extends State<MySplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 2), () {
       final user = FirebaseAuth.instance.currentUser;
 
       if (mounted) {
+        if (widget.nextRoute != '/page1') {
+          Navigator.pushReplacementNamed(context, widget.nextRoute);
+          return;
+        }
         if (user != null) {
-          if (widget.nextRoute == '/page1') {
-            Navigator.pushReplacementNamed(context, '/home');
-          } else {
-            Navigator.pushReplacementNamed(context, widget.nextRoute);
-          }
+          Navigator.pushReplacementNamed(context, '/home');
         } else {
           Navigator.pushReplacementNamed(context, '/page1');
         }
