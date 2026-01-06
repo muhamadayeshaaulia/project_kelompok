@@ -107,7 +107,7 @@ class AyeshaProfilPage extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(5),
               decoration: const BoxDecoration(
-                color: Colors.white,
+                color: Colors.blue,
                 shape: BoxShape.circle,
               ),
               child: CircleAvatar(
@@ -119,6 +119,24 @@ class AyeshaProfilPage extends StatelessWidget {
                 child: (photoUrl == null || photoUrl.isEmpty)
                     ? Icon(Icons.person, size: 70, color: iconColor)
                     : null,
+              ),
+            ),
+          ),
+          Transform.translate(
+            offset: const Offset(0, -30),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                children: [
+                  Text(
+                    nama,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
