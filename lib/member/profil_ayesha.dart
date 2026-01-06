@@ -23,6 +23,52 @@ class AyeshaProfilPage extends StatelessWidget {
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
       ),
+      body: FutureBuilder<DocumentSnapshot>(
+        future: FirebaseFirestore.instance
+            .collection('users')
+            .doc(ayeshaDocId)
+            .get(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(color: Colors.orange),
+            );
+          }
+          if (snapshot.hasError ||
+              !snapshot.hasData ||
+              !snapshot.data!.exists) {
+            return const Center(child: Text("Gagal memuat data developer."));
+          }
+          var data = snapshot.data!.data() as Map<String, dynamic>;
+          return Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildSpecialCard(
+                      nama: data['nama'] ?? "Nama Tidak Ada",
+                      realName: data['nama_lengkap'] ?? "-",
+                      nim: data['nim'] ?? "-",
+                      role: data['role'] ?? "Developer",
+                      alamat: data['alamat'] ?? "-",
+                      bio: data['keterangan'] ?? "Tidak ada bio.",
+                      kelas: data['kelas'] ?? "-",
+                      email: data['email'] ?? "-",
+                      noHp: data['no_hp'] ?? "-",
+                      warna: Colors.yellow.shade100,
+                      iconColor: Colors.orange,
+                      photoUrl:
+                          data['photo_url'],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
