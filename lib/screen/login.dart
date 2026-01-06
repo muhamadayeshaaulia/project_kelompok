@@ -4,6 +4,7 @@ import 'package:lottie/lottie.dart';
 import 'package:project_kelompok/screen/home_page.dart';
 import 'package:project_kelompok/screen/page1.dart';
 import 'package:project_kelompok/screen/register.dart';
+import 'package:project_kelompok/screen/splash_screen.dart';
 
 class MyLogin extends StatefulWidget {
   const MyLogin({super.key});
@@ -177,10 +178,12 @@ class _MyLoginState extends State<MyLogin> {
 
                           TextButton(
                             onPressed: () {
-                              Navigator.push(
+                              Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const MyRegis(),
+                                  builder: (context) => const MySplashScreen(
+                                    nextRoute: '/register'
+                                  ),
                                 ),
                               );
                             },
@@ -210,7 +213,8 @@ class _MyLoginState extends State<MyLogin> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const MyPage1(),
+                                  builder: (context) =>
+                                      const MySplashScreen(nextRoute: '/page1'),
                                 ),
                               );
                             },
