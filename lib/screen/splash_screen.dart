@@ -15,7 +15,7 @@ class _MySplashScreenState extends State<MySplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 1), () {
+    Future.delayed(const Duration(seconds: 2), () {
       final user = FirebaseAuth.instance.currentUser;
 
       if (mounted) {
