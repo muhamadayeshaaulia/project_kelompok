@@ -102,7 +102,6 @@ class _PhotoBoothPageState extends State<PhotoBoothPage3> {
             toolbarTitle: 'Potong Foto Vintage',
             toolbarColor: Colors.yellow[700],
             toolbarWidgetColor: Colors.white,
-            activeControlsWidgetColor: const Color(0xFFD7CCC8),
             lockAspectRatio: true,
           ),
           IOSUiSettings(title: 'Potong Foto Vintage'),

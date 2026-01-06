@@ -329,7 +329,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ],
       ),
       body: isFetching
-          ? const Center(child: CircularProgressIndicator(color: Colors.yellow))
+          ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
           : Stack(
               children: [
                 CustomScrollView(
@@ -774,7 +774,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildLoadingOverlay() => Container(
     color: Colors.black26,
-    child: const Center(child: CircularProgressIndicator(color: Colors.yellow)),
+    child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
   );
 
   dynamic _getProfileImage() {
@@ -794,7 +794,6 @@ class _ProfilePageState extends State<ProfilePage> {
           AndroidUiSettings(
             toolbarTitle: 'Potong Foto',
             toolbarColor: Colors.yellow[700],
-            activeControlsWidgetColor: Colors.yellow[700],
           ),
         ],
       );
