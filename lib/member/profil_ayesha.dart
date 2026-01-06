@@ -102,6 +102,26 @@ class AyeshaProfilPage extends StatelessWidget {
               ),
             ),
           ),
+          Transform.translate(
+            offset: const Offset(0, -50),
+            child: Container(
+              padding: const EdgeInsets.all(5),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: CircleAvatar(
+                radius: 60,
+                backgroundColor: Colors.grey[200],
+                backgroundImage: (photoUrl != null && photoUrl.isNotEmpty)
+                    ? NetworkImage(photoUrl)
+                    : null,
+                child: (photoUrl == null || photoUrl.isEmpty)
+                    ? Icon(Icons.person, size: 70, color: iconColor)
+                    : null,
+              ),
+            ),
+          ),
         ],
       ),
     );
