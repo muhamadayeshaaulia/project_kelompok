@@ -21,9 +21,7 @@ class AyeshaProfilPage extends StatelessWidget {
           ),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
-        centerTitle: true,
         elevation: 0,
-        
       ),
     );
   }
