@@ -31,7 +31,7 @@ class AyeshaProfilPage extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child: CircularProgressIndicator(color: Colors.orange),
+              child: CircularProgressIndicator(color: Colors.blue),
             );
           }
           if (snapshot.hasError ||
@@ -95,7 +95,11 @@ class AyeshaProfilPage extends StatelessWidget {
           Container(
             height: 100,
             decoration: BoxDecoration(
-              color: warna,
+              gradient: LinearGradient(
+              colors: [Colors.blue, Colors.white],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(25),
                 topRight: Radius.circular(25),
