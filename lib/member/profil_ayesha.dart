@@ -58,7 +58,7 @@ class AyeshaProfilPage extends StatelessWidget {
                       email: data['email'] ?? "-",
                       noHp: data['no_hp'] ?? "-",
                       warna: Colors.yellow.shade100,
-                      iconColor: Colors.orange,
+                      iconColor: Colors.blue,
                       photoUrl: data['photo_url'],
                     ),
                   ],
