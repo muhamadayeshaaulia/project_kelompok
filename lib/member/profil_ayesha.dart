@@ -8,7 +8,13 @@ class AyeshaProfilPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
+      backgroundColor: Colors.grey[50],
+      appBar: AppBar(
+        title: const Text("Profil Developer"),
+        backgroundColor: const Color.fromRGBO(255, 192, 45, 1),
+        centerTitle: true,
+        elevation: 0,
+      ),
     );
   }
 }
