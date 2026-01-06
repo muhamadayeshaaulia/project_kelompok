@@ -172,7 +172,7 @@ class AyeshaProfilPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildInfoItem(Icons.badge, "NIM", nim),
-                      buildInfoItem(Icons.class, "Kelas", kelas),
+                      _buildInfoItem(Icons.class_, "Kelas", kelas),
                     ],
                   ),
                   const SizedBox(height: 15),
@@ -228,5 +228,28 @@ class AyeshaProfilPage extends StatelessWidget {
     String label,
     String value, {
     bool isSmall = false,
-  })
+  }) {
+    {
+    return Expanded(
+      child: Column(
+        children: [
+          Icon(icon, size: 24, color: Colors.blue,),
+          const SizedBox(height: 5),
+          Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: isSmall
+                  ? 12
+                  : 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  }
 }
