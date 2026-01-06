@@ -244,7 +244,7 @@ class AyeshaProfilPage extends StatelessWidget {
               fontWeight: FontWeight.bold,
               fontSize: isSmall
                   ? 12
-                  : 14,
+                  : 12,
             ),
           ),
         ],
