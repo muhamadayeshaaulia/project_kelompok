@@ -175,6 +175,19 @@ class AyeshaProfilPage extends StatelessWidget {
                       buildInfoItem(Icons.class, "Kelas", kelas),
                     ],
                   ),
+                  const SizedBox(height: 15),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildInfoItem(
+                        Icons.email,
+                        "Email",
+                        email,
+                        isSmall: true,
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
