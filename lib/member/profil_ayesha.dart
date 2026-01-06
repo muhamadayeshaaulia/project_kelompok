@@ -136,6 +136,16 @@ class AyeshaProfilPage extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                   const SizedBox(height: 5),
+                  Text(
+                    "($realName)",
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
                 ],
               ),
             ),
