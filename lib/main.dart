@@ -11,6 +11,7 @@ import 'package:project_kelompok/screen/splash_screen.dart';
 import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'services/supabase_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,9 +31,19 @@ class MyApp extends StatelessWidget {
       title: 'Booth Art Apps',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.yellow),
-      initialRoute: '/',
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const MySplashScreen();
+          }
+          if (snapshot.hasData) {
+            return const MyHomePage();
+          }
+          return const MySplashScreen();
+        },
+      ),
       routes: {
-        '/': (context) => const MySplashScreen(),
         '/page1': (context) => const MyPage1(),
         '/login': (context) => const MyLogin(),
         '/register': (context) => const MyRegis(),
