@@ -197,6 +197,23 @@ class AyeshaProfilPage extends StatelessWidget {
                       _buildInfoItem(Icons.location_on, "Domisili", alamat),
                     ],
                   ),
+                  const SizedBox(height: 20),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[50],
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Text(
+                      bio,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.black54,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  )
                 ],
               ),
             ),
