@@ -71,4 +71,18 @@ class AyeshaProfilPage extends StatelessWidget {
       ),
     );
   }
+  Widget _buildSpecialCard({
+    required String nama,
+    required String realName,
+    required String nim,
+    required String role,
+    required String alamat,
+    required String bio,
+    required String kelas,
+    required String email,
+    required String noHp,
+    required Color warna,
+    required Color iconColor,
+    String? photoUrl,
+  }){}
 }
