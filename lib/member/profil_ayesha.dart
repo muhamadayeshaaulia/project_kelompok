@@ -218,8 +218,15 @@ class AyeshaProfilPage extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(height: 10),
         ],
       ),
     );
   }
+  Widget _buildInfoItem(
+    IconData icon,
+    String label,
+    String value, {
+    bool isSmall = false,
+  })
 }
