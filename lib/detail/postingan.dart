@@ -306,9 +306,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     leading: StreamBuilder<DocumentSnapshot>(
                       stream: FirebaseFirestore.instance
                           .collection('users')
-                          .doc(
-                            widget.postData['uid'],
-                          )
+                          .doc(widget.postData['uid'])
                           .snapshots(),
                       builder: (context, userSnapshot) {
                         String? livePhotoUrl;
@@ -539,17 +537,32 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
     return ListTile(
       dense: true,
-      leading: GestureDetector(
-        onTap: () => _navigateToProfile(data['uid']),
-        child: CircleAvatar(
-          radius: isReply ? 12 : 15,
-          backgroundImage: data['photo_url'] != null
-              ? NetworkImage(data['photo_url'])
-              : null,
-          child: data['photo_url'] == null
-              ? const Icon(Icons.person, size: 18)
-              : null,
-        ),
+      leading: StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .doc(data['uid'])
+            .snapshots(),
+        builder: (context, userSnapshot) {
+          String? commenterPhoto;
+          if (userSnapshot.hasData && userSnapshot.data!.exists) {
+            var userData = userSnapshot.data!.data() as Map<String, dynamic>;
+            commenterPhoto = userData['photo_url'];
+          }
+          return GestureDetector(
+            onTap: () => _navigateToProfile(data['uid']),
+            child: CircleAvatar(
+              radius: isReply ? 12 : 15,
+              backgroundColor: Colors.grey[200],
+              backgroundImage:
+                  (commenterPhoto != null && commenterPhoto.isNotEmpty)
+                  ? NetworkImage(commenterPhoto)
+                  : null,
+              child: (commenterPhoto == null || commenterPhoto.isEmpty)
+                  ? Icon(Icons.person, size: isReply ? 14 : 18)
+                  : null,
+            ),
+          );
+        },
       ),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
