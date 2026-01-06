@@ -108,9 +108,12 @@ class _MyPage1State extends State<MyPage1> {
                             style: TextStyle(color: Colors.white),
                           ),
                           InkWell(
-                            onTap: () => Navigator.pushReplacementNamed(
+                            onTap: () => Navigator.pushReplacement(
                               context,
-                              '/login',
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const MySplashScreen(nextRoute: '/login'),
+                              ),
                             ),
                             child: const Text(
                               'Masuk',
