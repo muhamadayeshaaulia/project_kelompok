@@ -166,6 +166,15 @@ class AyeshaProfilPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 25),
                   const Divider(),
+                  const SizedBox(height: 15),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildInfoItem(Icons.badge, "NIM", nim),
+                      buildInfoItem(Icons.class, "Kelas", kelas),
+                    ],
+                  ),
                 ],
               ),
             ),
