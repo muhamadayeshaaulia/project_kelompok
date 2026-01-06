@@ -303,16 +303,37 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ListTile(
-                    leading: GestureDetector(
-                      onTap: () => _navigateToProfile(widget.postData['uid']),
-                      child: CircleAvatar(
-                        backgroundImage: widget.postData['user_image'] != null
-                            ? NetworkImage(widget.postData['user_image'])
-                            : null,
-                        child: widget.postData['user_image'] == null
-                            ? const Icon(Icons.person)
-                            : null,
-                      ),
+                    leading: StreamBuilder<DocumentSnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(
+                            widget.postData['uid'],
+                          )
+                          .snapshots(),
+                      builder: (context, userSnapshot) {
+                        String? livePhotoUrl;
+                        if (userSnapshot.hasData && userSnapshot.data!.exists) {
+                          var userData =
+                              userSnapshot.data!.data() as Map<String, dynamic>;
+                          livePhotoUrl = userData['photo_url'];
+                        }
+                        return GestureDetector(
+                          onTap: () =>
+                              _navigateToProfile(widget.postData['uid']),
+                          child: CircleAvatar(
+                            backgroundColor: Colors.grey[200],
+                            backgroundImage:
+                                (livePhotoUrl != null &&
+                                    livePhotoUrl.isNotEmpty)
+                                ? NetworkImage(livePhotoUrl)
+                                : null,
+                            child:
+                                (livePhotoUrl == null || livePhotoUrl.isEmpty)
+                                ? const Icon(Icons.person)
+                                : null,
+                          ),
+                        );
+                      },
                     ),
                     title: GestureDetector(
                       onTap: () => _navigateToProfile(widget.postData['uid']),
