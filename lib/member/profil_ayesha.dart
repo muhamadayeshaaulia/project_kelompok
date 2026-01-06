@@ -59,8 +59,7 @@ class AyeshaProfilPage extends StatelessWidget {
                       noHp: data['no_hp'] ?? "-",
                       warna: Colors.yellow.shade100,
                       iconColor: Colors.orange,
-                      photoUrl:
-                          data['photo_url'],
+                      photoUrl: data['photo_url'],
                     ),
                   ],
                 ),
@@ -71,6 +70,7 @@ class AyeshaProfilPage extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildSpecialCard({
     required String nama,
     required String realName,
@@ -84,5 +84,26 @@ class AyeshaProfilPage extends StatelessWidget {
     required Color warna,
     required Color iconColor,
     String? photoUrl,
-  }){}
+  }) {
+    return Card(
+      elevation: 8,
+      shadowColor: Colors.black26,
+      color: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+      child: Column(
+        children: [
+          Container(
+            height: 100,
+            decoration: BoxDecoration(
+              color: warna,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(25),
+                topRight: Radius.circular(25),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
