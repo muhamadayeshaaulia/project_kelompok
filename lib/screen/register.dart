@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:lottie/lottie.dart';
+import 'package:project_kelompok/screen/splash_screen.dart';
 
 class MyRegis extends StatefulWidget {
   const MyRegis({super.key});
@@ -59,9 +60,7 @@ class _MyRegisState extends State<MyRegis> {
             password: passCtrl.text,
           );
       String uid = userCredential.user!.uid;
-      String defaultName = emailCtrl.text.split(
-        '@',
-      )[0];
+      String defaultName = emailCtrl.text.split('@')[0];
 
       await FirebaseFirestore.instance.collection('users').doc(uid).set({
         'uid': uid,
@@ -229,10 +228,23 @@ class _MyRegisState extends State<MyRegis> {
                       "Sudah punya akun? ",
                       style: TextStyle(color: Colors.black54),
                     ),
-                    GestureDetector(
-                      onTap: () => Navigator.pushReplacementNamed(context, '/login'),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const MySplashScreen(nextRoute: '/login'),
+                          ),
+                        );
+                      },
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
                       child: const Text(
-                        "Login",
+                        "Login Sekarang!",
                         style: TextStyle(
                           color: Colors.teal,
                           fontWeight: FontWeight.bold,
