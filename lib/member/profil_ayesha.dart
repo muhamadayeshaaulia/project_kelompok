@@ -164,6 +164,8 @@ class AyeshaProfilPage extends StatelessWidget {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 25),
+                  const Divider(),
                 ],
               ),
             ),
