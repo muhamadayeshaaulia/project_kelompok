@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_kelompok/member/profil_ayesha.dart';
+import 'package:project_kelompok/screen/home_page.dart';
 
 class MemberCardPage extends StatelessWidget {
   const MemberCardPage({super.key});
@@ -53,7 +54,7 @@ class MemberCardPage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const AyeshaProfilePage(),
+                          builder: (context) => const ProfilAyeshaPage(),
                         ),
                       );
                     },
@@ -114,7 +115,7 @@ Widget _buildMemberCard({
           gradient: LinearGradient(
             colors: [
               warna,
-              warna.withOpacity(0.3),
+            Colors.blue,
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
