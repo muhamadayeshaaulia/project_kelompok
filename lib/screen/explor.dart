@@ -187,9 +187,8 @@ class _ExplorPageState extends State<ExplorPage> {
             var post = snapshot.data!.docs[index];
             var data = post.data() as Map<String, dynamic>;
             String postId = post.id;
-            
-            // 1. AMBIL UID PEMILIK POSTINGAN
-            String ownerUid = data['uid']; 
+
+            String ownerUid = data['uid'];
 
             return Card(
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -207,9 +206,31 @@ class _ExplorPageState extends State<ExplorPage> {
                         ),
                       );
                     },
-                    leading: CircleAvatar(
-                      backgroundImage: NetworkImage(data['user_image'] ?? ''),
-                      backgroundColor: Colors.grey[200],
+                    leading: StreamBuilder<DocumentSnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(ownerUid)
+                          .snapshots(),
+                      builder: (context, userSnapshot) {
+                        String? livePhotoUrl;
+                        if (userSnapshot.hasData && userSnapshot.data!.exists) {
+                          var userData =
+                              userSnapshot.data!.data() as Map<String, dynamic>;
+                          livePhotoUrl =
+                              userData['photo_url'];
+                        }
+
+                        return CircleAvatar(
+                          backgroundColor: Colors.grey[200],
+                          backgroundImage:
+                              (livePhotoUrl != null && livePhotoUrl.isNotEmpty)
+                              ? NetworkImage(livePhotoUrl)
+                              : null,
+                          child: (livePhotoUrl == null || livePhotoUrl.isEmpty)
+                              ? const Icon(Icons.person, color: Colors.grey)
+                              : null,
+                        );
+                      },
                     ),
                     title: Text(
                       data['nama'] ?? 'User',
@@ -219,9 +240,13 @@ class _ExplorPageState extends State<ExplorPage> {
                       formatPostTime(data['timestamp'] as Timestamp?),
                       style: const TextStyle(fontSize: 12, color: Colors.grey),
                     ),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+                    trailing: const Icon(
+                      Icons.arrow_forward_ios,
+                      size: 14,
+                      color: Colors.grey,
+                    ),
                   ),
-                  
+
                   GestureDetector(
                     onTap: () => _openDetail(postId, data),
                     child: Image.network(
@@ -229,8 +254,11 @@ class _ExplorPageState extends State<ExplorPage> {
                       fit: BoxFit.cover,
                       width: double.infinity,
                       height: 300,
-                      errorBuilder: (context, error, stackTrace) => 
-                          Container(height: 300, color: Colors.grey[300], child: Icon(Icons.error)),
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        height: 300,
+                        color: Colors.grey[300],
+                        child: Icon(Icons.error),
+                      ),
                     ),
                   ),
 
