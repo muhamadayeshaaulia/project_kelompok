@@ -12,6 +12,7 @@ class MemberCardPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Tim Developer"),
         backgroundColor: const Color.fromRGBO(255, 192, 45, 1),
+        elevation: 0,
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -24,30 +25,30 @@ class MemberCardPage extends StatelessWidget {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 20),
               StreamBuilder<DocumentSnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('users')
                     .doc(ayeshaDocId)
                     .snapshots(),
                 builder: (context, snapshot) {
-                  String namaTampil = "Loading...";
-                  String nimTampil = "...";
-                  String roleTampil = "...";
+                  String nama = "Loading...";
+                  String nim = "...";
+                  String role = "...";
 
                   if (snapshot.hasData && snapshot.data!.exists) {
                     var data = snapshot.data!.data() as Map<String, dynamic>;
-                    namaTampil = data['nama'] ?? "Muhamad Ayesha Aulia";
-                    nimTampil = data['nim'] ?? "-";
-                    roleTampil = data['role'] ?? "Developer";
+                    nama = data['nama'] ?? "Muhamad Ayesha Aulia";
+                    nim = data['nim'] ?? "1123150188";
+                    role = data['role'] ?? "Frontend Developer";
                   }
 
                   return _buildMemberCard(
                     context: context,
-                    nama: namaTampil,
-                    nim: "NIM: $nimTampil",
-                    role: roleTampil,
-                    warna: Colors.pink.shade100,
+                    nama: nama,
+                    nim: "NIM: $nim",
+                    role: role,
+                    warna: Colors.pink.shade200,
                     onTap: () {
                       Navigator.push(
                         context,
@@ -60,29 +61,29 @@ class MemberCardPage extends StatelessWidget {
                 },
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 15),
               _buildMemberCard(
                 context: context,
                 nama: "Muhammad Abdul Rozak",
                 nim: "NIM: 1123150006",
                 role: "Project Manager",
-                warna: Colors.blue.shade100,
+                warna: Colors.blue.shade200,
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 15),
               _buildMemberCard(
                 context: context,
                 nama: "Muhammad Ilham Maulana",
                 nim: "NIM: 1123150141",
                 role: "UI/UX Designer",
-                warna: Colors.green.shade100,
+                warna: Colors.green.shade200,
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 15),
               _buildMemberCard(
                 context: context,
                 nama: "Muhammad Arifin",
                 nim: "NIM: 1123150053",
                 role: "Backend Developer",
-                warna: Colors.orange.shade100,
+                warna: Colors.orange.shade200,
               ),
             ],
           ),
@@ -100,25 +101,44 @@ Widget _buildMemberCard({
   required Color warna,
   VoidCallback? onTap,
 }) {
-  return GestureDetector(
-    onTap: onTap,
-    child: Card(
-      elevation: 2,
-      color: warna,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
+  return Card(
+    elevation: 4,
+    shadowColor: warna.withOpacity(0.4),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+    child: InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(15),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          gradient: LinearGradient(
+            colors: [
+              warna,
+              warna.withOpacity(0.3),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        padding: const EdgeInsets.all(15.0),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 5,
+                    offset: const Offset(0, 2),
+                  )
+                ],
               ),
-              child: const Icon(Icons.person, size: 40, color: Colors.grey),
+              child: Icon(Icons.person, size: 35, color: warna.withOpacity(0.8)),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 15),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,14 +148,24 @@ Widget _buildMemberCard({
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      color: Colors.black87,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(nim),
+                  Text(
+                    nim,
+                    style: const TextStyle(
+                      fontSize: 12, 
+                      color: Colors.black54,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
                   Text(
                     role,
-                    style: TextStyle(
-                      color: Colors.grey[700],
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Colors.black87,
                       fontStyle: FontStyle.italic,
                     ),
                   ),
@@ -143,10 +173,13 @@ Widget _buildMemberCard({
               ),
             ),
             if (onTap != null)
-              const Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-                color: Colors.black54,
+              Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.5),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.black54),
               ),
           ],
         ),
