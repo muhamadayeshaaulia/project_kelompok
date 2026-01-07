@@ -63,6 +63,7 @@ class MyProfileDetailPage extends StatelessWidget {
                 const SizedBox(height: 60),
                 _buildHeader(data),
                 const SizedBox(height: 30),
+                Expanded(),
               ],
             );
           },
