@@ -7,6 +7,7 @@ import 'package:project_kelompok/screen/login.dart';
 import 'package:project_kelompok/screen/page1.dart';
 import 'package:project_kelompok/screen/profile_page.dart';
 import 'package:project_kelompok/screen/register.dart';
+import 'package:project_kelompok/screen/screen.dart';
 import 'package:project_kelompok/screen/splash_screen.dart';
 import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const MySplashScreen(),
         '/page1': (context) => const MyPage1(),
+        '/screen': (context) => const MyPage2(),
         '/login': (context) => const MyLogin(),
         '/register': (context) => const MyRegis(),
         '/home': (context) => const MyHomePage(),

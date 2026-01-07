@@ -5,7 +5,7 @@ import 'package:lottie/lottie.dart';
 
 class MySplashScreen extends StatefulWidget {
   final String nextRoute;
-  const MySplashScreen({super.key, this.nextRoute = '/page1'});
+  const MySplashScreen({super.key, this.nextRoute = '/screen'});
 
   @override
   State<MySplashScreen> createState() => _MySplashScreenState();
@@ -19,15 +19,15 @@ class _MySplashScreenState extends State<MySplashScreen> {
       final user = FirebaseAuth.instance.currentUser;
 
       if (mounted) {
-        if (widget.nextRoute != '/page1') {
-          Navigator.pushReplacementNamed(context, widget.nextRoute);
+        if (user != null) {
+          if (widget.nextRoute == '/screen') {
+            Navigator.pushReplacementNamed(context, '/home');
+          } else {
+            Navigator.pushReplacementNamed(context, widget.nextRoute);
+          }
           return;
         }
-        if (user != null) {
-          Navigator.pushReplacementNamed(context, '/home');
-        } else {
-          Navigator.pushReplacementNamed(context, '/page1');
-        }
+        Navigator.pushReplacementNamed(context, widget.nextRoute);
       }
     });
   }
