@@ -173,4 +173,10 @@ class MyProfileDetailPage extends StatelessWidget {
 
 Widget _buildHeader(Map<String, dynamic> data) {
   String? photoUrl = data['photo_url'];
+
+  return Column(
+    children: [
+      Container()
+    ]
+  )
 }
