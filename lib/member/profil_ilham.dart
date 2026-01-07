@@ -52,7 +52,79 @@ class IlhamProfilPage extends StatelessWidget {
 
           return Stack(
             children: [
-              // LANJUT KE COMMIT 2
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: headerHeight, 
+                child: Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color.fromRGBO(255, 192, 45, 1), Colors.white],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 30), 
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 10,
+                              offset: const Offset(0, 5),
+                            )
+                          ]
+                        ),
+                        child: CircleAvatar(
+                          radius: 65,
+                          backgroundColor: Colors.grey[200],
+                          backgroundImage: (photoUrl != null && photoUrl.isNotEmpty)
+                              ? NetworkImage(photoUrl)
+                              : null,
+                          child: (photoUrl == null)
+                              ? const Icon(Icons.person, size: 60, color: Colors.grey)
+                              : null,
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      Text(
+                        nama,
+                        style: const TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87, 
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.8),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          role.toUpperCase(),
+                          style: TextStyle(
+                            color: Colors.orange[800],
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // LANJUT KE COMMIT 3
             ],
           );
         },
