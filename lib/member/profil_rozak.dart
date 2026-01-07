@@ -9,7 +9,9 @@ class MyProfileDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container()
+      body: Container(
+        width: double.infinity,
+      )
     )
   }
 }
