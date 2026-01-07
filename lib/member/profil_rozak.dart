@@ -230,32 +230,48 @@ Widget _buildHeader(Map<String, dynamic> data) {
   );
 }
 
-Widget _buildDetailItem(IconData icon, String label, String value, {bool isLink = false}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: const Color(0xFF2E3192), size: 20),
+Widget _buildDetailItem(
+  IconData icon,
+  String label,
+  String value, {
+  bool isLink = false,
+}) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 15),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.grey[100],
+            borderRadius: BorderRadius.circular(10),
           ),
-          const SizedBox(width: 15),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: Colors.grey[500],
-                    fontSize: 12,
-                  ),
+          child: Icon(icon, color: const Color(0xFF2E3192), size: 20),
+        ),
+        const SizedBox(width: 15),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(color: Colors.grey[500], fontSize: 12),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: TextStyle(
+                  color: isLink ? Colors.blue : Colors.black87,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                  decoration: isLink ? TextDecoration.underline : null,
                 ),
-                const SizedBox(height: 4),
-              ]))
-        ]))
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
