@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class IlhamProfilPage extends StatelessWidget {
   const IlhamProfilPage({super.key});
 
-  final String ilhamDocId = "MASUKKAN_ID_ILHAM_DISINI";
+  final String ilhamDocId = "VAGSZaUD4TU5bV4zNXMENBKU2Tg1";
 
   @override
   Widget build(BuildContext context) {
@@ -12,9 +12,9 @@ class IlhamProfilPage extends StatelessWidget {
     final double contentStartPos = 360.0;
 
     return Scaffold(
-      extendBodyBehindAppBar: true, 
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent, 
+        backgroundColor: Colors.transparent,
         elevation: 0,
         leading: Container(
           margin: const EdgeInsets.only(left: 10, top: 10),
@@ -37,12 +37,14 @@ class IlhamProfilPage extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Container(
               color: Colors.white,
-              child: const Center(child: CircularProgressIndicator(color: Colors.orange)),
+              child: const Center(
+                child: CircularProgressIndicator(color: Colors.orange),
+              ),
             );
           }
 
           if (!snapshot.hasData || !snapshot.data!.exists) {
-             return const Center(child: Text("Data tidak ditemukan"));
+            return const Center(child: Text("Data tidak ditemukan"));
           }
 
           var data = snapshot.data!.data() as Map<String, dynamic>;
@@ -56,7 +58,7 @@ class IlhamProfilPage extends StatelessWidget {
                 top: 0,
                 left: 0,
                 right: 0,
-                height: headerHeight, 
+                height: headerHeight,
                 child: Container(
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
@@ -68,7 +70,7 @@ class IlhamProfilPage extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 30), 
+                      const SizedBox(height: 30),
                       Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
@@ -79,17 +81,22 @@ class IlhamProfilPage extends StatelessWidget {
                               color: Colors.black12,
                               blurRadius: 10,
                               offset: const Offset(0, 5),
-                            )
-                          ]
+                            ),
+                          ],
                         ),
                         child: CircleAvatar(
                           radius: 65,
                           backgroundColor: Colors.grey[200],
-                          backgroundImage: (photoUrl != null && photoUrl.isNotEmpty)
+                          backgroundImage:
+                              (photoUrl != null && photoUrl.isNotEmpty)
                               ? NetworkImage(photoUrl)
                               : null,
                           child: (photoUrl == null)
-                              ? const Icon(Icons.person, size: 60, color: Colors.grey)
+                              ? const Icon(
+                                  Icons.person,
+                                  size: 60,
+                                  color: Colors.grey,
+                                )
                               : null,
                         ),
                       ),
@@ -99,13 +106,16 @@ class IlhamProfilPage extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 26,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87, 
+                          color: Colors.black87,
                           letterSpacing: 0.5,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 15,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.8),
                           borderRadius: BorderRadius.circular(20),
@@ -129,7 +139,7 @@ class IlhamProfilPage extends StatelessWidget {
                 child: Container(
                   width: double.infinity,
                   decoration: const BoxDecoration(
-                    color: Colors.white, 
+                    color: Colors.white,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(35),
                       topRight: Radius.circular(35),
@@ -139,7 +149,7 @@ class IlhamProfilPage extends StatelessWidget {
                         color: Colors.black12,
                         blurRadius: 20,
                         offset: Offset(0, -5),
-                      )
+                      ),
                     ],
                   ),
                   child: Padding(
@@ -160,32 +170,65 @@ class IlhamProfilPage extends StatelessWidget {
                         const SizedBox(height: 25),
                         const Text(
                           "About Me",
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
                         ),
                         const SizedBox(height: 10),
                         Text(
                           data['keterangan'] ?? "Tidak ada deskripsi tersedia.",
-                          style: TextStyle(color: Colors.grey[600], height: 1.6, fontSize: 15),
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            height: 1.6,
+                            fontSize: 15,
+                          ),
                           textAlign: TextAlign.justify,
                         ),
                         const SizedBox(height: 30),
                         const Text(
                           "Personal Info",
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
                         ),
                         const SizedBox(height: 15),
-                        _buildInfoRow(Icons.person_outline, "Nama Lengkap", data['nama_lengkap']),
+                        _buildInfoRow(
+                          Icons.person_outline,
+                          "Nama Lengkap",
+                          data['nama_lengkap'],
+                        ),
                         _buildInfoRow(Icons.badge_outlined, "NIM", data['nim']),
-                        _buildInfoRow(Icons.class_outlined, "Kelas", data['kelas']),
+                        _buildInfoRow(
+                          Icons.class_outlined,
+                          "Kelas",
+                          data['kelas'],
+                        ),
                         const SizedBox(height: 30),
                         const Text(
                           "Contact",
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
                         ),
                         const SizedBox(height: 15),
-                        _buildInfoRow(Icons.email_outlined, "Email", data['email']),
-                        _buildInfoRow(Icons.phone_android_outlined, "No HP", data['no_hp']),
-                        _buildInfoRow(Icons.location_on_outlined, "Alamat", data['alamat']),
+                        _buildInfoRow(
+                          Icons.email_outlined,
+                          "Email",
+                          data['email'],
+                        ),
+                        _buildInfoRow(
+                          Icons.phone_android_outlined,
+                          "No HP",
+                          data['no_hp'],
+                        ),
+                        _buildInfoRow(
+                          Icons.location_on_outlined,
+                          "Alamat",
+                          data['alamat'],
+                        ),
                         const SizedBox(height: 50),
                       ],
                     ),
@@ -198,6 +241,7 @@ class IlhamProfilPage extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildInfoRow(IconData icon, String label, String? value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20.0),
@@ -219,10 +263,7 @@ class IlhamProfilPage extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[500],
-                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.grey[500]),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -235,7 +276,7 @@ class IlhamProfilPage extends StatelessWidget {
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
