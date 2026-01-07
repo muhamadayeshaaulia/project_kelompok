@@ -73,7 +73,21 @@ class MemberCardPage extends StatelessWidget {
               ),
               const SizedBox(height: 15),
 
-              
+              StreamBuilder<DocumentSnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(ilhamDocId)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  String nama = "Muhammad Ilham Maulana"; 
+                  String nim = "1123150141";
+                  String role = "UI/UX Designer";
+
+                  
+
+                  
+                },
+              ),
 
               const SizedBox(height: 15),
               _buildMemberCard(
