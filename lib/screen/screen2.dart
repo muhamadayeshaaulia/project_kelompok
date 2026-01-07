@@ -14,7 +14,13 @@ class MyPage3 extends StatelessWidget {
             Container(
               height: 160,
               width: 160,
-              
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                  image: AssetImage('assets/logo/logo-global.png'),
+                  fit: BoxFit.contain,
+                ),
+              ),
             ),
             SizedBox(height: 20),
             Text(
