@@ -200,6 +200,16 @@ Widget _buildHeader(Map<String, dynamic> data) {
               : null,
         ),
       ),
+      const SizedBox(height: 15),
+      Text(
+        data['nama'] ?? "User",
+        style: const TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+          letterSpacing: 1,
+        ),
+      ),
     ],
   );
 }
