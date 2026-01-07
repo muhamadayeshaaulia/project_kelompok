@@ -82,6 +82,10 @@ class MyProfileDetailPage extends StatelessWidget {
                     ),
                     child: SingleChildScrollView(
                       padding: const EdgeInsets.all(30),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [],
+                      ),
                     ),
                   ),
                 ),
