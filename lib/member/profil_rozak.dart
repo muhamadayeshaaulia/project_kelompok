@@ -170,3 +170,5 @@ class MyProfileDetailPage extends StatelessWidget {
     );
   }
 }
+
+Widget _buildHeader(Map<String, dynamic> data) {}
