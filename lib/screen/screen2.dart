@@ -20,6 +20,12 @@ class MyPage3 extends StatelessWidget {
             ),
           ),
           SizedBox(height: 20),
+          Text(
+            'Selamat datang di aplikasi Booth-Art \n Aplikasi ini di buat bertujuan untuk tugas UAS pembelajaran Aplikasi mobile menggunakan flutter dan firebase',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+\
           
         ],
       ),
