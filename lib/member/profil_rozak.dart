@@ -129,6 +129,34 @@ class MyProfileDetailPage extends StatelessWidget {
                           const SizedBox(height: 20),
                           const Divider(),
                           const SizedBox(height: 10),
+
+                          const Text(
+                            "Tentang Saya",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+
+                          const SizedBox(height: 10),
+                          Container(
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.withOpacity(0.05),
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(
+                                color: Colors.blue.withOpacity(0.1),
+                              ),
+                            ),
+                            child: Text(
+                              data['keterangan'] ?? "Tidak ada deskripsi.",
+                              style: const TextStyle(
+                                color: Colors.black54,
+                                height: 1.5,
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
