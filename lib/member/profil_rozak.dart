@@ -244,4 +244,18 @@ Widget _buildDetailItem(IconData icon, String label, String value, {bool isLink 
             ),
             child: Icon(icon, color: const Color(0xFF2E3192), size: 20),
           ),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: Colors.grey[500],
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(height: 4),
+              ]))
         ]))
