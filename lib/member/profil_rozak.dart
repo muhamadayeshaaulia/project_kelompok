@@ -29,6 +29,9 @@ class MyProfileDetailPage extends StatelessWidget {
                 child: CircularProgressIndicator(color: Colors.white),
               );
             }
+            if (snapshot.hasError ||
+                !snapshot.hasData ||
+                !snapshot.data!.exists) {}
           },
         ),
       ),
