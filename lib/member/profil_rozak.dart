@@ -58,7 +58,9 @@ class MyProfileDetailPage extends StatelessWidget {
               );
             }
             var data = snapshot.data!.data() as Map<String, dynamic>;
-            return Column()
+            return Column(
+              children: []
+            )
           },
         ),
       ),
