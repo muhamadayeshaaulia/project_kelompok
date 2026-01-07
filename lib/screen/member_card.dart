@@ -90,7 +90,21 @@ class MemberCardPage extends StatelessWidget {
                     role = data['role'] ?? role;
                   }
 
-                  
+                  return _buildMemberCard(
+                    context: context,
+                    nama: nama,
+                    nim: "NIM: $nim",
+                    role: role,
+                    warna: Colors.green.shade200,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const IlhamProfilPage(),
+                        ),
+                      );
+                    },
+                  );
                 },
               ),
 
