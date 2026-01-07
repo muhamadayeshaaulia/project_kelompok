@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_kelompok/member/profil_ayesha.dart';
+import 'package:project_kelompok/member/profil_ilham.dart';
 import 'package:project_kelompok/screen/home_page.dart';
 
 class MemberCardPage extends StatelessWidget {
