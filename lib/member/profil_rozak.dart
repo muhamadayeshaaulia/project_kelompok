@@ -18,7 +18,12 @@ class MyProfileDetailPage extends StatelessWidget {
             colors: [Color(0xFF2E3192), Color(0xFF1BFFFF)],
           ),
         ),
-        child: FutureBuilder<DocumentSnapshot>(),
+        child: FutureBuilder<DocumentSnapshot>(
+          future: FirebaseFirestore.instance
+              .collection('users')
+              .doc(myUid)
+              .get(),
+        ),
       ),
     );
   }
