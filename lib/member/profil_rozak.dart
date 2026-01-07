@@ -31,7 +31,9 @@ class MyProfileDetailPage extends StatelessWidget {
             }
             if (snapshot.hasError ||
                 !snapshot.hasData ||
-                !snapshot.data!.exists) {}
+                !snapshot.data!.exists) {
+                  return Center()
+                }
           },
         ),
       ),
