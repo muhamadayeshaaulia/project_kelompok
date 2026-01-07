@@ -9,19 +9,17 @@ class MyPage3 extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-                height: 200, 
-                width: double.infinity,
-                child: Lottie.asset(
-                  'assets/animations/CamerasP.json',
-                  fit: BoxFit.contain,
-                ),
+              height: 200,
+              width: double.infinity,
+              child: Lottie.asset(
+                'assets/animations/CamerasP.json',
+                fit: BoxFit.contain,
               ),
+            ),
             SizedBox(height: 20),
             Text(
               'Tangkap Momentmu Lalu Abadikan \n Jadikan Setiap Moment mu diabadikan Untuk Dokumentasi Anak Cucu mu',
@@ -104,7 +102,6 @@ class MyPage3 extends StatelessWidget {
             ),
           ],
         ),
-      ),
       ),
     );
   }
