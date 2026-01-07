@@ -32,7 +32,9 @@ class MyProfileDetailPage extends StatelessWidget {
             if (snapshot.hasError ||
                 !snapshot.hasData ||
                 !snapshot.data!.exists) {
-                  return Center()
+                  return Center(
+                    child: Column()
+                  )
                 }
           },
         ),
