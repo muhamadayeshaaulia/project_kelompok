@@ -23,7 +23,13 @@ class MyProfileDetailPage extends StatelessWidget {
               .collection('users')
               .doc(myUid)
               .get(),
-          builder: (context, snapshot) {},
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(color: Colors.white),
+              );
+            }
+          },
         ),
       ),
     );
