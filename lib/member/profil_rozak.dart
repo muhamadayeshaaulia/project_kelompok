@@ -32,12 +32,31 @@ class MyProfileDetailPage extends StatelessWidget {
             if (snapshot.hasError ||
                 !snapshot.hasData ||
                 !snapshot.data!.exists) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                    )
-                  )
-                }
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 50,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      "Data Profil Belum Ada",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    Text(
+                      "UID: $myUid",
+                      style: const TextStyle(
+                        color: Colors.white54,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
           },
         ),
       ),
