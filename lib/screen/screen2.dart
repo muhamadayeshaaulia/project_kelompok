@@ -22,7 +22,7 @@ class MyPage3 extends StatelessWidget {
           ),
           SizedBox(height: 20),
           Text(
-            'Tangkap Momentmu Lalu Abadikan \n Aplikasi ini di buat bertujuan untuk tugas UAS pembelajaran Aplikasi mobile menggunakan flutter dan firebase',
+            'Tangkap Momentmu Lalu Abadikan \n Jadikan Setiap Moment mu diabadikan Untuk Dokumentasi Anak Cucu mu',
             style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
