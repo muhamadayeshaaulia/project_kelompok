@@ -11,7 +11,14 @@ class MyProfileDetailPage extends StatelessWidget {
     return Scaffold(
       body: Container(
         width: double.infinity,
-      )
-    )
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF2E3192), Color(0xFF1BFFFF)],
+          ),
+        ),
+      ),
+    );
   }
 }
