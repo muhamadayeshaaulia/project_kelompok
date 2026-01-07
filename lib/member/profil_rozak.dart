@@ -63,7 +63,25 @@ class MyProfileDetailPage extends StatelessWidget {
                 const SizedBox(height: 60),
                 _buildHeader(data),
                 const SizedBox(height: 30),
-                Expanded(),
+                Expanded(
+                  child: Container(
+                    width: double.infinity,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(40),
+                        topRight: Radius.circular(40),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 10,
+                          offset: Offset(0, -5),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             );
           },
