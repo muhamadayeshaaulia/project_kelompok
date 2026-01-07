@@ -25,7 +25,7 @@ class MyPage3 extends StatelessWidget {
             style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
-\
+          SizedBox(height: 20),
           
         ],
       ),
