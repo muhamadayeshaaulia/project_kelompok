@@ -33,7 +33,9 @@ class MyProfileDetailPage extends StatelessWidget {
                 !snapshot.hasData ||
                 !snapshot.data!.exists) {
                   return Center(
-                    child: Column()
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                    )
                   )
                 }
           },
