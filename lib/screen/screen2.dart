@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:project_kelompok/screen/splash_screen.dart';
 
 class MyPage3 extends StatelessWidget {
@@ -14,16 +15,13 @@ class MyPage3 extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              height: 160,
-              width: 160,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                  image: AssetImage('assets/logo/logo-global.png'),
+                height: 300, 
+                width: double.infinity,
+                child: Lottie.asset(
+                  'assets/animations/Photography.json',
                   fit: BoxFit.contain,
                 ),
               ),
-            ),
             SizedBox(height: 20),
             Text(
               'Tangkap Momentmu Lalu Abadikan \n Jadikan Setiap Moment mu diabadikan Untuk Dokumentasi Anak Cucu mu',
