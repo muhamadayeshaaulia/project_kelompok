@@ -229,3 +229,12 @@ Widget _buildHeader(Map<String, dynamic> data) {
     ],
   );
 }
+
+Widget _buildDetailItem(IconData icon, String label, String value, {bool isLink = false}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          
+        ]))
