@@ -84,7 +84,48 @@ class MyProfileDetailPage extends StatelessWidget {
                       padding: const EdgeInsets.all(30),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [],
+                        children: [
+                          const Text(
+                            "Informasi Pribadi",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF2E3192),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          _buildDetailItem(
+                            Icons.badge,
+                            "NIM",
+                            data['nim'] ?? "-",
+                          ),
+                          _buildDetailItem(
+                            Icons.class_,
+                            "Kelas",
+                            data['kelas'] ?? "-",
+                          ),
+                          _buildDetailItem(
+                            Icons.email,
+                            "Email",
+                            data['email'] ?? "-",
+                          ),
+                          _buildDetailItem(
+                            Icons.phone,
+                            "No. HP",
+                            data['no_hp'] ?? "-",
+                          ),
+                          _buildDetailItem(
+                            Icons.home,
+                            "Alamat",
+                            data['alamat'] ?? "-",
+                          ),
+                          _buildDetailItem(
+                            Icons.link,
+                            "Sosial Media",
+                            data['sosmed_link'] ?? "-",
+                            isLink: true,
+                          ),
+                        ],
                       ),
                     ),
                   ),
