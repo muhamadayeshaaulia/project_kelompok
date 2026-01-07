@@ -15,7 +15,7 @@ class MyPage3 extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-                height: 300, 
+                height: 200, 
                 width: double.infinity,
                 child: Lottie.asset(
                   'assets/animations/CamerasP.json',
