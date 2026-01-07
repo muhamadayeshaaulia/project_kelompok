@@ -70,6 +70,14 @@ class MemberCardPage extends StatelessWidget {
                 nim: "NIM: 1123150006",
                 role: "Project Manager",
                 warna: Colors.blue.shade200,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const RozakDetailPage(),
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 15),
               _buildMemberCard(
