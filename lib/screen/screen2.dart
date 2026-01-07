@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:project_kelompok/screen/splash_screen.dart';
 
-class MyPage2 extends StatelessWidget {
-  const MyPage2({super.key});
+class MyPage3 extends StatelessWidget {
+  const MyPage3({super.key});
 
   Widget build(BuildContext context) {
     return Scaffold(
