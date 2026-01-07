@@ -65,6 +65,7 @@ class MyPage2 extends StatelessWidget {
               ),
             ],
           ),
+          SizedBox(height: 20),
         ],
       ),
     );
