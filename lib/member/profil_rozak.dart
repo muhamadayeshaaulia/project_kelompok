@@ -23,6 +23,7 @@ class MyProfileDetailPage extends StatelessWidget {
               .collection('users')
               .doc(myUid)
               .get(),
+          builder: (context, snapshot) {},
         ),
       ),
     );
