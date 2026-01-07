@@ -6,6 +6,7 @@ import 'package:project_kelompok/screen/home_page.dart';
 class MemberCardPage extends StatelessWidget {
   const MemberCardPage({super.key});
   final String ayeshaDocId = "6JozUEKn8fMzDjoq4ZyHtwqm8IP2";
+  final String ilhamDocId = "VAGSZaUD4TU5bV4zNXMENBKU2Tg1";
 
   @override
   Widget build(BuildContext context) {
@@ -71,13 +72,9 @@ class MemberCardPage extends StatelessWidget {
                 warna: Colors.blue.shade200,
               ),
               const SizedBox(height: 15),
-              _buildMemberCard(
-                context: context,
-                nama: "Muhammad Ilham Maulana",
-                nim: "NIM: 1123150141",
-                role: "UI/UX Designer",
-                warna: Colors.green.shade200,
-              ),
+
+              
+
               const SizedBox(height: 15),
               _buildMemberCard(
                 context: context,
