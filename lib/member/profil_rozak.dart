@@ -236,5 +236,12 @@ Widget _buildDetailItem(IconData icon, String label, String value, {bool isLink 
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: const Color(0xFF2E3192), size: 20),
+          ),
         ]))
