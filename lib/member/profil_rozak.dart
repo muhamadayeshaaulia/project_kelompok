@@ -125,6 +125,10 @@ class MyProfileDetailPage extends StatelessWidget {
                             data['sosmed_link'] ?? "-",
                             isLink: true,
                           ),
+
+                          const SizedBox(height: 20),
+                          const Divider(),
+                          const SizedBox(height: 10),
                         ],
                       ),
                     ),
