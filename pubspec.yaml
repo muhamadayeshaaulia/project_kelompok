@@ -84,6 +84,7 @@ flutter:
     - assets/animations/Photography.json
     - assets/animations/Camera_Click.json
     - assets/images/
+    - assets/logo/
     - .env
 
 flutter_launcher_icons:
