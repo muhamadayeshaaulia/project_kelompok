@@ -176,7 +176,20 @@ Widget _buildHeader(Map<String, dynamic> data) {
 
   return Column(
     children: [
-      Container()
+      Container(
+        padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 3),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 10,
+                spreadRadius: 2,
+              )
+            ],
+          ),
+      )
     ]
   )
 }
