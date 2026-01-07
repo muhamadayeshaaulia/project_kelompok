@@ -124,7 +124,74 @@ class IlhamProfilPage extends StatelessWidget {
                   ),
                 ),
               ),
-              // LANJUT KE COMMIT 3
+              SingleChildScrollView(
+                padding: EdgeInsets.only(top: contentStartPos),
+                child: Container(
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    color: Colors.white, 
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(35),
+                      topRight: Radius.circular(35),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 20,
+                        offset: Offset(0, -5),
+                      )
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(25.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Container(
+                            width: 50,
+                            height: 5,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 25),
+                        const Text(
+                          "About Me",
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          data['keterangan'] ?? "Tidak ada deskripsi tersedia.",
+                          style: TextStyle(color: Colors.grey[600], height: 1.6, fontSize: 15),
+                          textAlign: TextAlign.justify,
+                        ),
+                        const SizedBox(height: 30),
+                        const Text(
+                          "Personal Info",
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                        const SizedBox(height: 15),
+                        _buildInfoRow(Icons.person_outline, "Nama Lengkap", data['nama_lengkap']),
+                        _buildInfoRow(Icons.badge_outlined, "NIM", data['nim']),
+                        _buildInfoRow(Icons.class_outlined, "Kelas", data['kelas']),
+                        const SizedBox(height: 30),
+                        const Text(
+                          "Contact",
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                        const SizedBox(height: 15),
+                        _buildInfoRow(Icons.email_outlined, "Email", data['email']),
+                        _buildInfoRow(Icons.phone_android_outlined, "No HP", data['no_hp']),
+                        _buildInfoRow(Icons.location_on_outlined, "Alamat", data['alamat']),
+                        const SizedBox(height: 50),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ],
           );
         },
