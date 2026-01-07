@@ -39,7 +39,7 @@ class MyPage3 extends StatelessWidget {
                     width: 20,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.blue,
+                      color: Colors.blue[100],
                     ),
                   ),
                 ),
@@ -50,7 +50,7 @@ class MyPage3 extends StatelessWidget {
                     width: 20,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.blue[100],
+                      color: Colors.blue,
                     ),
                   ),
                 ),
