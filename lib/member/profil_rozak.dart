@@ -80,6 +80,7 @@ class MyProfileDetailPage extends StatelessWidget {
                         ),
                       ],
                     ),
+                    child: SingleChildScrollView(),
                   ),
                 ),
               ],
