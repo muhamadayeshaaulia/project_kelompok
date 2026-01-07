@@ -26,6 +26,25 @@ class MyPage3 extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                child: Container(
+                  margin: EdgeInsets.all(10),
+                  height: 20,
+                  width: 20,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.blue,
+                  ),
+                ),
+              ),
+             
+              
+            ],
+          ),
+          SizedBox(height: 20),
           
         ],
       ),
