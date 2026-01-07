@@ -80,7 +80,9 @@ class MyProfileDetailPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: SingleChildScrollView(),
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(30),
+                    ),
                   ),
                 ),
               ],
