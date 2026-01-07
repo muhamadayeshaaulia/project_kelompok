@@ -83,7 +83,12 @@ class MemberCardPage extends StatelessWidget {
                   String nim = "1123150141";
                   String role = "UI/UX Designer";
 
-                  
+                  if (snapshot.hasData && snapshot.data!.exists) {
+                    var data = snapshot.data!.data() as Map<String, dynamic>;
+                    nama = data['nama'] ?? nama;
+                    nim = data['nim'] ?? nim;
+                    role = data['role'] ?? role;
+                  }
 
                   
                 },
