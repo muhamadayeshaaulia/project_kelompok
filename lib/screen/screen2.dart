@@ -6,7 +6,9 @@ class MyPage3 extends StatelessWidget {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -93,6 +95,7 @@ class MyPage3 extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }
