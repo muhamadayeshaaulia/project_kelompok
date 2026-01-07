@@ -68,7 +68,7 @@ class MemberCardPage extends StatelessWidget {
                 context: context,
                 nama: "Muhammad Abdul Rozak",
                 nim: "NIM: 1123150006",
-                role: "Project Manager",
+                role: "Backend",
                 warna: Colors.blue.shade200,
                 onTap: () {
                   Navigator.push(
