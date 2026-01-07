@@ -18,7 +18,7 @@ class MyPage3 extends StatelessWidget {
                 height: 300, 
                 width: double.infinity,
                 child: Lottie.asset(
-                  'assets/animations/Photography.json',
+                  'assets/animations/CamerasP.json',
                   fit: BoxFit.contain,
                 ),
               ),
