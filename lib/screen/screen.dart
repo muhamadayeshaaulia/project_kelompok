@@ -63,6 +63,7 @@ class MyPage2 extends StatelessWidget {
                   ),
                 ),
               ),
+              
             ],
           ),
           SizedBox(height: 20),
@@ -76,7 +77,7 @@ class MyPage2 extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          const MySplashScreen(nextRoute: '/page1'),
+                          const MySplashScreen(nextRoute: '/screen2'),
                     ),
                     (Route<dynamic> route) => false,
                   );

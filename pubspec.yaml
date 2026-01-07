@@ -83,6 +83,7 @@ flutter:
     - assets/animations/Bus_Loader.json
     - assets/animations/Photography.json
     - assets/animations/Camera_Click.json
+    - assets/animations/CamerasP.json
     - assets/images/
     - assets/logo/
     - .env
