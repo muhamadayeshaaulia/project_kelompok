@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_kelompok/member/profil_ayesha.dart';
+import 'package:project_kelompok/member/profil_ilham.dart';
 import 'package:project_kelompok/screen/home_page.dart';
 
 class MemberCardPage extends StatelessWidget {
   const MemberCardPage({super.key});
   final String ayeshaDocId = "6JozUEKn8fMzDjoq4ZyHtwqm8IP2";
+  final String ilhamDocId = "VAGSZaUD4TU5bV4zNXMENBKU2Tg1";
 
   @override
   Widget build(BuildContext context) {
@@ -71,13 +73,42 @@ class MemberCardPage extends StatelessWidget {
                 warna: Colors.blue.shade200,
               ),
               const SizedBox(height: 15),
-              _buildMemberCard(
-                context: context,
-                nama: "Muhammad Ilham Maulana",
-                nim: "NIM: 1123150141",
-                role: "UI/UX Designer",
-                warna: Colors.green.shade200,
+
+              StreamBuilder<DocumentSnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(ilhamDocId)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  String nama = "Muhammad Ilham Maulana"; 
+                  String nim = "1123150141";
+                  String role = "UI/UX Designer";
+
+                  if (snapshot.hasData && snapshot.data!.exists) {
+                    var data = snapshot.data!.data() as Map<String, dynamic>;
+                    nama = data['nama'] ?? nama;
+                    nim = data['nim'] ?? nim;
+                    role = data['role'] ?? role;
+                  }
+
+                  return _buildMemberCard(
+                    context: context,
+                    nama: nama,
+                    nim: "NIM: $nim",
+                    role: role,
+                    warna: Colors.green.shade200,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const IlhamProfilPage(),
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
+
               const SizedBox(height: 15),
               _buildMemberCard(
                 context: context,
