@@ -10,6 +10,7 @@ import 'package:project_kelompok/screen/profile_page.dart';
 import 'package:project_kelompok/screen/register.dart';
 import 'package:project_kelompok/screen/screen.dart';
 import 'package:project_kelompok/screen/screen2.dart';
+import 'package:project_kelompok/screen/screen3.dart';
 import 'package:project_kelompok/screen/splash_screen.dart';
 import 'package:project_kelompok/services/notification_service.dart';
 import 'firebase_options.dart';
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
         '/page1': (context) => const MyPage1(),
         '/screen': (context) => const MyPage2(),
         '/screen2': (context) => const MyPage3(),
+        '/screen3': (context) => const MyPage4(),
         '/login': (context) => const MyLogin(),
         '/register': (context) => const MyRegis(),
         '/home': (context) => const MyHomePage(),
