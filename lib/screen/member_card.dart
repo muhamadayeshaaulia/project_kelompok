@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_kelompok/member/profil_ayesha.dart';
 import 'package:project_kelompok/member/profil_ilham.dart';
 import 'package:project_kelompok/screen/home_page.dart';
+import 'package:project_kelompok/member/profil_rozak.dart';
 
 class MemberCardPage extends StatelessWidget {
   const MemberCardPage({super.key});
@@ -69,8 +70,16 @@ class MemberCardPage extends StatelessWidget {
                 context: context,
                 nama: "Muhammad Abdul Rozak",
                 nim: "NIM: 1123150006",
-                role: "Project Manager",
+                role: "Backend",
                 warna: Colors.blue.shade200,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const RozakDetailPage(),
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 15),
 
@@ -144,10 +153,7 @@ Widget _buildMemberCard({
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
           gradient: LinearGradient(
-            colors: [
-              warna,
-            Colors.blue,
-            ],
+            colors: [warna, Colors.blue],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -165,10 +171,14 @@ Widget _buildMemberCard({
                     color: Colors.black.withOpacity(0.1),
                     blurRadius: 5,
                     offset: const Offset(0, 2),
-                  )
+                  ),
                 ],
               ),
-              child: Icon(Icons.person, size: 35, color: warna.withOpacity(0.8)),
+              child: Icon(
+                Icons.person,
+                size: 35,
+                color: warna.withOpacity(0.8),
+              ),
             ),
             const SizedBox(width: 15),
             Expanded(
@@ -187,7 +197,7 @@ Widget _buildMemberCard({
                   Text(
                     nim,
                     style: const TextStyle(
-                      fontSize: 12, 
+                      fontSize: 12,
                       color: Colors.black54,
                       fontWeight: FontWeight.w500,
                     ),
@@ -211,7 +221,11 @@ Widget _buildMemberCard({
                   color: Colors.white.withOpacity(0.5),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.black54),
+                child: const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 14,
+                  color: Colors.black54,
+                ),
               ),
           ],
         ),
