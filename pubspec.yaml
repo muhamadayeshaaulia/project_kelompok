@@ -85,6 +85,7 @@ flutter:
     - assets/animations/Photography.json
     - assets/animations/Camera_Click.json
     - assets/animations/CamerasP.json
+    - assets/animations/SocialMedia.json
     - assets/images/
     - assets/logo/
     - .env
