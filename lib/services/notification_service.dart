@@ -41,4 +41,22 @@ class NotificationService {
       }
     }
   }
+
+  static void _navigateToDetail(String postId) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postId)
+        .get();
+
+    if (doc.exists && navigatorKey.currentState != null) {
+      navigatorKey.currentState!.push(
+        MaterialPageRoute(
+          builder: (context) => PostDetailPage(
+            postId: postId,
+            postData: doc.data() as Map<String, dynamic>,
+          ),
+        ),
+      );
+    }
+  }
 }
