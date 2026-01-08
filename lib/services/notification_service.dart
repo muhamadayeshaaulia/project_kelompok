@@ -59,4 +59,24 @@ class NotificationService {
       );
     }
   }
+   static Future<void> showPostSuccessNotification(String postId) async {
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+          'post_channel',
+          'Post Notifications',
+          importance: Importance.max,
+          priority: Priority.high,
+        );
+         const NotificationDetails notificationDetails = NotificationDetails(
+      android: androidDetails,
+    );
+
+    await _notificationsPlugin.show(
+      0,
+      'Yey! Postingan Berhasil 🚀',
+      'Karyamu sudah publish di publik, klik untuk melihat!',
+      notificationDetails,
+      payload: postId,
+    );
+  }
 }
