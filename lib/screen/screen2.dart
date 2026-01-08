@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:project_kelompok/screen/screen3.dart'; // Pastikan ini mengarah ke MyPage4
 import 'package:project_kelompok/screen/splash_screen.dart';
 
 class MyPage3 extends StatelessWidget {
   const MyPage3({super.key});
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -12,7 +14,8 @@ class MyPage3 extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
+            // --- Animasi ---
+            SizedBox(
               height: 200,
               width: double.infinity,
               child: Lottie.asset(
@@ -20,81 +23,53 @@ class MyPage3 extends StatelessWidget {
                 fit: BoxFit.contain,
               ),
             ),
-            SizedBox(height: 20),
-            Text(
-              'Tangkap Momentmu Lalu Abadikan \n Jadikan Setiap Moment mu diabadikan Untuk Dokumentasi Anak Cucu mu',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
+            const SizedBox(height: 20),
+
+            // --- Teks Deskripsi ---
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.0),
+              child: Text(
+                'Tangkap Momentmu Lalu Abadikan \n Jadikan Setiap Moment mu diabadikan Untuk Dokumentasi Anak Cucu mu',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
+
+            // --- Indikator (Dots) ---
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(
-                  child: Container(
-                    margin: EdgeInsets.all(10),
-                    height: 20,
-                    width: 20,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.blue[100],
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  child: Container(
-                    margin: EdgeInsets.all(10),
-                    height: 20,
-                    width: 20,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  child: Container(
-                    margin: EdgeInsets.all(10),
-                    height: 20,
-                    width: 20,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.blue[100],
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  child: Container(
-                    margin: EdgeInsets.all(10),
-                    height: 20,
-                    width: 20,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.blue[100],
-                    ),
-                  ),
-                ),
+                _buildDot(isActive: false), // Dot 1
+                _buildDot(isActive: true), // Dot 2 (AKTIF)
+                _buildDot(isActive: false), // Dot 3
+                _buildDot(isActive: false), // Dot 4
               ],
             ),
-            SizedBox(height: 20),
-            Container(
-              child: SizedBox(
-                height: 40,
-                width: double.infinity,
+            const SizedBox(height: 20),
+
+            // --- Tombol Continue ---
+            SizedBox(
+              height: 40,
+              width: double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushAndRemoveUntil(
+                    Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            const MySplashScreen(nextRoute: '/page1'),
-                      ),
-                      (Route<dynamic> route) => false,
+                      // Pastikan MyPage4 sudah diimport dengan benar
+                      MaterialPageRoute(builder: (context) => const MyPage4()),
                     );
                   },
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-                  child: Text(
-                    "Next",
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8), // Gaya rounded
+                    ),
+                  ),
+                  child: const Text(
+                    "Continue", // Teks sesuai request
                     style: TextStyle(fontSize: 16, color: Colors.black),
                   ),
                 ),
@@ -102,6 +77,19 @@ class MyPage3 extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  // Helper agar kodingan dots lebih rapi & tidak duplikat
+  Widget _buildDot({required bool isActive}) {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      height: 20,
+      width: 20,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: isActive ? Colors.blue : Colors.blue[100],
       ),
     );
   }

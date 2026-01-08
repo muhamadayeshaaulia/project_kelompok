@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:project_kelompok/screen/screen2.dart';
+import 'package:lottie/lottie.dart';
+import 'package:project_kelompok/screen/splash_screen.dart';
 
-class MyPage2 extends StatelessWidget {
-  const MyPage2({super.key});
+class MyPage4 extends StatefulWidget {
+  const MyPage4({super.key});
 
+  @override
+  State<MyPage4> createState() => _MyPage4State();
+}
+
+class _MyPage4State extends State<MyPage4> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -12,22 +18,22 @@ class MyPage2 extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              height: 160,
-              width: 160,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                  image: AssetImage('assets/logo/logo-global.png'),
-                  fit: BoxFit.contain,
-                ),
+            SizedBox(
+              height: 200,
+              width: double.infinity,
+              child: Lottie.asset(
+                'assets/animations/SocialMedia.json',
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(Icons.share, size: 100, color: Colors.blue);
+                },
               ),
             ),
             const SizedBox(height: 20),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
-                'Selamat datang di aplikasi Booth-Art \n Aplikasi ini di buat bertujuan untuk tugas UAS pembelajaran Aplikasi mobile menggunakan flutter dan firebase',
+                'Bagikan Keseruanmu \n Upload langsung ke Media Sosial dan biarkan dunia melihat senyum terbaikmu',
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
@@ -36,9 +42,9 @@ class MyPage2 extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                _buildDot(isActive: false),
+                _buildDot(isActive: false),
                 _buildDot(isActive: true),
-                _buildDot(isActive: false),
-                _buildDot(isActive: false),
                 _buildDot(isActive: false),
               ],
             ),
@@ -50,9 +56,13 @@ class MyPage2 extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
+                    Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (context) => const MyPage3()),
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const MySplashScreen(nextRoute: '/page1'),
+                      ),
+                      (Route<dynamic> route) => false,
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -62,7 +72,7 @@ class MyPage2 extends StatelessWidget {
                     ),
                   ),
                   child: const Text(
-                    "Continue",
+                    "Mulai Sekarang",
                     style: TextStyle(fontSize: 16, color: Colors.black),
                   ),
                 ),
