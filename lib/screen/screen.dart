@@ -63,7 +63,17 @@ class MyPage2 extends StatelessWidget {
                   ),
                 ),
               ),
-              
+              SizedBox(
+                child: Container(
+                  margin: EdgeInsets.all(10),
+                  height: 20,
+                  width: 20,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.blue[100],
+                  ),
+                ),
+              ),
             ],
           ),
           SizedBox(height: 20),
