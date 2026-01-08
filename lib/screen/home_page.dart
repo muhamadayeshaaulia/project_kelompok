@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_kelompok/detail/postingan.dart';
+import 'package:project_kelompok/services/notification_service.dart';
 import 'package:project_kelompok/template/photoboothpage.dart';
 import 'package:project_kelompok/template/photoboothpage2.dart';
 import 'package:project_kelompok/template/template_vintage.dart';
@@ -430,15 +431,18 @@ class _MyHomePageState extends State<MyHomePage> {
     if (user == null) return;
 
     try {
-      await FirebaseFirestore.instance.collection('posts').add({
-        'uid': user.uid,
-        'nama': _displayName,
-        'user_image': _profileImageUrl,
-        'post_image': imageUrl,
-        'template_type': templateType,
-        'timestamp': FieldValue.serverTimestamp(),
-        'views': 0,
-      });
+      DocumentReference ref = await FirebaseFirestore.instance
+          .collection('posts')
+          .add({
+            'uid': user.uid,
+            'nama': _displayName,
+            'user_image': _profileImageUrl,
+            'post_image': imageUrl,
+            'template_type': templateType,
+            'timestamp': FieldValue.serverTimestamp(),
+            'views': 0,
+          });
+      await NotificationService.showPostSuccessNotification(ref.id);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Berhasil diposting ke publik! 🚀")),
