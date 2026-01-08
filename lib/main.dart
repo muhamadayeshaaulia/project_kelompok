@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:project_kelompok/detail/postingan.dart';
 import 'package:project_kelompok/screen/explor.dart';
 import 'package:project_kelompok/screen/home_page.dart';
 import 'package:project_kelompok/screen/info_page.dart';
@@ -22,8 +21,7 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await dotenv.load(fileName: ".env");
   await SupabaseService.init();
-  await NotificationService.init();
-  await NotificationService.handleInitialNotification();
+  await NotificationService.initializeAll();
   await Permission.notification.request();
 
   runApp(const MyApp());
