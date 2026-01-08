@@ -86,10 +86,7 @@ class MyPage3 extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            const MyPage4(), // Pastikan import MyPage4
-                      ),
+                      MaterialPageRoute(builder: (context) => const MyPage4()),
                     );
                   },
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
