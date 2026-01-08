@@ -17,6 +17,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'services/supabase_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -27,7 +28,6 @@ void main() async {
 
   runApp(const MyApp());
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

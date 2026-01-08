@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -28,6 +29,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    updateFCMToken();
     _fetchUserData();
     _loadPhotos();
     if (!hasShownWelcome) {
@@ -67,6 +69,26 @@ class _MyHomePageState extends State<MyHomePage> {
         duration: const Duration(seconds: 3),
       ),
     );
+  }
+
+  Future<void> updateFCMToken() async {
+    try {
+      // 1. Ambil token unik dari HP ini
+      String? token = await FirebaseMessaging.instance.getToken();
+      String? uid = FirebaseAuth.instance.currentUser?.uid;
+
+      if (uid != null && token != null) {
+        // 2. Simpan atau Update ke koleksi users di dokumen milik user tersebut
+        await FirebaseFirestore.instance.collection('users').doc(uid).set(
+          {'fcmToken': token},
+          SetOptions(merge: true),
+        ); // Pakai merge: true agar data lain (nama/foto) tidak terhapus
+
+        print("Token Berhasil Disimpan: $token");
+      }
+    } catch (e) {
+      print("Error simpan token: $e");
+    }
   }
 
   Future<void> _fetchUserData() async {

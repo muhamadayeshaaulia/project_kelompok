@@ -56,6 +56,8 @@ dependencies:
   url_launcher: ^6.3.0
   flutter_local_notifications: any
   firebase_messaging: any
+  http: ^1.6.0
+  googleapis_auth: ^2.0.0
 
 dev_dependencies:
   flutter_test:
@@ -89,6 +91,7 @@ flutter:
     - assets/animations/SocialMedia.json
     - assets/images/
     - assets/logo/
+    - assets/json/
     - .env
 
 flutter_launcher_icons:
