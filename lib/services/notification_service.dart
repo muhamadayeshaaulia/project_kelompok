@@ -19,7 +19,6 @@ class NotificationService {
     await _notificationsPlugin.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
-
         if (response.payload != null && response.payload!.isNotEmpty) {
           Future.delayed(Duration(milliseconds: 300), () {
             _navigateToDetail(response.payload!);
@@ -27,5 +26,19 @@ class NotificationService {
         }
       },
     );
+  }
+
+  static Future<void> handleInitialNotification() async {
+    final NotificationAppLaunchDetails? details = await _notificationsPlugin
+        .getNotificationAppLaunchDetails();
+
+    if (details != null && details.didNotificationLaunchApp) {
+      String? payload = details.notificationResponse?.payload;
+      if (payload != null && payload.isNotEmpty) {
+        Future.delayed(const Duration(seconds: 2), () {
+          _navigateToDetail(payload);
+        });
+      }
+    }
   }
 }
