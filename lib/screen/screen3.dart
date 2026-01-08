@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:project_kelompok/screen/splash_screen.dart';
 
-import 'package:flutter/material.dart';
-
 class MyPage4 extends StatefulWidget {
   const MyPage4({super.key});
 
@@ -23,7 +21,6 @@ class _MyPage4State extends State<MyPage4> {
             SizedBox(
               height: 200,
               width: double.infinity,
-              // Pastikan kamu punya file animasi baru, misal tentang sharing/social media
               child: Lottie.asset(
                 'assets/animations/SocialMedia.json',
                 fit: BoxFit.contain,
@@ -52,19 +49,13 @@ class _MyPage4State extends State<MyPage4> {
               ],
             ),
             const SizedBox(height: 20),
-
-            // --- Bagian Tombol ---
             SizedBox(
               height: 40,
               width: double.infinity,
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20.0,
-                ), // Tambah padding biar rapi
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: ElevatedButton(
                   onPressed: () {
-                    // Logic navigasi ke halaman selanjutnya (Page 1 / Login)
-                    // Menggunakan MySplashScreen loader sesuai kodingan temanmu
                     Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
@@ -77,13 +68,11 @@ class _MyPage4State extends State<MyPage4> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        8,
-                      ), // Sedikit rounded biar modern
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                   child: const Text(
-                    "Mulai Sekarang", // Kata-kata diganti karena ini mendekati akhir
+                    "Mulai Sekarang",
                     style: TextStyle(fontSize: 16, color: Colors.black),
                   ),
                 ),
@@ -102,7 +91,6 @@ class _MyPage4State extends State<MyPage4> {
       width: 20,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        // Jika aktif warna Biru Tua, jika tidak Biru Muda
         color: isActive ? Colors.blue : Colors.blue[100],
       ),
     );
