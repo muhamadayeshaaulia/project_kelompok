@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:project_kelompok/template/photoboothpage.dart';
 import 'package:project_kelompok/template/photoboothpage2.dart';
 import 'package:project_kelompok/template/template_vintage.dart';
+import 'package:project_kelompok/services/notification_service.dart';
 
 class PostDetailPage extends StatefulWidget {
   final String postId;
@@ -86,16 +87,37 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
   void _toggleLike() async {
     if (currentUser == null) return;
+
     final likeRef = FirebaseFirestore.instance
         .collection('posts')
         .doc(widget.postId)
         .collection('likes')
         .doc(currentUser!.uid);
 
-    if (isLiked) {
-      await likeRef.delete();
-    } else {
+    if (!isLiked) {
       await likeRef.set({'timestamp': FieldValue.serverTimestamp()});
+      final ownerUid = widget.postData['uid'];
+      if (ownerUid != currentUser!.uid) {
+        final ownerDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(ownerUid)
+            .get();
+
+        if (ownerDoc.exists) {
+          String? targetToken = ownerDoc.data()?['fcmToken'];
+
+          if (targetToken != null) {
+            await NotificationService.sendPushNotification(
+              targetToken: targetToken,
+              title: 'Seseorang menyukai karyamu! ❤️',
+              body: '$_myUserName baru saja menyukai postingan kamu.',
+              postId: widget.postId,
+            );
+          }
+        }
+      }
+    } else {
+      await likeRef.delete();
     }
     setState(() => isLiked = !isLiked);
   }
