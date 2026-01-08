@@ -9,4 +9,23 @@ class NotificationService {
   static final GlobalKey<NavigatorState> navigatorKey =
       GlobalKey<NavigatorState>();
 
+  static Future<void> init() async {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    const InitializationSettings initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
+
+    await _notificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+
+        if (response.payload != null && response.payload!.isNotEmpty) {
+          Future.delayed(Duration(milliseconds: 300), () {
+            _navigateToDetail(response.payload!);
+          });
+        }
+      },
+    );
+  }
 }
