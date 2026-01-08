@@ -41,6 +41,16 @@ class _MyPage4State extends State<MyPage4> {
                 textAlign: TextAlign.center,
               ),
             ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildDot(isActive: false),
+                _buildDot(isActive: false),
+                _buildDot(isActive: true),
+                _buildDot(isActive: false),
+              ],
+            ),
           ],
         ),
       ),
