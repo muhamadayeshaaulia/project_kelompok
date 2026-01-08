@@ -32,6 +32,15 @@ class _MyPage4State extends State<MyPage4> {
                 },
               ),
             ),
+            const SizedBox(height: 20),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.0),
+              child: Text(
+                'Bagikan Keseruanmu \n Upload langsung ke Media Sosial dan biarkan dunia melihat senyum terbaikmu',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+            ),
           ],
         ),
       ),
