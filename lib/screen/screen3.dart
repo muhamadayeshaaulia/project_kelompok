@@ -19,7 +19,20 @@ class _MyPage4State extends State<MyPage4> {
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [],
+          children: [
+            SizedBox(
+              height: 200,
+              width: double.infinity,
+              // Pastikan kamu punya file animasi baru, misal tentang sharing/social media
+              child: Lottie.asset(
+                'assets/animations/SocialMedia.json',
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(Icons.share, size: 100, color: Colors.blue);
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
