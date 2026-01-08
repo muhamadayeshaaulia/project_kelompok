@@ -6,7 +6,6 @@ import 'package:project_kelompok/detail/postingan.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print("Menangani pesan background: ${message.messageId}");
 }
 
 class NotificationService {
