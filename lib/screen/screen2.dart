@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:project_kelompok/screen/screen3.dart';
 import 'package:project_kelompok/screen/splash_screen.dart';
 
 class MyPage3 extends StatelessWidget {
@@ -83,13 +84,12 @@ class MyPage3 extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushAndRemoveUntil(
+                    Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            const MySplashScreen(nextRoute: '/page1'),
+                            const MyPage4(), // Pastikan import MyPage4
                       ),
-                      (Route<dynamic> route) => false,
                     );
                   },
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
