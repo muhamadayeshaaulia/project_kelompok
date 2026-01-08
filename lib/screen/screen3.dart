@@ -51,6 +51,44 @@ class _MyPage4State extends State<MyPage4> {
                 _buildDot(isActive: false),
               ],
             ),
+            const SizedBox(height: 20),
+
+            // --- Bagian Tombol ---
+            SizedBox(
+              height: 40,
+              width: double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                ), // Tambah padding biar rapi
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Logic navigasi ke halaman selanjutnya (Page 1 / Login)
+                    // Menggunakan MySplashScreen loader sesuai kodingan temanmu
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const MySplashScreen(nextRoute: '/page1'),
+                      ),
+                      (Route<dynamic> route) => false,
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        8,
+                      ), // Sedikit rounded biar modern
+                    ),
+                  ),
+                  child: const Text(
+                    "Mulai Sekarang", // Kata-kata diganti karena ini mendekati akhir
+                    style: TextStyle(fontSize: 16, color: Colors.black),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
