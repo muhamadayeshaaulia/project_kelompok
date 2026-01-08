@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:project_kelompok/detail/postingan.dart';
 import 'package:project_kelompok/screen/explor.dart';
 import 'package:project_kelompok/screen/home_page.dart';
 import 'package:project_kelompok/screen/info_page.dart';
@@ -10,15 +11,20 @@ import 'package:project_kelompok/screen/register.dart';
 import 'package:project_kelompok/screen/screen.dart';
 import 'package:project_kelompok/screen/screen2.dart';
 import 'package:project_kelompok/screen/splash_screen.dart';
+import 'package:project_kelompok/services/notification_service.dart';
 import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'services/supabase_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await dotenv.load(fileName: ".env");
   await SupabaseService.init();
+  await NotificationService.init();
+  await NotificationService.handleInitialNotification();
+  await Permission.notification.request();
 
   runApp(const MyApp());
 }
@@ -29,6 +35,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: NotificationService.navigatorKey,
       title: 'Booth Art Apps',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.yellow),
