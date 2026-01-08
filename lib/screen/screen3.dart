@@ -94,4 +94,17 @@ class _MyPage4State extends State<MyPage4> {
       ),
     );
   }
+
+  Widget _buildDot({required bool isActive}) {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      height: 20,
+      width: 20,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        // Jika aktif warna Biru Tua, jika tidak Biru Muda
+        color: isActive ? Colors.blue : Colors.blue[100],
+      ),
+    );
+  }
 }
