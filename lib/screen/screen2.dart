@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:project_kelompok/screen/screen3.dart'; // Pastikan ini mengarah ke MyPage4
-import 'package:project_kelompok/screen/splash_screen.dart';
+import 'package:project_kelompok/screen/screen3.dart';
 
 class MyPage3 extends StatelessWidget {
   const MyPage3({super.key});
@@ -14,7 +13,6 @@ class MyPage3 extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // --- Animasi ---
             SizedBox(
               height: 200,
               width: double.infinity,
@@ -25,7 +23,6 @@ class MyPage3 extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // --- Teks Deskripsi ---
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
@@ -36,19 +33,16 @@ class MyPage3 extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // --- Indikator (Dots) ---
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildDot(isActive: false), // Dot 1
-                _buildDot(isActive: true), // Dot 2 (AKTIF)
-                _buildDot(isActive: false), // Dot 3
-                _buildDot(isActive: false), // Dot 4
+                _buildDot(isActive: false),
+                _buildDot(isActive: true),
+                _buildDot(isActive: false),
+                _buildDot(isActive: false),
               ],
             ),
             const SizedBox(height: 20),
-
-            // --- Tombol Continue ---
             SizedBox(
               height: 40,
               width: double.infinity,
@@ -58,18 +52,17 @@ class MyPage3 extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      // Pastikan MyPage4 sudah diimport dengan benar
                       MaterialPageRoute(builder: (context) => const MyPage4()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8), // Gaya rounded
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                   child: const Text(
-                    "Continue", // Teks sesuai request
+                    "Continue",
                     style: TextStyle(fontSize: 16, color: Colors.black),
                   ),
                 ),
@@ -81,7 +74,6 @@ class MyPage3 extends StatelessWidget {
     );
   }
 
-  // Helper agar kodingan dots lebih rapi & tidak duplikat
   Widget _buildDot({required bool isActive}) {
     return Container(
       margin: const EdgeInsets.all(10),
