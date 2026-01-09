@@ -350,10 +350,10 @@ storage
 
 | Name | Role | Contributions |
 |------|------|---------------|
-| **Asis** | Project Lead & Backend Developer | - Authentication system<br>- Firebase integration<br>- API development<br>- Database design |
-| **Helen** | Frontend Developer | - UI/UX Design<br>- Home screen implementation<br>- Profile screen<br>- State management |
-| **Rio** | Full Stack Developer | - Splash screen<br>- Register screen<br>- Notification system<br>- Push notifications (FCM) |
-| **Adit** | Mobile Developer | - Login screen<br>- Local database (SQLite)<br>- Offline sync logic<br>- Testing & QA |
+| **Muhamad Ayesha Aulia** | Project Lead & Full stack dev in Solved project | - Authentication system<br>- Firebase integration<br>- API development<br>- UI Fiture Home,post,detail pots,list_user,profile_detail, profile_page,splash1,lottie, screen, button nav implementation <br>- Notification system<br>- Push notifications (FCM)<br>- Google Auth Sign-in <br>-Solved Problem Project tim|
+| **Muhamad Ilham Maulana** | Full stack dev | - UI Design<br>- Home,post,detail pots,list_user,profile_detail,camera_page_frame4_template screen implementation<br>- Profile screen<br>- Frame template |
+| **Muhammad Abdul Rozak** | Frontend Developer | - Auth login,logout <br>- login,splash_screen3,home button nav add, frame_template_vintage screen |
+| **Muhammad Arifin** | Frontend Developer | - Info,follow, profile,screen4 screen
 
 
 ## 📄 License
