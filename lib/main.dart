@@ -17,14 +17,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'services/supabase_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await dotenv.load(fileName: ".env");
   await SupabaseService.init();
   await NotificationService.initializeAll();
+
   await Permission.notification.request();
 
   runApp(const MyApp());
