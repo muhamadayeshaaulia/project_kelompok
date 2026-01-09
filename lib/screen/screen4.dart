@@ -22,7 +22,7 @@ class _MyPage5State extends State<MyPage5> {
               height: 200,
               width: double.infinity,
               child: Lottie.asset(
-                'assets/animations/SocialMedia.json',
+                'assets/animations/DigitalCamera.json',
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
                   return const Icon(Icons.share, size: 100, color: Colors.blue);
