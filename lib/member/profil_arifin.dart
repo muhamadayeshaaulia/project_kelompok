@@ -7,3 +7,4 @@ class arifinProfilPage extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
+     final double headerHeight = 400.0;
