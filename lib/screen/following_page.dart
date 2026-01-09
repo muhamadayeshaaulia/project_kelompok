@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:project_kelompok/screen/explor.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
 import 'package:project_kelompok/detail/profilDetail.dart';
+import 'package:project_kelompok/services/notification_service.dart';
 
 class FollowingPage extends StatefulWidget {
   const FollowingPage({super.key});
@@ -24,6 +25,52 @@ class _FollowingPageState extends State<FollowingPage> {
     super.initState();
     _loadMyFollowing();
     _loadMyFollowers();
+  }
+
+  Future<void> _sendFollowNotification(
+    String targetUid,
+    bool isFollback,
+  ) async {
+    try {
+      DocumentSnapshot targetDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(targetUid)
+          .get();
+
+      DocumentSnapshot myDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser!.uid)
+          .get();
+
+      if (targetDoc.exists && myDoc.exists) {
+        String? token =
+            (targetDoc.data() as Map<String, dynamic>?)?['fcmToken'];
+        String targetName =
+            (targetDoc.data() as Map<String, dynamic>?)?['nama'] ?? "User";
+        String myName =
+            (myDoc.data() as Map<String, dynamic>?)?['nama'] ?? "Seseorang";
+
+        if (token != null) {
+          String title = "Halo $targetName! 👋";
+          String body = "";
+
+          if (isFollback) {
+            body = "$myName baru saja follback kamu! 🤝";
+          } else {
+            body = "$myName mulai mengikuti kamu 👤";
+          }
+
+          await NotificationService.sendPushNotification(
+            targetToken: token,
+            title: title,
+            body: body,
+            postId: "",
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint("Gagal kirim notif follow: $e");
+    }
   }
 
   Future<void> _loadMyFollowing() async {
@@ -124,6 +171,16 @@ class _FollowingPageState extends State<FollowingPage> {
       await myFollowingDoc.set(timestamp);
       await targetFollowersDoc.set(timestamp);
       setState(() => myFollowingList.add(targetUid));
+
+      final checkFollbackDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('followers')
+          .doc(targetUid)
+          .get();
+
+      bool isFollback = checkFollbackDoc.exists;
+      _sendFollowNotification(targetUid, isFollback);
     }
   }
 
