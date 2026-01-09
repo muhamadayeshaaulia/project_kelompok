@@ -52,3 +52,4 @@ class arifinProfilPage extends StatelessWidget {
             children: [
               Positioned(
                 top: 0,
+                left: 0,
