@@ -41,3 +41,7 @@ class arifinProfilPage extends StatelessWidget {
               ),
             );
           }
+          if (!snapshot.hasData || !snapshot.data!.exists) {
+            return const Center(child: Text("Data tidak ditemukan"));
+          }
+          var data = snapshot.data!.data() as Map<String, dynamic>;
