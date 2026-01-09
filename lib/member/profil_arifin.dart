@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ArifinProfilPage extends StatelessWidget {
   const ArifinProfilPage({super.key});
-  
+
   final String arifinDocId = "lpFLoTHeFTPRtfoESKnFoGzO3a42";
 
   @override
@@ -36,7 +36,6 @@ class ArifinProfilPage extends StatelessWidget {
             .doc(arifinDocId)
             .get(),
         builder: (context, snapshot) {
-
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(color: Colors.amber),
@@ -45,6 +44,16 @@ class ArifinProfilPage extends StatelessWidget {
           if (!snapshot.hasData || !snapshot.data!.exists) {
             return const Center(child: Text("Data Arifin tidak ditemukan"));
           }
+          var data = snapshot.data!.data() as Map<String, dynamic>;
+          String nama = data['nama'] ?? "Arifin";
+          String role = data['role'] ?? "Developer";
+          String? photoUrl = data['photo_url'];
+
+          return Stack(
+            children: [
+              // Nanti kita isi konten di sini
+            ],
+          );
           return Container();
         },
       ),
