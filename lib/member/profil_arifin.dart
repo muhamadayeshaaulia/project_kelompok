@@ -197,4 +197,5 @@ class arifinProfilPage extends StatelessWidget {
                           "Nama Lengkap",
                           data['nama_lengkap'],
                         ),
+                        _buildInfoRow(Icons.badge_outlined, "NIM", data['nim']),
              
