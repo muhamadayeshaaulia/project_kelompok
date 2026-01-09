@@ -51,7 +51,27 @@ class ArifinProfilPage extends StatelessWidget {
 
           return Stack(
             children: [
-              // Nanti kita isi konten di sini
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: headerHeight,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xFFFFC107),
+                        Color(0xFFFF8F00),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Stack(
+                     children: [],
+                  ),
+                ),
+              ),
             ],
           );
           return Container();
