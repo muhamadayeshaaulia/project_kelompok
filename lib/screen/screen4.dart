@@ -33,7 +33,7 @@ class _MyPage5State extends State<MyPage5> {
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
-                'Bagikan Keseruanmu \n Upload langsung ke Media Sosial dan biarkan dunia melihat senyum terbaikmu',
+                'Ayo Ambil MomenMu \n Hari Mu adalah Kebahagianmu',
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
