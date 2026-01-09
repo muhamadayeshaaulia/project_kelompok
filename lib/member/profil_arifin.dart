@@ -206,7 +206,6 @@ class ArifinProfilPage extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: Colors.grey[300],
                               borderRadius: BorderRadius.circular(10),
-                              
                             ),
                           ),
                         ),
@@ -223,7 +222,7 @@ class ArifinProfilPage extends StatelessWidget {
                                 blurRadius: 10,
                                 spreadRadius: 1,
                                 offset: const Offset(0, 2),
-                              )
+                              ),
                             ],
                           ),
                           child: Column(
@@ -270,22 +269,58 @@ class ArifinProfilPage extends StatelessWidget {
                           ),
                           child: Column(
                             children: [
-                              _buildModernRow(Icons.person_outline_rounded, "Nama Lengkap", data['nama_lengkap']),
+                              _buildModernRow(
+                                Icons.person_outline_rounded,
+                                "Nama Lengkap",
+                                data['nama_lengkap'],
+                              ),
                               const Padding(
                                 padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Divider(height: 1),
                               ),
-                              _buildModernRow(Icons.badge_outlined, "NIM", data['nim']),
+                              _buildModernRow(
+                                Icons.badge_outlined,
+                                "NIM",
+                                data['nim'],
+                              ),
                               const Padding(
                                 padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Divider(height: 1),
                               ),
-                              _buildModernRow(Icons.class_outlined, "Kelas", data['kelas']),
+                              _buildModernRow(
+                                Icons.class_outlined,
+                                "Kelas",
+                                data['kelas'],
+                              ),
                             ],
                           ),
                         ),
                         const SizedBox(height: 25),
+                        _buildSectionTitle("Contact Details"),
+                        const SizedBox(height: 15),
 
+                        _buildContactCard(
+                          Icons.email_outlined,
+                          "Email",
+                          data['email'],
+                          Colors.blueAccent,
+                        ),
+                        const SizedBox(height: 10),
+                        _buildContactCard(
+                          Icons.phone_iphone_rounded,
+                          "WhatsApp",
+                          data['no_hp'],
+                          Colors.green,
+                        ),
+                        const SizedBox(height: 10),
+                        _buildContactCard(
+                          Icons.location_on_outlined,
+                          "Alamat",
+                          data['alamat'],
+                          Colors.redAccent,
+                        ),
+
+                        const SizedBox(height: 50),
                       ],
                     ),
                   ),
@@ -312,8 +347,6 @@ class ArifinProfilPage extends StatelessWidget {
         ),
       ),
     );
-
-    
   }
 
   Widget _buildModernRow(IconData icon, String label, String? value) {
@@ -347,12 +380,17 @@ class ArifinProfilPage extends StatelessWidget {
               ),
             ],
           ),
-        )
+        ),
       ],
     );
   }
 
-  Widget _buildContactCard(IconData icon, String label, String? value, Color accentColor) {
+  Widget _buildContactCard(
+    IconData icon,
+    String label,
+    String? value,
+    Color accentColor,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
       decoration: BoxDecoration(
@@ -383,7 +421,11 @@ class ArifinProfilPage extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: TextStyle(fontSize: 11, color: Colors.grey[500], fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey[500],
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 Text(
                   value ?? "-",
