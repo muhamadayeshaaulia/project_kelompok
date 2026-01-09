@@ -19,3 +19,4 @@ class arifinProfilPage extends StatelessWidget {
           margin: const EdgeInsets.only(left: 10, top: 10),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.4),
+            shape: BoxShape.circle,
