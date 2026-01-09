@@ -8,3 +8,6 @@ class arifinProfilPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
      final double headerHeight = 400.0;
+     final double contentStartPos = 360.0;
+
+    return Scaffold(
