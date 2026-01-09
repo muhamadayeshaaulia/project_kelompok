@@ -22,3 +22,4 @@ class arifinProfilPage extends StatelessWidget {
             shape: BoxShape.circle,
             ),
           child: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.black87),
