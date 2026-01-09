@@ -60,7 +60,7 @@ class _MyPage4State extends State<MyPage4> {
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            const MySplashScreen(nextRoute: '/page1'),
+                            const MySplashScreen(nextRoute: '/screen4'),
                       ),
                       (Route<dynamic> route) => false,
                     );
