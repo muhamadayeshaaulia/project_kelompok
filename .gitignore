@@ -45,5 +45,5 @@ app.*.map.json
 /android/app/release
 
 .vscode/templates
-./assets/json/service_account.json
+assets/json/service_account.json
 .env
