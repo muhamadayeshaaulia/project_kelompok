@@ -251,6 +251,9 @@ class ArifinProfilPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 25),
+
+                        _buildSectionTitle("Personal Info"),
+                        const SizedBox(height: 15),
                       ],
                     ),
                   ),
