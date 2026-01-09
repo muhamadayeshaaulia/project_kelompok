@@ -25,14 +25,14 @@ Booth-Art adalah aplikasi mobile modern yang dikembangkan menggunakan Flutter un
 
 ### Key Features
 
-- **Modern UI/UX Design** - Antarmuka yang clean dan user-friendly
-- ....
-- ....
-- **Push Notifications** - Reminder untuk catatan penting
+- **Modern UI/UX Design** - Antarmuka yang clean dan user-friendly.
+- **Frame creative** - Menyediakan beberapa freame free untuk berkreasi dengan foto dari galeri 
+                       atau di ambil langsung dari kamera.
+- **Sign-Google** - Memberikan kenyamanan dan ke aman an untuk user yg menggunakan aplikasi.
+- **Push Notifications** - Menggunakan local notification & firbase cloud untuk menangani notifikasi
+                           yang interaktive.
 - **Cloud Sync** - Sinkronisasi otomatis dengan Firebase
-- **Dark Mode** - Theme gelap untuk kenyamanan mata
-- ...
-- ...
+- **Thema modern** - Ui yg menarik untuk aplikasi mudah di gunakan untuk user awam
 
 ## Screenshots
 
