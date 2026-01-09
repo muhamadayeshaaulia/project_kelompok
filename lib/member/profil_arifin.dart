@@ -96,7 +96,31 @@ class ArifinProfilPage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                              const SizedBox(height: 20),
-                             // Avatar masuk sini
+                            Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white.withOpacity(0.3),
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white,
+                                ),
+                                child: CircleAvatar(
+                                  radius: 60,
+                                  backgroundColor: Colors.grey[200],
+                                  backgroundImage: (photoUrl != null && photoUrl.isNotEmpty)
+                                      ? NetworkImage(photoUrl)
+                                      : null,
+                                  child: (photoUrl == null)
+                                      ? Icon(Icons.person, size: 50, color: Colors.grey[400])
+                                      : null,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 15),
                           ],
                         ),
                       ),
