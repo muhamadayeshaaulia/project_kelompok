@@ -45,3 +45,4 @@ class arifinProfilPage extends StatelessWidget {
             return const Center(child: Text("Data tidak ditemukan"));
           }
           var data = snapshot.data!.data() as Map<String, dynamic>;
+          String nama = data['nama'] ?? "Nama";
