@@ -47,3 +47,4 @@ class arifinProfilPage extends StatelessWidget {
           var data = snapshot.data!.data() as Map<String, dynamic>;
           String nama = data['nama'] ?? "Nama";
           String role = data['role'] ?? "Developer";
+          String? photoUrl = data['photo_url'];
