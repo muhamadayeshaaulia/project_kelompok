@@ -310,6 +310,23 @@ posts
 
 ```
 
+# structure supabase storage
+```
+storage
+└── buckets
+    └── photos (PUBLIC)
+        ├── profile
+        │   └── {user_id}
+        │       └── profile.png
+        │
+        └── uploads
+            └── {user_id}
+                ├── C2_strip_1767463595287.png
+                ├── C2_strip_17678569329.png
+                ├── vintage_strip_1767463868.png
+
+```
+
 
 ## 📝 API Documentation
 
