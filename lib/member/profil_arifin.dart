@@ -190,3 +190,11 @@ class arifinProfilPage extends StatelessWidget {
                             fontSize: 18,
                           ),
                         ),
+                        
+                        const SizedBox(height: 15),
+                        _buildInfoRow(
+                          Icons.person_outline,
+                          "Nama Lengkap",
+                          data['nama_lengkap'],
+                        ),
+             
