@@ -30,7 +30,16 @@ class ArifinProfilPage extends StatelessWidget {
           ),
         ),
       ),
-      body: Container(),
+      body: FutureBuilder<DocumentSnapshot>(
+        future: FirebaseFirestore.instance
+            .collection('users')
+            .doc(arifinDocId)
+            .get(),
+        builder: (context, snapshot) {
+          // Kita akan isi logikanya di commit berikutnya
+          return Container();
+        },
+      ),
     );
   }
 }
