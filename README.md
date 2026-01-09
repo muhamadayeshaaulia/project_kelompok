@@ -402,6 +402,6 @@ Terima kasih kepada komunitas dan layanan berikut yang membantu dalam pengembang
 
 
 <div align="center">
-  <p>Made with by .... Team</p>
-  <p>© 2026 Notes App. All rights reserved.</p>
+  <p>Made with by 716 Production Team</p>
+  <p>© 2026 Booth-Art. All rights reserved.</p>
 </div>
