@@ -36,3 +36,8 @@ class arifinProfilPage extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Container(
               color: Colors.white,
+              child: const Center(
+                child: CircularProgressIndicator(color: Colors.orange),
+              ),
+            );
+          }
