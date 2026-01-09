@@ -44,8 +44,8 @@ class _MyPage5State extends State<MyPage5> {
               children: [
                 _buildDot(isActive: false),
                 _buildDot(isActive: false),
-                _buildDot(isActive: true),
                 _buildDot(isActive: false),
+                _buildDot(isActive: true),
               ],
             ),
             const SizedBox(height: 20),
