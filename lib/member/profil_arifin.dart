@@ -58,3 +58,8 @@ class arifinProfilPage extends StatelessWidget {
                 child: Container(
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
+                      colors: [Color.fromRGBO(255, 192, 45, 1), Colors.white],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
