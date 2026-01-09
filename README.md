@@ -377,6 +377,17 @@ Terima kasih kepada komunitas dan layanan berikut yang membantu dalam pengembang
 - FontAwesome — ikon tambahan
 - Cupertino Icons — ikon iOS
 
+### 📸 Media & Storage
+- Image Picker — mengambil gambar
+- Image Cropper — crop gambar
+- Screenshot — capture widget
+- Camera — kamera device
+- Camera Windows — support kamera Windows
+- Gal — penyimpanan gallery
+- Share Plus — share ke sosmed
+- Path Provider — akses direktori
+- Path — utilitas path
+
 
 
 
