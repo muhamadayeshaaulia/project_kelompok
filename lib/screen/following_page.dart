@@ -180,6 +180,12 @@ class _FollowingPageState extends State<FollowingPage> {
           .get();
 
       bool isFollback = checkFollbackDoc.exists;
+      setState(() {
+        myFollowingList.add(targetUid);
+        if (isFollback && !myFollowersList.contains(targetUid)) {
+          myFollowersList.add(targetUid);
+        }
+      });
       _sendFollowNotification(targetUid, isFollback);
     }
   }
