@@ -7,6 +7,7 @@ import 'package:project_kelompok/detail/postingan.dart';
 import 'package:project_kelompok/detail/user_list_page.dart';
 import 'package:project_kelompok/screen/profile_page.dart';
 import 'package:project_kelompok/widgats/custom_buttom_nav.dart';
+import 'package:project_kelompok/services/notification_service.dart';
 
 class Profildetail extends StatefulWidget {
   final String uid;
@@ -27,6 +28,52 @@ class _ProfildetailState extends State<Profildetail> {
   void initState() {
     super.initState();
     _checkStatus();
+  }
+
+  Future<void> _sendFollowNotification(
+    String targetUid,
+    bool isFollback,
+  ) async {
+    try {
+      DocumentSnapshot targetDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(targetUid)
+          .get();
+
+      DocumentSnapshot myDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUid)
+          .get();
+
+      if (targetDoc.exists && myDoc.exists) {
+        String? token =
+            (targetDoc.data() as Map<String, dynamic>?)?['fcmToken'];
+        String targetName =
+            (targetDoc.data() as Map<String, dynamic>?)?['nama'] ?? "User";
+        String myName =
+            (myDoc.data() as Map<String, dynamic>?)?['nama'] ?? "Seseorang";
+
+        if (token != null) {
+          String title = "Halo $targetName! 👋";
+          String body = "";
+          if (isFollback) {
+            body = "$myName baru saja follback kamu! 🤝";
+          } else {
+            body = "$myName mulai mengikuti kamu 👤";
+          }
+
+          // Kirim Notif
+          await NotificationService.sendPushNotification(
+            targetToken: token,
+            title: title,
+            body: body,
+            postId: "",
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint("Gagal kirim notif follow: $e");
+    }
   }
 
   void _checkStatus() async {
@@ -106,6 +153,9 @@ class _ProfildetailState extends State<Profildetail> {
     }
 
     await batch.commit();
+    if (startFollowing) {
+      _sendFollowNotification(widget.uid, isHeFollowingMe);
+    }
     _checkStatus();
   }
 
