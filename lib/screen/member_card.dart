@@ -4,6 +4,7 @@ import 'package:project_kelompok/member/profil_ayesha.dart';
 import 'package:project_kelompok/member/profil_ilham.dart';
 import 'package:project_kelompok/screen/home_page.dart';
 import 'package:project_kelompok/member/profil_rozak.dart';
+import 'package:project_kelompok/member/profil_arifin.dart';
 
 class MemberCardPage extends StatelessWidget {
   const MemberCardPage({super.key});
@@ -145,7 +146,7 @@ class MemberCardPage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const IlhamProfilPage(),
+                          builder: (context) => const arifinProfilPage(),
                         ),
                       );
                     },
