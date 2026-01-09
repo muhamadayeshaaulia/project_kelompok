@@ -46,6 +46,7 @@ class MyApp extends StatelessWidget {
         '/screen': (context) => const MyPage2(),
         '/screen2': (context) => const MyPage3(),
         '/screen3': (context) => const MyPage4(),
+        '/screen4': (context) => const MyPage5(),
         '/login': (context) => const MyLogin(),
         '/register': (context) => const MyRegis(),
         '/home': (context) => const MyHomePage(),
