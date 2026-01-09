@@ -91,6 +91,7 @@ flutter:
     - assets/animations/SocialMedia.json
     - assets/animations/DigitalCamera.json
     - assets/images/
+    - assets/screenshots/
     - assets/logo/
     - assets/json/
     - .env
