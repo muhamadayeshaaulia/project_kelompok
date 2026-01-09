@@ -95,7 +95,7 @@ class ArifinProfilPage extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                             const SizedBox(height: 20),
+                            const SizedBox(height: 20),
                             Container(
                               padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
@@ -111,11 +111,16 @@ class ArifinProfilPage extends StatelessWidget {
                                 child: CircleAvatar(
                                   radius: 60,
                                   backgroundColor: Colors.grey[200],
-                                  backgroundImage: (photoUrl != null && photoUrl.isNotEmpty)
+                                  backgroundImage:
+                                      (photoUrl != null && photoUrl.isNotEmpty)
                                       ? NetworkImage(photoUrl)
                                       : null,
                                   child: (photoUrl == null)
-                                      ? Icon(Icons.person, size: 50, color: Colors.grey[400])
+                                      ? Icon(
+                                          Icons.person,
+                                          size: 50,
+                                          color: Colors.grey[400],
+                                        )
                                       : null,
                                 ),
                               ),
@@ -140,11 +145,16 @@ class ArifinProfilPage extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.black.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: Colors.white.withOpacity(0.2)),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.2),
+                                ),
                               ),
                               child: Text(
                                 role.toUpperCase(),
@@ -160,6 +170,36 @@ class ArifinProfilPage extends StatelessWidget {
                         ),
                       ),
                     ],
+                  ),
+                ),
+              ),
+
+              SingleChildScrollView(
+                padding: EdgeInsets.only(top: contentStartPos),
+                child: Container(
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFF8F9FA),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(40),
+                      topRight: Radius.circular(40),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 20,
+                        offset: Offset(0, -5),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(25, 10, 25, 50),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Isi body nanti di sini
+                      ],
+                    ),
                   ),
                 ),
               ),
