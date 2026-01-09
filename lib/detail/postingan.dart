@@ -320,13 +320,15 @@ class _PostDetailPageState extends State<PostDetailPage> {
     }
   }
 
-  void _toggleCommentLike(String commentId, List likes) async {
+  void _toggleCommentLike(String commentId, List likes, String ownerUid) async {
     if (currentUser == null) return;
+
     final docRef = FirebaseFirestore.instance
         .collection('posts')
         .doc(widget.postId)
         .collection('comments')
         .doc(commentId);
+
     if (likes.contains(currentUser!.uid)) {
       await docRef.update({
         'likes': FieldValue.arrayRemove([currentUser!.uid]),
@@ -335,6 +337,34 @@ class _PostDetailPageState extends State<PostDetailPage> {
       await docRef.update({
         'likes': FieldValue.arrayUnion([currentUser!.uid]),
       });
+      if (ownerUid != currentUser!.uid) {
+        _sendLikeCommentNotification(ownerUid);
+      }
+    }
+  }
+
+  Future<void> _sendLikeCommentNotification(String targetUid) async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(targetUid)
+          .get();
+
+      if (doc.exists) {
+        String? token = doc.data()?['fcmToken'];
+        String ownerName = doc.data()?['nama'] ?? "User";
+
+        if (token != null) {
+          await NotificationService.sendPushNotification(
+            targetToken: token,
+            title: 'Halo $ownerName! 👋',
+            body: '$_myUserName menyukai komentarmu ❤️',
+            postId: widget.postId,
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint("Gagal kirim notif like komentar: $e");
     }
   }
 
@@ -683,7 +713,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
           Row(
             children: [
               GestureDetector(
-                onTap: () => _toggleCommentLike(id, likes),
+                onTap: () => _toggleCommentLike(id, likes, data['uid']),
                 child: Text(
                   isCommentLiked ? "Batal Suka" : "Suka",
                   style: TextStyle(
