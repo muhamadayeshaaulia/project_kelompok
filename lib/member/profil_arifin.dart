@@ -217,4 +217,9 @@ class arifinProfilPage extends StatelessWidget {
                           "Email",
                           data['email'],
                         ),
+                        _buildInfoRow(
+                          Icons.phone_android_outlined,
+                          "No HP",
+                          data['no_hp'],
+                        ),
                   
