@@ -126,7 +126,7 @@ class MemberCardPage extends StatelessWidget {
                 builder: (context, snapshot) {
                   String nama = "Muhammad Arifin"; 
                   String nim = "1123150053";
-                  String role = "UI/UX Designer";
+                  String role = "Backend Developer";
 
                   if (snapshot.hasData && snapshot.data!.exists) {
                     var data = snapshot.data!.data() as Map<String, dynamic>;
