@@ -1,4 +1,4 @@
-# Nama Aplikasi App - Flutter Application
+# Nama Aplikasi Booth-Art - Flutter Application
 
 <div align="center">
 <url>
