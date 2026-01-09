@@ -124,7 +124,7 @@ class MemberCardPage extends StatelessWidget {
                     .doc(ilhamDocId)
                     .snapshots(),
                 builder: (context, snapshot) {
-                  String nama = "Muhammad Ilham Maulana"; 
+                  String nama = "Muhammad Arifin"; 
                   String nim = "1123150141";
                   String role = "UI/UX Designer";
 
@@ -152,7 +152,7 @@ class MemberCardPage extends StatelessWidget {
                   );
                 },
               ),
-              
+
             ],
           ),
         ),
