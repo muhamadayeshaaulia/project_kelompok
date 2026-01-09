@@ -59,16 +59,13 @@ class ArifinProfilPage extends StatelessWidget {
                 child: Container(
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [
-                        Color(0xFFFFC107),
-                        Color(0xFFFF8F00),
-                      ],
+                      colors: [Color(0xFFFFC107), Color(0xFFFF8F00)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                   ),
                   child: Stack(
-                     children: [
+                    children: [
                       Positioned(
                         top: -50,
                         right: -50,
@@ -91,6 +88,16 @@ class ArifinProfilPage extends StatelessWidget {
                             shape: BoxShape.circle,
                             color: Colors.white.withOpacity(0.1),
                           ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                             const SizedBox(height: 20),
+                             // Avatar masuk sini
+                          ],
                         ),
                       ),
                     ],
