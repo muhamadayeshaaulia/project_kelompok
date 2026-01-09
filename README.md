@@ -372,6 +372,12 @@ Terima kasih kepada komunitas dan layanan berikut yang membantu dalam pengembang
 - Supabase — database & authentication
 - Google APIs — integrasi layanan Google
 
+### 🎨 UI & Animations
+- Lottie — animasi JSON
+- FontAwesome — ikon tambahan
+- Cupertino Icons — ikon iOS
+
+
 
 
 <div align="center">
