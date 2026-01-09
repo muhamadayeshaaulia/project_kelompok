@@ -125,7 +125,7 @@ class MemberCardPage extends StatelessWidget {
                     .snapshots(),
                 builder: (context, snapshot) {
                   String nama = "Muhammad Arifin"; 
-                  String nim = "1123150141";
+                  String nim = "1123150053";
                   String role = "UI/UX Designer";
 
                   if (snapshot.hasData && snapshot.data!.exists) {
