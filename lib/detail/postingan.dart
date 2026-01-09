@@ -9,7 +9,6 @@ import 'package:project_kelompok/template/photoboothpage2.dart';
 import 'package:project_kelompok/template/template_vintage.dart';
 import 'package:project_kelompok/services/notification_service.dart';
 
-
 class PostDetailPage extends StatefulWidget {
   final String postId;
   final Map<String, dynamic> postData;
@@ -30,6 +29,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   bool isLiked = false;
   String? replyingToId;
   String? replyingToName;
+  String? replyingToUid;
   String _myUserName = "Loading...";
   String? _myProfilePic;
 
@@ -190,6 +190,21 @@ class _PostDetailPageState extends State<PostDetailPage> {
   void _addComment() async {
     String commentText = _commentController.text.trim();
     if (commentText.isEmpty || currentUser == null) return;
+    String? targetUid;
+    String notificationTitle = "";
+    String notificationBody = "";
+
+    if (replyingToId != null) {
+      targetUid = replyingToUid;
+      notificationTitle = "Halo $replyingToName! 👋";
+      notificationBody = "$_myUserName membalas komentarmu: \"$commentText\"";
+    } else {
+      targetUid = widget.postData['uid'];
+      String ownerName = widget.postData['nama'] ?? "User";
+      notificationTitle = "Halo $ownerName! 👋";
+      notificationBody =
+          "$_myUserName mengomentari postinganmu: \"$commentText\"";
+    }
 
     try {
       await FirebaseFirestore.instance
@@ -216,6 +231,13 @@ class _PostDetailPageState extends State<PostDetailPage> {
           ),
         );
       }
+      if (targetUid != null && targetUid != currentUser!.uid) {
+        _sendCommentNotification(
+          targetUid,
+          notificationTitle,
+          notificationBody,
+        );
+      }
 
       setState(() {
         _commentController.clear();
@@ -225,6 +247,33 @@ class _PostDetailPageState extends State<PostDetailPage> {
       FocusScope.of(context).unfocus();
     } catch (e) {
       debugPrint("Error adding comment: $e");
+    }
+  }
+
+  Future<void> _sendCommentNotification(
+    String targetUid,
+    String title,
+    String body,
+  ) async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(targetUid)
+          .get();
+
+      if (doc.exists) {
+        String? token = doc.data()?['fcmToken'];
+        if (token != null) {
+          await NotificationService.sendPushNotification(
+            targetToken: token,
+            title: title,
+            body: body,
+            postId: widget.postId,
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint("Gagal kirim notif komentar: $e");
     }
   }
 
@@ -271,13 +320,15 @@ class _PostDetailPageState extends State<PostDetailPage> {
     }
   }
 
-  void _toggleCommentLike(String commentId, List likes) async {
+  void _toggleCommentLike(String commentId, List likes, String ownerUid) async {
     if (currentUser == null) return;
+
     final docRef = FirebaseFirestore.instance
         .collection('posts')
         .doc(widget.postId)
         .collection('comments')
         .doc(commentId);
+
     if (likes.contains(currentUser!.uid)) {
       await docRef.update({
         'likes': FieldValue.arrayRemove([currentUser!.uid]),
@@ -286,6 +337,34 @@ class _PostDetailPageState extends State<PostDetailPage> {
       await docRef.update({
         'likes': FieldValue.arrayUnion([currentUser!.uid]),
       });
+      if (ownerUid != currentUser!.uid) {
+        _sendLikeCommentNotification(ownerUid);
+      }
+    }
+  }
+
+  Future<void> _sendLikeCommentNotification(String targetUid) async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(targetUid)
+          .get();
+
+      if (doc.exists) {
+        String? token = doc.data()?['fcmToken'];
+        String ownerName = doc.data()?['nama'] ?? "User";
+
+        if (token != null) {
+          await NotificationService.sendPushNotification(
+            targetToken: token,
+            title: 'Halo $ownerName! 👋',
+            body: '$_myUserName menyukai komentarmu ❤️',
+            postId: widget.postId,
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint("Gagal kirim notif like komentar: $e");
     }
   }
 
@@ -634,7 +713,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
           Row(
             children: [
               GestureDetector(
-                onTap: () => _toggleCommentLike(id, likes),
+                onTap: () => _toggleCommentLike(id, likes, data['uid']),
                 child: Text(
                   isCommentLiked ? "Batal Suka" : "Suka",
                   style: TextStyle(
@@ -647,8 +726,10 @@ class _PostDetailPageState extends State<PostDetailPage> {
               const SizedBox(width: 15),
               GestureDetector(
                 onTap: () => setState(() {
-                  replyingToId = id;
+                  String rootParentId = data['parent_id'] ?? id;
+                  replyingToId = rootParentId;
                   replyingToName = data['nama'];
+                  replyingToUid = data['uid'];
                 }),
                 child: const Text(
                   "Balas",
@@ -694,6 +775,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     onTap: () => setState(() {
                       replyingToId = null;
                       replyingToName = null;
+                      replyingToUid = null;
                     }),
                     child: const Icon(Icons.close, size: 16),
                   ),
