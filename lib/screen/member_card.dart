@@ -118,14 +118,41 @@ class MemberCardPage extends StatelessWidget {
                 },
               ),
 
-              const SizedBox(height: 15),
-              _buildMemberCard(
-                context: context,
-                nama: "Muhammad Arifin",
-                nim: "NIM: 1123150053",
-                role: "Backend Developer",
-                warna: Colors.orange.shade200,
+              StreamBuilder<DocumentSnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(ilhamDocId)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  String nama = "Muhammad Ilham Maulana"; 
+                  String nim = "1123150141";
+                  String role = "UI/UX Designer";
+
+                  if (snapshot.hasData && snapshot.data!.exists) {
+                    var data = snapshot.data!.data() as Map<String, dynamic>;
+                    nama = data['nama'] ?? nama;
+                    nim = data['nim'] ?? nim;
+                    role = data['role'] ?? role;
+                  }
+
+                  return _buildMemberCard(
+                    context: context,
+                    nama: nama,
+                    nim: "NIM: $nim",
+                    role: role,
+                    warna: Colors.green.shade200,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const IlhamProfilPage(),
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
+              
             ],
           ),
         ),
