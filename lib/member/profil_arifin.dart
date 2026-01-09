@@ -23,3 +23,8 @@ class arifinProfilPage extends StatelessWidget {
             ),
           child: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black87),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
+      ),
+      body: FutureBuilder<DocumentSnapshot>(
