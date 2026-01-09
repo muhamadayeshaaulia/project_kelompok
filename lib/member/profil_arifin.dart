@@ -53,3 +53,4 @@ class arifinProfilPage extends StatelessWidget {
               Positioned(
                 top: 0,
                 left: 0,
+                right: 0,
