@@ -395,7 +395,10 @@ Terima kasih kepada komunitas dan layanan berikut yang membantu dalam pengembang
 - Permission Handler — izin aplikasi
 - Flutter Dotenv — dukungan file `.env`
 
-
+### 📦 Komunitas & Resource
+- Flutter Community — dokumentasi & package
+- Flaticon — sumber icon aplikasi
+- Unsplash — placeholder images
 
 
 <div align="center">
