@@ -339,9 +339,9 @@ storage
 ### Development Workflow
 
 1. Fork repository
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
+2. Create feature branch (`git checkout -b feature/splash_screen`)
+3. Commit changes (`git commit -m "menambahkan splash_screen"`)
+4. Push to branch (`git push origin feature/splash_screen`)
 5. Open Pull Request
 
 ## Team Members & Contributions
