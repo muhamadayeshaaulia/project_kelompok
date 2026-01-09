@@ -197,7 +197,18 @@ class ArifinProfilPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Isi body nanti di sini
+                        // Handle Bar
+                        Center(
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 25),
+                            width: 40,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
