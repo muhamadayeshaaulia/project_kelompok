@@ -206,9 +206,51 @@ class ArifinProfilPage extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: Colors.grey[300],
                               borderRadius: BorderRadius.circular(10),
+                              
                             ),
                           ),
                         ),
+                        // Section 1: About Me
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.05),
+                                blurRadius: 10,
+                                spreadRadius: 1,
+                                offset: const Offset(0, 2),
+                              )
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              const Text(
+                                "About Me",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                data['keterangan'] ?? "Tidak ada deskripsi.",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  height: 1.5,
+                                  fontSize: 14,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 25),
                       ],
                     ),
                   ),
