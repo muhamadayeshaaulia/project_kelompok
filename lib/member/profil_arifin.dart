@@ -36,7 +36,11 @@ class ArifinProfilPage extends StatelessWidget {
             .doc(arifinDocId)
             .get(),
         builder: (context, snapshot) {
-          // Kita akan isi logikanya di commit berikutnya
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(color: Colors.amber),
+            );
+          }
           return Container();
         },
       ),

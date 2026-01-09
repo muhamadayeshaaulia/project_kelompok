@@ -146,7 +146,7 @@ class MemberCardPage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const arifinProfilPage(),
+                          builder: (context) => const ArifinProfilPage(),
                         ),
                       );
                     },
