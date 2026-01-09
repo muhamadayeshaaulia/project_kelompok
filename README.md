@@ -13,7 +13,7 @@ https://global.ac.id/
 
   ##  Project UAS
   - Mata Kuliah : Aplikasi Mobile
-  - Kelas : KS1234 
+  - Kelas : TI SE M & SH 23 
   - Semester : GANJIL 
   - Tahun Akademik: 2025 - 2026 
   
@@ -21,9 +21,7 @@ https://global.ac.id/
 
 ## About The Project
 
-..... adalah aplikasi mobile modern yang dikembangkan menggunakan Flutter untuk membantu ....... menyediakan antarmuka yang intuitif, fitur sinkronisasi cloud menggunakan firebase authentication , firebase store, ..... dan .......
-
-Dengan .............. lain.
+Booth-Art adalah aplikasi mobile modern yang dikembangkan menggunakan Flutter untuk membantu orang-orang berkreasi dengan gaya foto dengan beberapa frame yang menarik, menyediakan antarmuka yang intuitif, fitur sinkronisasi cloud menggunakan firebase authentication , firebase store, google cloud, supabase storage dan Firebase Cloud Messaging.
 
 ### Key Features
 
