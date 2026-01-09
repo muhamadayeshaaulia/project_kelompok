@@ -696,7 +696,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
               const SizedBox(width: 15),
               GestureDetector(
                 onTap: () => setState(() {
-                  replyingToId = id;
+                  String rootParentId = data['parent_id'] ?? id;
+                  replyingToId = rootParentId;
                   replyingToName = data['nama'];
                   replyingToUid = data['uid'];
                 }),
