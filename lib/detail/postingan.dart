@@ -105,12 +105,13 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
         if (ownerDoc.exists) {
           String? targetToken = ownerDoc.data()?['fcmToken'];
+          String ownerName = ownerDoc.data()?['nama'] ?? "User";
 
           if (targetToken != null) {
             await NotificationService.sendPushNotification(
               targetToken: targetToken,
-              title: 'Seseorang menyukai karyamu! ❤️',
-              body: '$_myUserName baru saja menyukai postingan kamu.',
+              title: 'Halo $ownerName! 👋',
+              body: '$_myUserName baru saja menyukai postingan kamu ❤️',
               postId: widget.postId,
             );
           }
