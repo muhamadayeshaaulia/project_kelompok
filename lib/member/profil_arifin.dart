@@ -17,3 +17,4 @@ class arifinProfilPage extends StatelessWidget {
         elevation: 0,
         leading: Container(
           margin: const EdgeInsets.only(left: 10, top: 10),
+          decoration: BoxDecoration(
