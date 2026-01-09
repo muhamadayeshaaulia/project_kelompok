@@ -20,3 +20,5 @@ class arifinProfilPage extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.4),
             shape: BoxShape.circle,
+            ),
+          child: IconButton(
