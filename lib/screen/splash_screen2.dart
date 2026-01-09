@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
-import 'package:project_kelompok/screen/screen3.dart';
+import 'package:project_kelompok/screen/splash_screen3.dart';
 
-class MyPage3 extends StatelessWidget {
-  const MyPage3({super.key});
+class MyPage2 extends StatelessWidget {
+  const MyPage2({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,31 +12,32 @@ class MyPage3 extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(
-              height: 200,
-              width: double.infinity,
-              child: Lottie.asset(
-                'assets/animations/CamerasP.json',
-                fit: BoxFit.contain,
+            Container(
+              height: 160,
+              width: 160,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                  image: AssetImage('assets/logo/logo-global.png'),
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
             const SizedBox(height: 20),
-
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
-                'Tangkap Momentmu Lalu Abadikan \n Jadikan Setiap Moment mu diabadikan Untuk Dokumentasi Anak Cucu mu',
+                'Selamat datang di aplikasi Booth-Art \n Aplikasi ini di buat bertujuan untuk tugas UAS pembelajaran Aplikasi mobile menggunakan flutter dan firebase',
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
             ),
             const SizedBox(height: 20),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildDot(isActive: false),
                 _buildDot(isActive: true),
+                _buildDot(isActive: false),
                 _buildDot(isActive: false),
                 _buildDot(isActive: false),
               ],
@@ -52,7 +52,7 @@ class MyPage3 extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const MyPage4()),
+                      MaterialPageRoute(builder: (context) => const MyPage3()),
                     );
                   },
                   style: ElevatedButton.styleFrom(

@@ -167,27 +167,49 @@ flutter build apk --split-per-abi
 
 ```
 lib/
-├── main.dart                 # Entry point
-├── app/
-│   ├── routes/              # App routing
-│   └── themes/              # App themes
-├── models/                   # Data models
-│   ├── user.dart
-│   └── category.dart
+├── main.dart               # Entry point
+├──  firebase_option.dart      
 ├── screens/                  # UI Screens
-│   ├── splash/
-│   ├── auth/
-│   │   ├── login_screen.dart
-│   │   └── register_screen.dart
-│   ├── home/
-│   ├── profile/
-│   └── settings/
-├── widgets/                  # Reusable widgets
-├── services/                 # Business logic
+│      ├── login.dart
+│      ├── register.dart
+│      ├── camera_page.dart
+│      ├── explor.dart
+│      ├── home_page.dart
+│      ├── following_page.dart
+│      ├── info_page.dart
+│      ├── splash_screen.dart
+│      ├── splash_screen1.dart
+│      ├── splash_screen2.dart
+│      ├── splash_screen3.dart
+│      ├── splash_screen4.dart
+│      ├── splash_screen5.dart
+│      ├── profile_page.dart
+│      ├── terms_conditions_page.dart
+│      ├── privacy_policy_page.dart
+│      └── member_card.dart
+├── widgats/                            # Reusable widgets
+│   └── custom_buttom_nav.dart          # agar button tinggal di panggil, 
+│                                         bottomNavigationBar: const CustomButtomNav(currentIndex: 
+│                                          index) di setiap page yg ingin di gunakan
+├── services/                           # Business logic
 │   ├── auth_service.dart
-│   ├── database_service.dart
+│   ├── notification_service.dart
 │   └── notification_service.dart
-└── utils/                    # Utilities & helpers
+├── template/                           # UI template untuk membuat beberapa frame untuk foto
+│    ├── photoboothpage.dart
+│    ├── photoboothpage2.dart
+│    └── template_vintage.dart  
+│
+├── detail/                             # UI untuk detail postingan profile dan setting profil dan 
+│     │                                    user following list
+│     ├── postingan.dart
+│     ├── ProfilDetail.dart
+│     └── user_list_page.dart  
+└── member/                             # UI yg berbeda-beda untuk detail profile developer
+    ├── profil_ayesha.dart
+    ├── profil_arifin.dart
+    ├── profil_ilham.dart
+    └── profil_rozak.dart                  
 ```
 
 ## Authentication Flow

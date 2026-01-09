@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:project_kelompok/screen/home_page.dart';
-import 'package:project_kelompok/screen/page1.dart';
+import 'package:project_kelompok/screen/splash_screen1.dart';
 import 'package:project_kelompok/screen/register.dart';
 import 'package:project_kelompok/screen/splash_screen.dart';
 
