@@ -254,6 +254,38 @@ class ArifinProfilPage extends StatelessWidget {
 
                         _buildSectionTitle("Personal Info"),
                         const SizedBox(height: 15),
+
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.05),
+                                blurRadius: 15,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              _buildModernRow(Icons.person_outline_rounded, "Nama Lengkap", data['nama_lengkap']),
+                              const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 10),
+                                child: Divider(height: 1),
+                              ),
+                              _buildModernRow(Icons.badge_outlined, "NIM", data['nim']),
+                              const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 10),
+                                child: Divider(height: 1),
+                              ),
+                              _buildModernRow(Icons.class_outlined, "Kelas", data['kelas']),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 25),
+
                       ],
                     ),
                   ),
