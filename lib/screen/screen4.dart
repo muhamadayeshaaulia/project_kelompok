@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:project_kelompok/screen/splash_screen.dart';
 
-class MyPage4 extends StatefulWidget {
-  const MyPage4({super.key});
+class MyPage5 extends StatefulWidget {
+  const MyPage5({super.key});
 
   @override
-  State<MyPage4> createState() => _MyPage4State();
+  State<MyPage5> createState() => _MyPage5State();
 }
 
-class _MyPage4State extends State<MyPage4> {
+class _MyPage5State extends State<MyPage5> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +22,7 @@ class _MyPage4State extends State<MyPage4> {
               height: 200,
               width: double.infinity,
               child: Lottie.asset(
-                'assets/animations/SocialMedia.json',
+                'assets/animations/DigitalCamera.json',
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
                   return const Icon(Icons.share, size: 100, color: Colors.blue);
@@ -33,7 +33,7 @@ class _MyPage4State extends State<MyPage4> {
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
-                'Bagikan Keseruanmu \n Upload langsung ke Media Sosial dan biarkan dunia melihat senyum terbaikmu',
+                'Ayo Ambil MomenMu \n Hari Mu adalah Kebahagianmu',
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
@@ -44,8 +44,8 @@ class _MyPage4State extends State<MyPage4> {
               children: [
                 _buildDot(isActive: false),
                 _buildDot(isActive: false),
-                _buildDot(isActive: true),
                 _buildDot(isActive: false),
+                _buildDot(isActive: true),
               ],
             ),
             const SizedBox(height: 20),
@@ -60,7 +60,7 @@ class _MyPage4State extends State<MyPage4> {
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            const MySplashScreen(nextRoute: '/screen4'),
+                            const MySplashScreen(nextRoute: '/page1'),
                       ),
                       (Route<dynamic> route) => false,
                     );

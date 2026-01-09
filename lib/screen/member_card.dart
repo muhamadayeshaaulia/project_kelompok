@@ -4,6 +4,7 @@ import 'package:project_kelompok/member/profil_ayesha.dart';
 import 'package:project_kelompok/member/profil_ilham.dart';
 import 'package:project_kelompok/screen/home_page.dart';
 import 'package:project_kelompok/member/profil_rozak.dart';
+import 'package:project_kelompok/member/profil_arifin.dart';
 
 class MemberCardPage extends StatelessWidget {
   const MemberCardPage({super.key});
@@ -118,14 +119,41 @@ class MemberCardPage extends StatelessWidget {
                 },
               ),
 
-              const SizedBox(height: 15),
-              _buildMemberCard(
-                context: context,
-                nama: "Muhammad Arifin",
-                nim: "NIM: 1123150053",
-                role: "Backend Developer",
-                warna: Colors.orange.shade200,
+              StreamBuilder<DocumentSnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(ilhamDocId)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  String nama = "Muhammad Arifin"; 
+                  String nim = "1123150053";
+                  String role = "Backend Developer";
+
+                  if (snapshot.hasData && snapshot.data!.exists) {
+                    var data = snapshot.data!.data() as Map<String, dynamic>;
+                    nama = data['nama'] ?? nama;
+                    nim = data['nim'] ?? nim;
+                    role = data['role'] ?? role;
+                  }
+
+                  return _buildMemberCard(
+                    context: context,
+                    nama: nama,
+                    nim: "NIM: $nim",
+                    role: role,
+                    warna: Colors.green.shade200,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ArifinProfilPage(),
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
+
             ],
           ),
         ),
