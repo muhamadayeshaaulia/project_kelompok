@@ -203,4 +203,18 @@ class arifinProfilPage extends StatelessWidget {
                           "Kelas",
                           data['kelas'],
                         ),
+                        const SizedBox(height: 30),
+                        const Text(
+                          "Contact",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+                        _buildInfoRow(
+                          Icons.email_outlined,
+                          "Email",
+                          data['email'],
+                        ),
                   
