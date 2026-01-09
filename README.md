@@ -93,8 +93,8 @@ Pastikan Anda sudah menginstall:
 
 1. Clone repository
 ```bash
-git clone https://github.com/yourusername/notes-app.git
-cd notes-app
+git clone https://github.com/muhamadayeshaaulia/project_kelompok.git
+cd project_kelompok
 ```
 
 2. Install dependencies
@@ -108,8 +108,44 @@ flutter pub get
 # Place in android/app/
 cp path/to/google-services.json android/app/
 ```
+4. Setup Supabase
+```bash
+# Untuk membuat file .env
+# cp .env .env.example
+# isi dari .env 
+# 1. buka supabase
+# 2. masuk ke project mu/buat project baru
+# 3. setelah masuk dashboard cari menu project settings
+# 4. cari DATA API di situ cari URL untuk supabase mu
+# 5. buka API keys masih di dalam project settings
+# 6. setelah buka API keys cari menu Legacy anon, service_role API keys
+# 7. cari anon public key supabase mu dan salin tempelkan di .env
+SUPABASE_URL=LINK_SUPABASE_URL_KAMU
+SUPABASE_ANON_KEY=ISI_DENGAN_ANON_KEY_SUPABASE_DISINI
+cp .env .env.example
+```
 
-4. Run aplikasi
+5. Service Account
+```bash
+# Akun layanan Firebase Anda dapat digunakan untuk mengautentikasi beberapa fitur Firebase, seperti Database, Penyimpanan, dan Autentikasi, secara terprogram melalui SDK Admin terpadu
+# buka firebase
+# login/buat project
+# setelah masuk project dashboard cari icon gir dan klik project settings
+# setelah di project settings cari service account
+# scroll kebawah dan klik generate new private key
+# TODO: untuk menangani firebase cloud messaging
+# hasil download an di taro di assets/json
+
+cd project_kelompok
+mkdir -p assets/json
+
+// jangan lupa di pubspec.yaml
+// flutter:
+  assets:
+    - assets/json/
+```
+
+6. Run aplikasi
 ```bash
 flutter run
 ```
