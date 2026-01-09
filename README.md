@@ -217,7 +217,7 @@ lib/
 ```
 1. Splash Screen (Auto-login check)
    ↓
-2. Login Screen / Register Screen
+2. Login Screen / Register Screen / Login Auth Google
    ↓
 3. Home Screen (Dashboard)
    ↓
@@ -227,17 +227,87 @@ lib/
 ## 🗄️ Database Schema
 
 ### Notes Table
-```sql
-CREATE TABLE tableABC (
-  id TEXT PRIMARY KEY,
-  user_id TEXT NOT NULL,
-  title TEXT NOT NULL,
-  content TEXT,
-  category_id TEXT,
-  created_at INTEGER,
-  updated_at INTEGER,
-  is_synced INTEGER DEFAULT 0
-);
+```json
+{
+  {
+  "collection": "users",
+  "fields": {
+    "alamat": "string",
+    "email": "string",
+    "fcmToken": "string",
+    "jenis_kelamin": "string",
+    "kelas": "string",
+    "keterangan": "string",
+    "nama": "string",
+    "nama_lengkap": "string",
+    "nim": "string",
+    "no_hp": "string",
+    "photo_url": "string",
+    "role": "string",
+    "search_keywords": "array<string>",
+    "sosmed_link": "string",
+    "uid": "string"
+  },
+  "subcollections": {
+    "followers": {
+      "documentId": "uid_pengikut",
+      "fields": {
+        "uid": "string",
+        "timestamp": "timestamp (opsional)"
+      }
+    },
+    "following": {
+      "documentId": "uid_diikuti",
+      "fields": {
+        "uid": "string",
+        "timestamp": "timestamp (opsional)"
+      }
+    }
+  }
+},
+  "posts": {
+    "{post_id}": {
+      "uid": "string (owner uid)",
+      "nama": "string",
+      "post_image": "string (URL)",
+      "user_image": "string (URL)",
+      "template_type": "string",
+      "views": "number",
+      "timestamp": "Date",
+
+      "comments": {
+        "{comment_id}": {
+          "uid": "string",
+          "username": "string",
+          "user_image": "string",
+          "text": "string",
+          "timestamp": "Date"
+        }
+      },
+      "likes": {
+        "{uid}": true
+      }
+    }
+  }
+}
+
+```
+# structure firebase
+```
+users
+ └── {uid}
+      ├── (fields...)
+      └── followers (SUBCOLLECTION)
+      └── following (SUBCOLLECTION)
+
+posts
+ └── {postId}
+      ├── (fields...)
+      ├── comments (subcollection)
+      │     └── {commentId}
+      └── likes (subcollection)
+            └── {likeUid}
+
 ```
 
 
