@@ -73,16 +73,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> updateFCMToken() async {
     try {
-      // 1. Ambil token unik dari HP ini
       String? token = await FirebaseMessaging.instance.getToken();
       String? uid = FirebaseAuth.instance.currentUser?.uid;
 
       if (uid != null && token != null) {
-        // 2. Simpan atau Update ke koleksi users di dokumen milik user tersebut
-        await FirebaseFirestore.instance.collection('users').doc(uid).set(
-          {'fcmToken': token},
-          SetOptions(merge: true),
-        ); // Pakai merge: true agar data lain (nama/foto) tidak terhapus
+        await FirebaseFirestore.instance.collection('users').doc(uid).set({
+          'fcmToken': token,
+        }, SetOptions(merge: true));
 
         print("Token Berhasil Disimpan: $token");
       }

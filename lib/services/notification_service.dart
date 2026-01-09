@@ -23,7 +23,7 @@ class NotificationService {
   static const String _projectId = 'myfristproject-dd7da';
   static Future<String> getAccessToken() async {
     final serviceAccountJson = await rootBundle.loadString(
-      'assets/json/service-account.json',
+      'assets/json/service_account.json',
     );
     final accountCredentials = auth.ServiceAccountCredentials.fromJson(
       serviceAccountJson,

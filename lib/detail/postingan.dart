@@ -9,6 +9,7 @@ import 'package:project_kelompok/template/photoboothpage2.dart';
 import 'package:project_kelompok/template/template_vintage.dart';
 import 'package:project_kelompok/services/notification_service.dart';
 
+
 class PostDetailPage extends StatefulWidget {
   final String postId;
   final Map<String, dynamic> postData;
@@ -105,12 +106,13 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
         if (ownerDoc.exists) {
           String? targetToken = ownerDoc.data()?['fcmToken'];
+          String ownerName = ownerDoc.data()?['nama'] ?? "User";
 
           if (targetToken != null) {
             await NotificationService.sendPushNotification(
               targetToken: targetToken,
-              title: 'Seseorang menyukai karyamu! ❤️',
-              body: '$_myUserName baru saja menyukai postingan kamu.',
+              title: 'Halo $ownerName! 👋',
+              body: '$_myUserName baru saja menyukai postingan kamu ❤️',
               postId: widget.postId,
             );
           }
