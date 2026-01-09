@@ -9,6 +9,7 @@ import 'package:project_kelompok/template/photoboothpage2.dart';
 import 'package:project_kelompok/template/template_vintage.dart';
 import 'package:project_kelompok/services/notification_service.dart';
 
+
 class PostDetailPage extends StatefulWidget {
   final String postId;
   final Map<String, dynamic> postData;
