@@ -55,3 +55,6 @@ class arifinProfilPage extends StatelessWidget {
                 left: 0,
                 right: 0,
                 height: headerHeight,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
