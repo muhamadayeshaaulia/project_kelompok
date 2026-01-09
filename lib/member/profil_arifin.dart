@@ -222,4 +222,9 @@ class arifinProfilPage extends StatelessWidget {
                           "No HP",
                           data['no_hp'],
                         ),
+                        _buildInfoRow(
+                          Icons.location_on_outlined,
+                          "Alamat",
+                          data['alamat'],
+                        ),
                   
