@@ -57,7 +57,10 @@ Booth-Art adalah aplikasi mobile modern yang dikembangkan menggunakan Flutter un
   <img src="assets/screenshots/profile_detail.jpeg" alt="Profile_detail" width="200"/>
   <img src="assets/screenshots/info.jpeg" alt="Info" width="200"/>
   <img src="assets/screenshots/info_dev.jpeg" alt="Info_Dev" width="200"/>
-<img src="assets/screenshots/profile_page.jpeg" alt="Profile" width="200"/>
+  <img src="assets/screenshots/profile_page.jpeg" alt="Profile" width="200"/>
+  <img src="assets/screenshots/settings_profile.jpeg" alt="Profile_settings" width="200"/>
+  <img src="assets/screenshots/list_mengikuti.jpeg" alt="following" width="200"/>
+  <img src="assets/screenshots/list_pengikut.jpeg" alt="followers" width="200"/>
 </div>
 
 ## Demo Video
