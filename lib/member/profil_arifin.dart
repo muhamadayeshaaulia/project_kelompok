@@ -63,3 +63,8 @@ class arifinProfilPage extends StatelessWidget {
                       end: Alignment.bottomRight,
                     ),
                   ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 30),
+                      Container(
