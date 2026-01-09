@@ -36,10 +36,14 @@ class ArifinProfilPage extends StatelessWidget {
             .doc(arifinDocId)
             .get(),
         builder: (context, snapshot) {
+
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(color: Colors.amber),
             );
+          }
+          if (!snapshot.hasData || !snapshot.data!.exists) {
+            return const Center(child: Text("Data Arifin tidak ditemukan"));
           }
           return Container();
         },
