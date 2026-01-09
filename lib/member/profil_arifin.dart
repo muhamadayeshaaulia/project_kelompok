@@ -11,3 +11,6 @@ class arifinProfilPage extends StatelessWidget {
      final double contentStartPos = 360.0;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
