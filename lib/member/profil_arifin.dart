@@ -263,4 +263,19 @@ class ArifinProfilPage extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 5),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontWeight: FontWeight.w800,
+          fontSize: 18,
+          color: Colors.black87,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
 }
