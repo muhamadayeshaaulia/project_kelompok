@@ -388,6 +388,13 @@ Terima kasih kepada komunitas dan layanan berikut yang membantu dalam pengembang
 - Path Provider — akses direktori
 - Path — utilitas path
 
+### 🌐 Networking & Utils
+- HTTP — jaringan REST API
+- Intl — formatting tanggal & angka
+- URL Launcher — buka link eksternal
+- Permission Handler — izin aplikasi
+- Flutter Dotenv — dukungan file `.env`
+
 
 
 
