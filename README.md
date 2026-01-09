@@ -99,7 +99,7 @@ Download versi terbaru aplikasi Notes App:
 - **[Flutter](https://flutter.dev/)** - UI Framework
 - **[Dart](https://dart.dev/)** - Programming Language
 - **[Firebase](https://firebase.google.com/)** - Backend & Authentication
-- **[SQLite](https://www.sqlite.org/)** - Local Database
+- **[Supabase](https://supabase.com/)** - Storage Database
 - **[Provider](https://pub.dev/packages/provider)** - State Management
 
 
