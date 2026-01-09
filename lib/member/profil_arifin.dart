@@ -11,6 +11,10 @@ class ArifinProfilPage extends StatelessWidget {
     final double headerHeight = 380.0;
     final double contentStartPos = 340.0;
 
-    return Container(); 
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FA),
+      extendBodyBehindAppBar: true,
+      body: Container(),
+    );
   }
 }
