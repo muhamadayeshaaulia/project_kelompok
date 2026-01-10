@@ -328,7 +328,6 @@ class ArifinProfilPage extends StatelessWidget {
               ),
             ],
           );
-          return Container();
         },
       ),
     );
