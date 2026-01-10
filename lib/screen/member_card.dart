@@ -10,6 +10,7 @@ class MemberCardPage extends StatelessWidget {
   const MemberCardPage({super.key});
   final String ayeshaDocId = "6JozUEKn8fMzDjoq4ZyHtwqm8IP2";
   final String ilhamDocId = "VAGSZaUD4TU5bV4zNXMENBKU2Tg1";
+  final String arifinDocId = "lpFLoTHeFTPRtfoESKnFoGzO3a42";
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +91,7 @@ class MemberCardPage extends StatelessWidget {
                     .doc(ilhamDocId)
                     .snapshots(),
                 builder: (context, snapshot) {
-                  String nama = "Muhammad Ilham Maulana"; 
+                  String nama = "Muhammad Ilham Maulana";
                   String nim = "1123150141";
                   String role = "UI/UX Designer";
 
@@ -119,13 +120,15 @@ class MemberCardPage extends StatelessWidget {
                 },
               ),
 
+              const SizedBox(height: 15),
+
               StreamBuilder<DocumentSnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('users')
-                    .doc(ilhamDocId)
+                    .doc(arifinDocId)
                     .snapshots(),
                 builder: (context, snapshot) {
-                  String nama = "Muhammad Arifin"; 
+                  String nama = "Muhammad Arifin";
                   String nim = "1123150053";
                   String role = "Backend Developer";
 
@@ -141,7 +144,7 @@ class MemberCardPage extends StatelessWidget {
                     nama: nama,
                     nim: "NIM: $nim",
                     role: role,
-                    warna: Colors.green.shade200,
+                    warna: Colors.yellow.shade200,
                     onTap: () {
                       Navigator.push(
                         context,
@@ -153,7 +156,6 @@ class MemberCardPage extends StatelessWidget {
                   );
                 },
               ),
-
             ],
           ),
         ),
