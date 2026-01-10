@@ -425,6 +425,16 @@ Terima kasih kepada komunitas dan layanan berikut yang membantu dalam pengembang
 - Unsplash — placeholder images
 
 
+## 🌐Social Media Muhamad Ayesha Aulia 
+
+- **[TIKTOK](https://www.tiktok.com/@programmer_amatir?_r=1&_t=ZS-92x9Bp5KtF3)**
+- **[YOUTUBE](https://youtube.com/@shaxyyy__03.?si=cvB63ycl32AK9wy0)**
+- **[INSTAGRAM](https://www.instagram.com/yesha_716?igsh=MW91bzhnemZza2lyNw==)**
+- **[LINKEDIN](https://www.linkedin.com/in/muhamad-ayesha-aulia-yesha-549623349?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app)**
+- **[WEBSITE-PORTOFOLIO](https://muhamadayeshaaulia.github.io/portfolio-v3/)**
+
+
+
 <div align="center">
   <p>Made with by 716 Production Team</p>
   <p>© 2026 Booth-Art. All rights reserved.</p>
