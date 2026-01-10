@@ -78,9 +78,9 @@ Booth-Art adalah aplikasi mobile modern yang dikembangkan menggunakan Flutter un
 
 Lihat video demo aplikasi kami untuk melihat semua fitur dalam aksi!
 
-**[Watch Full Demo on YouTube](https://youtube.com/watch?v=dQw4w9WgXcQ)**
+**[Watch Full Demo on YouTube Ayesha](https://youtu.be/mpIaYW_h9yI?feature=shared)**
 
-Alternative link: **[Google Drive Demo](https://drive.google.com/file/d/1234567890/view)**
+Alternative link kelompok presentasi: **[Google Drive Demo](https://drive.google.com/drive/folders/14dHVXtEQk6ZtqCF634N8hQdV_UXXKafp)**
 
 ## Download APK
 
