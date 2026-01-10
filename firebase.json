@@ -1,0 +1,36 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "myfristproject-dd7da",
+          "appId": "1:1043234910102:android:e1751651e447945648f7b7",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "myfristproject-dd7da",
+          "configurations": {
+            "android": "1:1043234910102:android:e1751651e447945648f7b7",
+            "web": "1:1043234910102:web:8bce53cba2080fe048f7b7"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
